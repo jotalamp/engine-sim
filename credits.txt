@@ -1,1 +1,20 @@
+
+
+Original 3D models:
+
+Engine 3D Model:
+https://sketchfab.com/3d-models/2jz-ge-engine-0289ac9eb3fb4e7eba1535fba6043024 by rpautomotive is licensed under CC Attribution-NonCommercial-ShareAlike https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Tracks:
+https://sketchfab.com/3d-models/race-trackkarting-track-based-on-south-garda-32c21042ba144ce9bd2822a88d5b54ec by Mauro3D is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+https://sketchfab.com/3d-models/modular-kit-city-development-711bedfcfaf945afb7138da65ad0d6df by Pieter Ferreira is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+
+Cars:
 "Datsun 510 Bluebird wagon - Low poly model" (https://skfb.ly/6Vw9o) by Daniel Zhabotinsky is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+"Toyota AE86 Trueno - Initial D spec" https://sketchfab.com/3d-models/toyota-ae86-trueno-initial-d-spec-59a0eaaa2af144b2956957e7032d0221 by Daniel Zhabotinsky is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+"1996 Toyota MR2 W20" https://sketchfab.com/3d-models/1996-toyota-mr2-w20-f66020ee62d741ebb0adc1ba351300db by _Sheep19 is licensed under Creative Commons Attribution https://creativecommons.org/licenses/by/4.0/
+
+
+I have edited 3d models to get them working in Engine Simulator, joining, splitting by material, moving origin etc
+
+-jotalamp
