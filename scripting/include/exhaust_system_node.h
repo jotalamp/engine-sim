@@ -21,7 +21,7 @@ namespace es_script {
         ExhaustSystem *generate(EngineContext *context) {
             ExhaustSystem *exhaust = context->getExhaust(this);
             ExhaustSystem::Parameters parameters = m_parameters;
-            parameters.ImpulseResponse = m_impulseResponse->generate(context);
+            parameters.impulseResponse = m_impulseResponse->generate(context);
 
             exhaust->initialize(parameters);
 

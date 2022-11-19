@@ -1,0 +1,3 @@
+# Hashes of file build rules.
+7049f20555bfe627bed02375d8fa01fa dependencies/submodules/piranha/parser.auto.cpp
+39d6ce7a7907e0ecf56cf68693635cc2 dependencies/submodules/piranha/scanner.auto.cpp

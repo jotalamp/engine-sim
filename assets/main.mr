@@ -1,6 +1,20 @@
 import "engine_sim.mr"
-import "engines/kohler/kohler_ch750.mr"
+import "themes/default.mr"
+import "engines/gearheadlydia/Toyota_3SGE.mr"
+//import "engines/joanne_chiong/Datsun_100A.mr"
+import "engines/maximumqc/4A-GEU.mr"
+
+use_default_theme()
 
 set_engine(
-    engine: kohler_ch750()
+    t4age()
 )
+
+set_vehicle(toyota_altezza_sxe10_vehicle())
+set_transmission(toyota_j160_transmission())
+
+/*
+set_engine(
+    Datsun_100A()
+)*/
+

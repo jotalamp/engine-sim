@@ -2,16 +2,20 @@
 #define ATG_ENGINE_SIM_VEHICLE_H
 
 #include "scs.h"
+#include "part.h"
 
-class Vehicle {
+#include "simulation_object.h"
+#include "../include/utilities.h"
+
+class Vehicle : public Part {
     public:
         struct Parameters {
-            double Mass;
-            double DragCoefficient;
-            double CrossSectionArea;
-            double DiffRatio;
-            double TireRadius;
-            double RollingResistance;
+            double mass;
+            double dragCoefficient;
+            double crossSectionArea;
+            double diffRatio;
+            double tireRadius;
+            double rollingResistance;
         };
 
     public:
@@ -31,10 +35,11 @@ class Vehicle {
         inline double getTravelledDistance() const { return m_travelledDistance; }
         inline void resetTravelledDistance() { m_travelledDistance = 0; }
         double linearForceToVirtualTorque(double force) const;
+        float mapToRange(float input, float inputStart, float inputEnd, float outputStart, float outputEnd);
+        float steeringAngle;
+        
 
     protected:
-        atg_scs::RigidBody *m_rotatingMass;
-
         double m_mass;
         double m_dragCoefficient;
         double m_crossSectionArea;
@@ -42,6 +47,19 @@ class Vehicle {
         double m_tireRadius;
         double m_travelledDistance;
         double m_rollingResistance;
+        
+
+    public:
+        atg_scs::RigidBody *m_rotatingMass;
+        //double m_position_x;
+        //double m_position_y;
+        //ysVector m_translation;
+        ysTransform *m_transform;
+        ysTransform *m_transform2;
+        ysTransform *m_transform_engine;
+        ysTransform *m_transform_camera;
+        double m_rotation;
+        float m_brakes;
 };
 
 #endif /* ATG_ENGINE_SIM_VEHICLE_H */

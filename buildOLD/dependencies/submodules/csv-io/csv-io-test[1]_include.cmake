@@ -1,0 +1,5 @@
+if(EXISTS "/home/lampinen/Ohjelmointi/Cpp/EngineSimulator/engine-sim/build/dependencies/submodules/csv-io/csv-io-test[1]_tests.cmake")
+  include("/home/lampinen/Ohjelmointi/Cpp/EngineSimulator/engine-sim/build/dependencies/submodules/csv-io/csv-io-test[1]_tests.cmake")
+else()
+  add_test(csv-io-test_NOT_BUILT csv-io-test_NOT_BUILT)
+endif()

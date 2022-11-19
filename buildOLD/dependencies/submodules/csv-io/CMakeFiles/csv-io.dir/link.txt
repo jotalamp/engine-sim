@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcsv-io.a CMakeFiles/csv-io.dir/src/information.cpp.o CMakeFiles/csv-io.dir/src/csv_data.cpp.o
+/usr/bin/ranlib libcsv-io.a

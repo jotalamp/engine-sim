@@ -1,0 +1,1 @@
+/usr/bin/clang++ -O3 -DNDEBUG CMakeFiles/piranha_reference_compiler.dir/demos/main.cpp.o CMakeFiles/piranha_reference_compiler.dir/demos/reference_language_rules.cpp.o CMakeFiles/piranha_reference_compiler.dir/demos/utilities.cpp.o -o piranha_reference_compiler  libpiranha.a 

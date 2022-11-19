@@ -1,0 +1,5 @@
+if(EXISTS "/home/lampinen/Ohjelmointi/Cpp/EngineSimulator/engine-sim/build/dependencies/submodules/piranha/piranha_test[1]_tests.cmake")
+  include("/home/lampinen/Ohjelmointi/Cpp/EngineSimulator/engine-sim/build/dependencies/submodules/piranha/piranha_test[1]_tests.cmake")
+else()
+  add_test(piranha_test_NOT_BUILT piranha_test_NOT_BUILT)
+endif()

@@ -1,0 +1,373 @@
+import "engine_sim.mr"
+
+units units()
+constants constants()
+impulse_response_library ir_lib()
+
+label cycle(2 * 360 * units.deg)
+label cycle180(180 * units.deg)
+
+private node wires {
+    output wire1: ignition_wire();
+    output wire2: ignition_wire();
+    output wire3: ignition_wire();
+    output wire4: ignition_wire();
+}
+
+private node zetec_e_head {
+    input intake_camshaft;
+    input exhaust_camshaft;
+    input chamber_volume: 47.7 * units.cc; //Don't change the chamber volume. This was a real life value.
+    input intake_runner_volume: 0.4 * units.L; //This was at 0.4 L.
+    input intake_runner_cross_section_area: 2.89 * units.cm2; //It was at 2.89 before you changed anything.
+    input exhaust_runner_volume: 1.4 * units.L;
+    input exhaust_runner_cross_section_area: 5 * units.cm2;
+    input flip_display: true;
+
+    input flow_attenuation: 1;
+    input lift_scale: 1;
+    alias output __out: head;
+
+    function intake_flow(47.7 * units.mm)
+    intake_flow
+        .add_flow_sample(0 * lift_scale, 0 * flow_attenuation)
+        .add_flow_sample(1 * lift_scale, 81 * flow_attenuation)
+        .add_flow_sample(2 * lift_scale, 119 * flow_attenuation)
+        .add_flow_sample(3 * lift_scale, 154 * flow_attenuation)
+        .add_flow_sample(4 * lift_scale, 181 * flow_attenuation)
+        .add_flow_sample(5 * lift_scale, 193 * flow_attenuation)
+        .add_flow_sample(6 * lift_scale, 205 * flow_attenuation)
+        .add_flow_sample(7 * lift_scale, 214 * flow_attenuation)
+        .add_flow_sample(8 * lift_scale, 220 * flow_attenuation)
+        .add_flow_sample(9 * lift_scale, 220 * flow_attenuation)
+        .add_flow_sample(10 * lift_scale, 220 * flow_attenuation)
+        .add_flow_sample(11 * lift_scale, 220 * flow_attenuation)
+        .add_flow_sample(12 * lift_scale, 220 * flow_attenuation)
+
+    function exhaust_flow(47.7 * units.mm)
+    exhaust_flow
+        .add_flow_sample(0 * lift_scale, 0 * flow_attenuation)
+        .add_flow_sample(1 * lift_scale, 75 * flow_attenuation)
+        .add_flow_sample(2 * lift_scale, 109 * flow_attenuation)
+        .add_flow_sample(3 * lift_scale, 145 * flow_attenuation)
+        .add_flow_sample(4 * lift_scale, 168 * flow_attenuation)
+        .add_flow_sample(5 * lift_scale, 186 * flow_attenuation)
+        .add_flow_sample(6 * lift_scale, 195 * flow_attenuation)
+        .add_flow_sample(7 * lift_scale, 204 * flow_attenuation)
+        .add_flow_sample(8 * lift_scale, 209 * flow_attenuation)
+        .add_flow_sample(9 * lift_scale, 214 * flow_attenuation)
+        .add_flow_sample(10 * lift_scale, 216  * flow_attenuation)
+        .add_flow_sample(11 * lift_scale, 216 * flow_attenuation)
+        .add_flow_sample(12 * lift_scale, 216 * flow_attenuation)
+
+    cylinder_head head(
+        chamber_volume: chamber_volume,
+        intake_runner_volume: intake_runner_volume,
+		intake_runner_cross_section_area: intake_runner_cross_section_area,
+
+        intake_port_flow: intake_flow,
+        exhaust_port_flow: exhaust_flow,
+        intake_camshaft: intake_camshaft,
+        exhaust_camshaft: exhaust_camshaft
+    )
+}
+
+private node zetec_e_camshaft_builder {
+    input lobe_profile: zetec_e_lobe_profile_int();
+    input ex_lobe_profile: zetec_e_lobe_profile_exh();
+    input intake_lobe_profile: lobe_profile;
+    input exhaust_lobe_profile: ex_lobe_profile;
+    input lobe_separation: 110 * units.deg;
+    input intake_lobe_center: lobe_separation;
+    input exhaust_lobe_center: lobe_separation;
+    input advance: 0 * units.deg;
+    input base_radius: 0.75 * units.inch;
+
+    output intake_cam_0: _intake_cam_0;
+    output exhaust_cam_0: _exhaust_cam_0;
+
+    camshaft_parameters params(
+        advance: advance,
+        base_radius: base_radius
+    )
+
+    camshaft _intake_cam_0(params, lobe_profile: intake_lobe_profile)
+	camshaft _exhaust_cam_0(params, lobe_profile: intake_lobe_profile)
+
+    label rot180(180 * units.deg)
+    label rot360(360 * units.deg)
+
+	//Firing order
+	//1,3,4,2
+
+    _exhaust_cam_0 
+		.add_lobe(rot360 - exhaust_lobe_center)
+        .add_lobe(rot360 - exhaust_lobe_center + 3 * rot180)
+        .add_lobe(rot360 - exhaust_lobe_center + rot180)
+        .add_lobe(rot360 - exhaust_lobe_center + 2 * rot180)
+        
+    
+	_intake_cam_0
+		.add_lobe(rot360 + intake_lobe_center)
+        .add_lobe(rot360 + intake_lobe_center + 3 * rot180)
+        .add_lobe(rot360 + intake_lobe_center + rot180)
+        .add_lobe(rot360 + intake_lobe_center + 2 * rot180)
+        
+}
+
+private node zetec_e_distributor {
+    input wires;
+    input timing_curve;
+    input rev_limit: 7000 * units.rpm;
+    input limiter_duration: 0.1 * units.sec;
+    alias output __out:
+        ignition_module(timing_curve: timing_curve, rev_limit: rev_limit, limiter_duration: limiter_duration)
+            .connect_wire(wires.wire1, 0)
+            .connect_wire(wires.wire2, 3 * cycle180)
+			.connect_wire(wires.wire3, 1 * cycle180)
+			.connect_wire(wires.wire4, 2 * cycle180);
+		
+}
+
+private node add_sym_sample {
+    input angle;
+    input lift;
+    input this;
+    alias output __out: this;
+
+    this.add_sample(angle * units.deg, lift * units.thou)
+    this.add_sample(-angle * units.deg, lift * units.thou)
+}
+
+private node zetec_e_lobe_profile_int {
+    alias output __out:
+        harmonic_cam_lobe(
+            duration_at_50_thou: 160 * units.deg,
+            gamma: 1,
+            lift: 450 * units.thou,
+            steps: 100
+        );
+}
+
+private node zetec_e_lobe_profile_exh {
+    alias output __out:
+        harmonic_cam_lobe(
+            duration_at_50_thou: 160 * units.deg,
+            gamma: 1,
+            lift: 450 * units.thou,
+            steps: 100
+        );
+}
+
+private node add_flow_sample {
+    input lift;
+    input flow;
+    input this;
+    alias output __out: this;
+
+    this.add_sample(lift * units.mm, k_28inH2O(flow))
+}
+
+public node zetec_e {
+    alias output __out: engine;
+
+    engine engine(
+        name: "2.0 L Zetec-E",
+        starter_torque: 200 * units.lb_ft,
+        starter_speed: 250 * units.rpm,
+        redline: 7000 * units.rpm,
+        fuel: fuel(
+                    max_turbulence_effect: 0.5,
+            burning_efficiency_randomness: 0.25,
+            max_burning_efficiency: 1.25)
+    )
+
+    wires wires()
+
+    label stroke(88 * units.mm)
+    label rod_length(140.8 * units.mm)
+    label compression_height(28 * units.mm)
+    label bore(84.8 * units.mm)
+    label rod_mass(240 * units.g)
+    label crank_mass(13 * units.kg)
+    label flywheel_mass(9 * units.kg)
+    label flywheel_radius(216 * units.mm)
+
+label crank_moment(
+        disk_moment_of_inertia(mass: crank_mass, radius: stroke)
+    )
+    label flywheel_moment(
+        disk_moment_of_inertia(mass: flywheel_mass, radius: flywheel_radius)
+    )
+    label other_moment(
+        disk_moment_of_inertia(mass: 1 * units.kg, radius: 1.0 * units.cm)
+    )
+
+    crankshaft c0(
+        throw: stroke / 2,
+        flywheel_mass: flywheel_mass,
+        mass: crank_mass,
+        friction_torque: 20 * units.lb_ft,
+        moment_of_inertia:
+            crank_moment + flywheel_moment + other_moment,
+        position_x: 0,
+        position_y: 0,
+        tdc: constants.pi / 2
+    )
+
+	//Firing order
+	//1,3,4,2
+
+    rod_journal rj0(angle: 0)
+    rod_journal rj1(angle: 3 * cycle180)
+    rod_journal rj2(angle: 1 * cycle180)
+    rod_journal rj3(angle: 2 * cycle180)
+    c0
+        .add_rod_journal(rj0)
+        .add_rod_journal(rj1)
+        .add_rod_journal(rj2)
+        .add_rod_journal(rj3)
+
+    piston_parameters piston_params(
+        mass: 314 * units.g,
+        compression_height: compression_height,
+        wrist_pin_position: 0.0,
+        displacement: 0.0
+    )
+
+    connecting_rod_parameters cr_params(
+        mass: rod_mass,
+        moment_of_inertia: rod_moment_of_inertia(
+            mass: rod_mass,
+            length: rod_length
+        ),
+        center_of_mass: 0.0,
+        length: rod_length
+    )
+
+    //These parts below primarily change airflow of the intake and exhaust, changing engine performance in ways that
+    //I don't understand fully understand.
+
+    intake intake(
+        plenum_volume: 0.491612 * units.L, //Don't change this, it was calculated to be true to real life. (0.491612 litres)
+        plenum_cross_section_area: 4.0 * units.cm2, //This was at 4.0 cm2.
+        intake_flow_rate: k_carb(200.58), //This was at 200.58.
+        runner_flow_rate: k_carb(200.58), //This was at 200.58.
+		runner_length: 18 * units.inch, //This is a real life value, don't change it (18").
+        idle_throttle_plate_position: 0.9956,
+        throttle_gamma: 0.5
+    )
+
+    exhaust_system_parameters es_params(
+        outlet_flow_rate: k_carb(200), //This was at 200.
+        primary_tube_length: 1.75 * units.inch, //Don't change this, this value is true to real life (1.75").
+        primary_flow_rate: k_carb(300), //This was at 200.
+        velocity_decay: 1, //This was at 1.
+        volume: 7.4 * units.L //This was at 5.
+    )
+
+    exhaust_system exhaust(es_params, audio_volume: 0.7, impulse_response: ir_lib.default_0)
+
+    cylinder_bank b0(
+    bore: bore,
+    deck_height: stroke / 2 + rod_length + compression_height,
+    angle: 0 * units.deg
+    )
+    b0
+        .add_cylinder(
+            piston: piston(piston_params, blowby: k_28inH2O(0.1)),
+            connecting_rod: connecting_rod(cr_params),
+            rod_journal: rj0,
+            intake: intake,
+            exhaust_system: exhaust,
+            ignition_wire: wires.wire1
+        )
+        .add_cylinder(
+            piston: piston(piston_params, blowby: k_28inH2O(0.1)),
+            connecting_rod: connecting_rod(cr_params),
+            rod_journal: rj1,
+            intake: intake,
+            exhaust_system: exhaust,
+            ignition_wire: wires.wire2
+        )
+        .add_cylinder(
+            piston: piston(piston_params, blowby: k_28inH2O(0.1)),
+            connecting_rod: connecting_rod(cr_params),
+            rod_journal: rj2,
+            intake: intake,
+            exhaust_system: exhaust,
+            ignition_wire: wires.wire3
+        )
+        .add_cylinder(
+            piston: piston(piston_params, blowby: k_28inH2O(0.1)),
+            connecting_rod: connecting_rod(cr_params),
+            rod_journal: rj3,
+            intake: intake,
+            exhaust_system: exhaust,
+            ignition_wire: wires.wire4
+        )
+    engine.add_cylinder_bank(b0)
+
+    engine.add_crankshaft(c0)
+
+    zetec_e_camshaft_builder camshaft(
+        lobe_profile: zetec_e_lobe_profile_int(),
+	       ex_lobe_profile: zetec_e_lobe_profile_exh()
+    )
+
+    b0.set_cylinder_head (
+        zetec_e_head(
+            intake_camshaft: camshaft.intake_cam_0,
+            exhaust_camshaft: camshaft.exhaust_cam_0
+        )
+    )
+
+    function timing_curve(1000 * units.rpm)
+    timing_curve
+        .add_sample(0000 * units.rpm, 0 * units.deg)
+        .add_sample(1000 * units.rpm, 0 * units.deg)
+        .add_sample(2000 * units.rpm, 0 * units.deg)
+        .add_sample(3000 * units.rpm, 0 * units.deg)
+        .add_sample(4000 * units.rpm, 0 * units.deg)
+        .add_sample(5000 * units.rpm, 0 * units.deg)
+        .add_sample(6000 * units.rpm, 0 * units.deg)
+        .add_sample(7000 * units.rpm, 0 * units.deg)
+
+    engine.add_ignition_module(
+        zetec_e_distributor(
+            wires: wires,
+            timing_curve: timing_curve,
+            rev_limit: 7000 * units.rpm
+        )
+	)
+}
+
+private node zetec_e_vehicle {
+    alias output __out:
+        vehicle(
+            mass: 1219 * units.kg,
+            drag_coefficient: 0.32,
+            cross_sectional_area: (618 * units.cm2) * (618 * units.cm2),
+            diff_ratio: 3.73,
+            tire_radius: 4.6 * units.inch,
+            rolling_resistance: 200 * units.N
+        );
+}
+
+private node zetec_e_transmission {
+    alias output __out:
+        transmission(
+            max_clutch_torque: 500 * units.lb_ft
+        )
+        .add_gear(3.535)
+        .add_gear(1.242)
+        .add_gear(0.652)
+        .add_gear(0.450);
+
+}
+
+public node main {
+    set_engine(zetec_e())
+    set_vehicle(zetec_e_vehicle())
+    set_transmission(zetec_e_transmission())
+}

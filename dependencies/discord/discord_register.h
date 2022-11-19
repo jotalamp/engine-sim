@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #if defined(DISCORD_DYNAMIC_LIB)
 #  if defined(_WIN32)
