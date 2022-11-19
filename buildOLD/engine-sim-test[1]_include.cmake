@@ -1,5 +1,0 @@
-if(EXISTS "/home/lampinen/Ohjelmointi/Cpp/EngineSimulator/engine-sim/build/engine-sim-test[1]_tests.cmake")
-  include("/home/lampinen/Ohjelmointi/Cpp/EngineSimulator/engine-sim/build/engine-sim-test[1]_tests.cmake")
-else()
-  add_test(engine-sim-test_NOT_BUILT engine-sim-test_NOT_BUILT)
-endif()

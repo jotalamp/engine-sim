@@ -1,1 +1,0 @@
-/usr/bin/clang++ -O3 -DNDEBUG CMakeFiles/csv-io-test.dir/test/sanity_test.cpp.o CMakeFiles/csv-io-test.dir/test/csv_data_tests.cpp.o -o csv-io-test  ../../../lib/libgtest_main.a libcsv-io.a ../../../lib/libgtest.a 

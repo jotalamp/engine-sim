@@ -1,1 +1,0 @@
-/usr/bin/clang++ -O3 -DNDEBUG CMakeFiles/csv-io-main.dir/src/main.cpp.o -o csv-io-main  libcsv-io.a 
