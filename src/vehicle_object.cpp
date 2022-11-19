@@ -22,8 +22,6 @@ VehicleObject::VehicleObject(EngineSimApplication *app, b2World *world, Vehicle 
     m_mesh_names = m_app->getIniReader().GetVector<std::string>("Vehicle", "Meshes");
     m_material_names = m_app->getIniReader().GetVector<std::string>("Vehicle", "Materials");
 
-    
-
     for (std::vector<std::string>::size_type i = 0; i != m_mesh_names.size(); i++)
         printf("\n%s", m_mesh_names[i].c_str());
 
@@ -32,23 +30,15 @@ VehicleObject::VehicleObject(EngineSimApplication *app, b2World *world, Vehicle 
     vehicleModel.scale = 1.0f;
     vehicleModel.height = -0.48;
 
-    // vehicleModel.tireX = +0.65f;
-    // std::vector<float> tirePosition = m_app->getIniReader().GetVector<float>("Tire_" + EngineSimApplication::intToString(0), "Position");
     std::vector<float> tirePosition = m_app->getIniReader().GetVector<float>("Vehicle", "TirePositions");
     vehicleModel.tireX = tirePosition[1];
     vehicleModel.tireY = tirePosition[0];
     vehicleModel.tireFrontZ = tirePosition[2];
     vehicleModel.tireRearZ = tirePosition[3];
 
-    // vehicleModel.tireY = 0.2f;
-    // vehicleModel.tireFrontZ = +1.37f;
-    // vehicleModel.tireRearZ = -1.05f;
-
     vehicleModel.collisionBoxLength = 2.0f;
     vehicleModel.collisionBoxWidth = 0.7f;
 
-    // vehicleModel.transformEngine.SetOrientation(ysMath::Constants::QuatIdentity);
-    // vehicleModel.transformEngine.SetPosition(ysMath::LoadVector(-0.3f, 0.38f, 1.5f));
     vehicleModel.transformEngine.SetOrientation(ysMath::LoadQuaternion(0.5f * ysMath::Constants::PI, ysMath::Constants::XAxis));
     vehicleModel.transformEngine.SetPosition(ysMath::LoadVector(-1.5f, 0.3f, 0.38));
 
@@ -69,11 +59,8 @@ VehicleObject::VehicleObject(EngineSimApplication *app, b2World *world, Vehicle 
     m_transform_model.SetParent(&m_transform);
 
     m_transform.SetOrientation(ysMath::Constants::QuatIdentity);
-    //m_transform.SetOrientation(orientation);
-    m_transform.SetPosition(ysMath::LoadVector(0,1,0));
+    m_transform.SetPosition(ysMath::LoadVector(0, 1, 0));
     m_transform.SetParent(nullptr);
-
-    // m_transform_engine.SetPosition(ysMath::LoadVector(0.0f, -2+0*0.21f, 0*-1.0f));
 
     m_engineModelRotation = m_app->getIniReader().GetVector<float>("Vehicle", "EngineModelRotation");
     m_engineModelPosition = m_app->getIniReader().GetVector<float>("Vehicle", "EngineModelPosition");
@@ -82,7 +69,7 @@ VehicleObject::VehicleObject(EngineSimApplication *app, b2World *world, Vehicle 
     ysQuaternion eqy = ysMath::LoadQuaternion(m_engineModelRotation[1] * ysMath::Constants::PI, ysMath::Constants::YAxis);
     ysQuaternion eqz = ysMath::LoadQuaternion(m_engineModelRotation[2] * ysMath::Constants::PI, ysMath::Constants::ZAxis);
 
-    ysQuaternion engineOrientation = ysMath::QuatMultiply(ysMath::QuatMultiply(eqx, eqy),eqz);
+    ysQuaternion engineOrientation = ysMath::QuatMultiply(ysMath::QuatMultiply(eqx, eqy), eqz);
 
     m_transform_engine = m_vehicle_model.transformEngine;
     m_transform_engine.SetParent(&m_transform);
@@ -114,22 +101,12 @@ VehicleObject::VehicleObject(EngineSimApplication *app, b2World *world, Vehicle 
     m_body->CreateFixture(&fixtureDef);
 
     // Wheels
-    m_tireCount = 4; // m_app->getIniReader().Get<int>("Vehicle", "TireCount");
-    /*
-        for(int i=0;i<m_tireCount;i++) {
-            std::vector<float> v = m_app->getIniReader().GetVector<float>("Tire_" + EngineSimApplication::intToString(i), "Position");
+    m_tireCount = m_app->getIniReader().Get<int>("Vehicle", "TireCount");
 
-            b2Vec2 tirePosition = b2Vec2(
-                m_app->getIniReader().GetVector<float>("Tire_" + m_app::intToString(i), "TireCount"),
-            //m_tires[i] = new TireObject(app, world, m_vehicle, &m_transform, m_body, b2Vec2(-m_vehicle_model.tireX, m_vehicle_model.tireRearZ), true);
-        }
-    */
     m_tires[0] = new TireObject(app, world, m_vehicle, &m_transform, m_body, b2Vec2(+m_vehicle_model.tireX, m_vehicle_model.tireRearZ), vehicleModel.tireY, true);
     m_tires[1] = new TireObject(app, world, m_vehicle, &m_transform, m_body, b2Vec2(+m_vehicle_model.tireX, m_vehicle_model.tireFrontZ), vehicleModel.tireY, true);
     m_tires[2] = new TireObject(app, world, m_vehicle, &m_transform, m_body, b2Vec2(-m_vehicle_model.tireX, m_vehicle_model.tireRearZ), vehicleModel.tireY, true);
     m_tires[3] = new TireObject(app, world, m_vehicle, &m_transform, m_body, b2Vec2(-m_vehicle_model.tireX, m_vehicle_model.tireFrontZ), vehicleModel.tireY, true);
-
-    printf("\nMass: %f", m_body->GetMass());
 
     m_tires[0]->m_joint->SetLimits(0.0f, 0.0f);
     m_tires[2]->m_joint->SetLimits(0.0f, 0.0f);
@@ -170,15 +147,9 @@ void VehicleObject::render(const ViewParameters *view)
     for (int i = 0; i < 4; i++)
         m_tires[i]->render(view);
 
-    //rotation = (float)m_vehicle->m_rotation;
-
     m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Material_02"));
 
-    //float speedfactor = 0.1f * m_app->getSimulator()->getSimulationSpeed();
-
     ysVector position = m_transform.GetWorldPosition();
-
-    //position += m_vehicle_model.scale * speedfactor * velocity;
 
     position[1] = m_vehicle_model.height - 0.2f;
 
@@ -190,19 +161,14 @@ void VehicleObject::render(const ViewParameters *view)
     m_transform.SetPosition(position);
 
     // L = T * R * S
-    ysQuaternion qx = ysMath::LoadQuaternion((- 0.5f) * ysMath::Constants::PI, ysMath::Constants::XAxis);
-    ysQuaternion qz = ysMath::LoadQuaternion((+ 0.5f) * ysMath::Constants::PI + rotation, ysMath::Constants::ZAxis);
+    ysQuaternion qx = ysMath::LoadQuaternion((-0.5f) * ysMath::Constants::PI, ysMath::Constants::XAxis);
+    ysQuaternion qz = ysMath::LoadQuaternion((+0.5f) * ysMath::Constants::PI + rotation, ysMath::Constants::ZAxis);
 
     ysQuaternion orientation = ysMath::QuatMultiply(qx, qz);
 
     m_transform.SetOrientation(orientation);
 
     m_vehicle->m_transform = &m_transform;
-
-    // float scale2 = 5.0f * m_vehicle_model.scale;
-
-    //ysTransform modelTransform;
-    //modelTransform.SetParent(&m_transform);
 
     if (m_vehicle_model.id == Bluebird)
     {
@@ -212,105 +178,13 @@ void VehicleObject::render(const ViewParameters *view)
 
         for (std::vector<std::string>::size_type i = 0; i != m_mesh_names.size(); i++)
         {
-            //printf("\n%s", m_mesh_names[i].c_str());
-
             m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial(m_material_names[i].c_str()));
 
             if (!m_app->m_show_engine || m_mesh_names[i] != "hood")
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset(m_mesh_names[i].c_str()),
-                1);
-        }
-
-        /*
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("body.001"),
-            1);
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("body.002"),
-            1);
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialHeadlights"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("body.003"),
-            1);
-        */
-
-        if (false)
-        {
-            if (!m_app->m_show_engine)
-            {
                 m_app->getEngine()->DrawModel(
                     m_app->getShaders()->GetRegularFlags(),
-                    m_app->getAssetManager()->GetModelAsset("hood"),
+                    m_app->getAssetManager()->GetModelAsset(m_mesh_names[i].c_str()),
                     1);
-            }
-
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("body.004"),
-                1);
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("body.011"),
-                1);
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("body.013"),
-                1);
-
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialBottom"));
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("body.005"),
-                1);
-
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialCoil"));
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("body.006"),
-                1);
-
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialInterior"));
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("body.007"),
-                1);
-
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialGray"));
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("body.008"),
-                1);
-
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialBottom"));
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("engine"),
-                1);
-
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialGlass"));
-
-            // if(false)
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("body.012"),
-                1);
         }
     }
 
@@ -374,24 +248,14 @@ void VehicleObject::process(float dt)
 
     float targetSpeedFromTireRotationSpeed = m_wheel_rotation_speed * 2.0f * ysMath::Constants::PI * m_tire_radius / scale;
 
-    if (false)
+    for (int i = 0; i < 4; i++)
     {
-        if (m_app->getSimulator()->getTransmission()->getGear() == -2)
-            m_body->ApplyForceToCenter(0.5f * (-targetSpeedFromTireRotationSpeed - realSpeed) * currentForwardNormal, true);
-        else
-            m_body->ApplyForceToCenter(0.5f * (targetSpeedFromTireRotationSpeed - realSpeed) * currentForwardNormal, true);
-    }
-    if (true)
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            m_tires[i]->m_rotation = m_wheel_rotation;
+        m_tires[i]->m_rotation = m_wheel_rotation;
 
-            if (m_app->getSimulator()->getTransmission()->getGear() == -2)
-                m_tires[i]->process(dt, -targetSpeedFromTireRotationSpeed);
-            else
-                m_tires[i]->process(dt, +targetSpeedFromTireRotationSpeed);
-        }
+        if (m_app->getSimulator()->getTransmission()->getGear() == -2)
+            m_tires[i]->process(dt, -targetSpeedFromTireRotationSpeed);
+        else
+            m_tires[i]->process(dt, +targetSpeedFromTireRotationSpeed);
     }
 }
 

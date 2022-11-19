@@ -1419,16 +1419,10 @@ void EngineSimApplication::processEngineInput()
     m_iceEngine->setSpeedControl(m_speedSetting);
 
     if (m_engine.ProcessKeyDown(ysKey::Code::M))
-    {
         m_show_engine = !m_show_engine;
-        printf("\nShow engine: %i", m_show_engine);
-        // m_infoCluster->setLogMessage("Show engine: " + std::to_string(m_show_engine));
-        m_infoCluster->setLogMessage("Show engine: " + std::to_string(m_vehicle->m_brakes));
-    }
+
     if (m_engine.ProcessKeyDown(ysKey::Code::N))
-    {
         m_debug = !m_debug;
-    }
 
     if (m_engine.ProcessKeyDown(ysKey::Code::OEM_Comma))
     {
