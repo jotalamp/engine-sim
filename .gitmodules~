@@ -1,6 +1,3 @@
-[submodule "dependencies/submodules/delta-studio"]
-	path = dependencies/submodules/delta-studio
-	url = https://github.com/ange-yaghi/delta-studio
 [submodule "dependencies/submodules/simple-2d-constraint-solver"]
 	path = dependencies/submodules/simple-2d-constraint-solver
 	url = https://github.com/ange-yaghi/simple-2d-constraint-solver
@@ -16,3 +13,7 @@
 [submodule "dependencies/submodules/csv-io"]
 	path = dependencies/submodules/csv-io
 	url = https://github.com/ange-yaghi/csv-io
+[submodule "dependencies/submodules/delta-studio"]
+	path = dependencies/submodules/delta-studio
+	url = https://github.com/phire/delta-studio/
+	branch = clang_linux
