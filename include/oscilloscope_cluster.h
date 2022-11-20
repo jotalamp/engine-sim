@@ -34,7 +34,7 @@ class OscilloscopeCluster : public UiElement {
         Oscilloscope *getSparkAdvanceScope() const { return m_sparkAdvanceScope; }
         Oscilloscope *getCylinderMoleculesScope() const { return m_cylinderMoleculesScope; }
         Oscilloscope *getPvScope() const { return m_pvScope; }
-        void setDynoMaxRange(double redline) { m_torqueScope->m_xMax = redline + 500; m_powerScope->m_xMax = redline + 500; }
+        void setDynoMaxRange(double redline) { m_torqueScope->m_xMax = redline + 500; m_hpScope->m_xMax = redline + 500; }
 
     protected:
         void renderScope(
@@ -46,7 +46,7 @@ class OscilloscopeCluster : public UiElement {
         Simulator *m_simulator;
         Oscilloscope
             *m_torqueScope,
-            *m_powerScope,
+            *m_hpScope,
             *m_audioWaveformScope,
             *m_exhaustValveLiftScope,
             *m_intakeValveLiftScope,
@@ -62,11 +62,7 @@ class OscilloscopeCluster : public UiElement {
         float m_updateTimer;
 
         double m_torque;
-        double m_power;
-
-        std::string m_powerUnits;
-        std::string m_torqueUnits;
-
+        double m_hp;
 };
 
 #endif /* ATG_ENGINE_SIM_OSCILLOSCOPE_CLUSTER_H */

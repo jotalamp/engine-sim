@@ -45,9 +45,9 @@ CombustionChamber::~CombustionChamber() {
 }
 
 void CombustionChamber::initialize(const Parameters &params) {
-    m_piston = params.piston;
+    m_piston = params.Piston;
     m_head = params.Head;
-    m_fuel = params.fuel;
+    m_fuel = params.Fuel;
     m_crankcasePressure = params.CrankcasePressure;
     m_meanPistonSpeedToTurbulence = params.MeanPistonSpeedToTurbulence;
 
@@ -219,6 +219,10 @@ void CombustionChamber::ignite() {
             m_system.pressure(),
             calculateFiringPressure(),
             units::pressure(160, units::psi));
+
+        if (rand() % 32 == 0) {
+            //m_flameEvent.efficiency = maxBurningEfficiency;
+        }
     }
 }
 

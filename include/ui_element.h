@@ -93,9 +93,6 @@ class UiElement {
                 const ysVector &frameColor,
                 const ysVector &fillColor,
                 bool fill = true);
-        void drawBox(
-                const Bounds &bounds,
-                const ysVector &fillColor);
         void drawText(
                 const std::string &s,
                 const Bounds &bounds,

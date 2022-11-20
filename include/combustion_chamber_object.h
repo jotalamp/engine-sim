@@ -12,17 +12,14 @@ class CombustionChamberObject : public SimulationObject {
         virtual ~CombustionChamberObject();
 
         virtual void generateGeometry();
-        //virtual void render(const ViewParameters *view);
-        virtual void render();
+        virtual void render(const ViewParameters *view);
         virtual void process(float dt);
         virtual void destroy();
 
         CombustionChamber *m_chamber;
 
     protected:
-        GeometryGenerator::GeometryIndices 
-            m_combustionChamberBody,
-            m_indices;
+        GeometryGenerator::GeometryIndices m_indices;
 };
 
 #endif /* ATG_ENGINE_SIM_COMBUSTION_CHAMBER_OBJECT_H */

@@ -65,7 +65,7 @@ es_script::Compiler::Output es_script::Compiler::execute() {
         // Todo: Runtime error
     }
 
-    return *output();
+    return *s_output;
 }
 
 void es_script::Compiler::destroy() {

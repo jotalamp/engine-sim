@@ -1,2 +1,0 @@
-CC=clang CXX=clang++ cmake -DOpenGL_GL_PREFERENCE=GLVND -DCMAKE_BUILD_TYPE=Release  ../
-cmake --build . --target engine-sim-app -j

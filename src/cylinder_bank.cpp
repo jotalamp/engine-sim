@@ -9,7 +9,6 @@ CylinderBank::CylinderBank() {
     m_bore = 0.0;
     m_deckHeight = 0.0;
     m_cylinderCount = 0;
-    m_displayDepth = 0.4;
     m_index = -1;
 
     m_dx = m_dy = 0;
@@ -31,8 +30,6 @@ void CylinderBank::initialize(const Parameters &params) {
 
     m_x = params.PositionX;
     m_y = params.PositionY;
-
-    m_displayDepth = params.DisplayDepth;
 
     m_index = params.Index;
 }

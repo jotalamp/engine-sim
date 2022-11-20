@@ -10,37 +10,23 @@ Vehicle::Vehicle() {
     m_diffRatio = 0;
     m_tireRadius = 0;
     m_travelledDistance = 0;
-    m_rollingResistance = 0;
-    m_brakes = 0;
-    steeringAngle = 0;
 }
 
 Vehicle::~Vehicle() {
-    m_transform = nullptr;
-    m_transform2 = nullptr;
-    m_transform_engine = nullptr;
-    m_transform_camera = nullptr;
+    /* void */
 }
 
 void Vehicle::initialize(const Parameters &params) {
-    m_mass = params.mass;
-    m_dragCoefficient = params.dragCoefficient;
-    m_crossSectionArea = params.crossSectionArea;
-    m_diffRatio = params.diffRatio;
-    m_tireRadius = params.tireRadius;
-    m_rollingResistance = params.rollingResistance;
+    m_mass = params.Mass;
+    m_dragCoefficient = params.DragCoefficient;
+    m_crossSectionArea = params.CrossSectionArea;
+    m_diffRatio = params.DiffRatio;
+    m_tireRadius = params.TireRadius;
+    m_rollingResistance = params.RollingResistance;
 }
 
 void Vehicle::update(double dt) {
     m_travelledDistance += getSpeed() * dt;
-
-    //if(getSpeed() > 0.01f) 
-    float f = clamp(1.0f - 4.0f * getSpeed(), 0.0001f, 1.0f);
-
-
-    //m_rotation = clamp((float)(0.00007f * steeringAngle * getSpeed()), -0.0002f, 0.0002f);
-    //m_rotation = -steeringAngle * getSpeed();
-    //clamp((float)(0.00007f * steeringAngle * getSpeed()), -0.0002f, 0.0002f);
 }
 
 void Vehicle::addToSystem(atg_scs::RigidBodySystem *system, atg_scs::RigidBody *rotatingMass) {
@@ -61,8 +47,4 @@ double Vehicle::linearForceToVirtualTorque(double force) const {
     const double rotationToKineticRatio =
         std::sqrt(m_rotatingMass->I / m_mass);
     return rotationToKineticRatio * force;
-}
-
-float Vehicle::mapToRange(float input, float inputStart, float inputEnd, float outputStart, float outputEnd) {
-    return outputStart + ((outputEnd - outputStart) / (inputEnd - inputStart)) * (input - inputStart);
 }

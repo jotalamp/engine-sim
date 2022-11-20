@@ -17,7 +17,6 @@ namespace es_script {
             Vehicle *vehicle = nullptr;
             Transmission *transmission = nullptr;
             Simulator::Parameters simulatorParameters;
-            ApplicationSettings applicationSettings;
 
             std::vector<Function *> functions;
         };

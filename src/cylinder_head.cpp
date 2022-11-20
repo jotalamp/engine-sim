@@ -1,19 +1,18 @@
 #include "../include/cylinder_head.h"
 
 #include "../include/cylinder_bank.h"
-#include "../include/valvetrain.h"
 
 #include <assert.h>
 
 CylinderHead::CylinderHead() {
     m_exhaustSystems = nullptr;
     m_intakes = nullptr;
-    m_soundAttenuation = nullptr;
 
     m_flipDisplay = false;
 
     m_bank = nullptr;
-    m_valvetrain = nullptr;
+    m_exhaustCamshaft = nullptr;
+    m_intakeCamshaft = nullptr;
 
     m_exhaustPortFlow = nullptr;
     m_intakePortFlow = nullptr;
@@ -23,8 +22,6 @@ CylinderHead::CylinderHead() {
     m_exhaustRunnerVolume = 0.0;
     m_exhaustRunnerCrossSectionArea = 0.0;
     m_combustionChamberVolume = 0.0;
-
-    m_cylinderIndex = -1;
 }
 
 CylinderHead::~CylinderHead() {
@@ -34,10 +31,10 @@ CylinderHead::~CylinderHead() {
 void CylinderHead::initialize(const Parameters &params) {
     m_exhaustSystems = new ExhaustSystem *[params.Bank->getCylinderCount()];
     m_intakes = new Intake *[params.Bank->getCylinderCount()];
-    m_soundAttenuation = new double[params.Bank->getCylinderCount()];
 
     m_bank = params.Bank;
-    m_valvetrain = params.valvetrain;
+    m_exhaustCamshaft = params.ExhaustCam;
+    m_intakeCamshaft = params.IntakeCam;
     m_exhaustPortFlow = params.ExhaustPortFlow;
     m_intakePortFlow = params.IntakePortFlow;
     m_combustionChamberVolume = params.CombustionChamberVolume;
@@ -50,20 +47,14 @@ void CylinderHead::initialize(const Parameters &params) {
 
     memset(m_exhaustSystems, 0, sizeof(ExhaustSystem *) * params.Bank->getCylinderCount());
     memset(m_intakes, 0, sizeof(Intake *) * params.Bank->getCylinderCount());
-
-    for (int i = 0; i < params.Bank->getCylinderCount(); ++i) {
-        m_soundAttenuation[i] = 1.0;
-    }
 }
 
 void CylinderHead::destroy() {
     if (m_exhaustSystems != nullptr) delete[] m_exhaustSystems;
     if (m_intakes != nullptr) delete[] m_intakes;
-    if (m_soundAttenuation != nullptr) delete[] m_soundAttenuation;
 
     m_exhaustSystems = nullptr;
     m_intakes = nullptr;
-    m_soundAttenuation = nullptr;
 }
 
 double CylinderHead::intakeFlowRate(int cylinder) const {
@@ -77,11 +68,11 @@ double CylinderHead::exhaustFlowRate(int cylinder) const {
 }
 
 double CylinderHead::intakeValveLift(int cylinder) const {
-    return m_valvetrain->intakeValveLift(cylinder);
+    return m_intakeCamshaft->valveLift(cylinder);
 }
 
 double CylinderHead::exhaustValveLift(int cylinder) const {
-    return m_valvetrain->exhaustValveLift(cylinder);
+    return m_exhaustCamshaft->valveLift(cylinder);
 }
 
 void CylinderHead::setAllExhaustSystems(ExhaustSystem *system) {
@@ -92,10 +83,6 @@ void CylinderHead::setAllExhaustSystems(ExhaustSystem *system) {
 
 void CylinderHead::setExhaustSystem(int i, ExhaustSystem *system) {
     m_exhaustSystems[i] = system;
-}
-
-void CylinderHead::setSoundAttenuation(int i, double soundAttenuation) {
-    m_soundAttenuation[i] = soundAttenuation;
 }
 
 void CylinderHead::setAllIntakes(Intake *intake) {
@@ -109,9 +96,9 @@ void CylinderHead::setIntake(int i, Intake *intake) {
 }
 
 Camshaft *CylinderHead::getExhaustCamshaft() {
-    return m_valvetrain->getActiveExhaustCamshaft();
+    return m_exhaustCamshaft;
 }
 
 Camshaft *CylinderHead::getIntakeCamshaft() {
-    return m_valvetrain->getActiveIntakeCamshaft();
+    return m_intakeCamshaft;
 }

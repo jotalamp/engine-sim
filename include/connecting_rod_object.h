@@ -13,7 +13,6 @@ class ConnectingRodObject : public SimulationObject {
 
         virtual void generateGeometry();
         virtual void render(const ViewParameters *view);
-        //virtual void render();
         virtual void process(float dt);
         virtual void destroy();
 
@@ -21,8 +20,7 @@ class ConnectingRodObject : public SimulationObject {
 
     protected:
         GeometryGenerator::GeometryIndices
-            m_connectingRodBody,
-            m_pins;
+            m_connectingRodBody;
 };
 
 #endif /* ATG_ENGINE_SIM_CONNECTING_ROD_OBJECT_H */

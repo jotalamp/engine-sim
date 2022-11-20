@@ -20,8 +20,6 @@ class Shaders : public dbasic::ShaderBase {
 		virtual void SetObjectTransform(const ysMatrix &mat);
 		virtual void ConfigureModel(float scale, dbasic::ModelAsset *model);
 
-        void SetDiffuseTexture(ysTexture *texture);
-
         void SetBaseColor(const ysVector &color);
         void ResetBaseColor();
 
@@ -33,13 +31,7 @@ class Shaders : public dbasic::ShaderBase {
             float height,
             const Bounds &cameraBounds,
             float screenWidth,
-            float screenHeight,
-            float phi,
-            float theta,
-            float zoom = 1.0f,
-            float targetX = 0.0f,
-            float targetY = 0.0f,
-            float targetZ = 0.0f);
+            float screenHeight);
         void CalculateUiCamera(float screenWidth, float screenHeight);
 
         void SetClearColor(const ysVector &col);
@@ -50,15 +42,12 @@ class Shaders : public dbasic::ShaderBase {
         dbasic::ShaderObjectVariables m_objectVariables;
 
         ysVector m_cameraPosition;
-        float m_zoom;
 
     protected:
         dbasic::ShaderStage *m_mainStage;
         dbasic::ShaderStage *m_uiStage;
 
         dbasic::LightingControls m_lightingControls;
-
-        dbasic::TextureHandle m_mainStageDiffuseTexture;
 };
 
 #endif /* ATG_ENGINE_SIM_SHADERS_H */

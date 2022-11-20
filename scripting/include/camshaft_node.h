@@ -24,7 +24,7 @@ namespace es_script {
             EngineContext *context) const
         {
             Camshaft::Parameters parameters = m_parameters;
-            parameters.crankshaft = crankshaft;
+            parameters.Crankshaft = crankshaft;
             parameters.Lobes = (int)m_lobes.size();
             parameters.LobeProfile = m_lobeProfile->generate(context);
             
@@ -54,7 +54,7 @@ namespace es_script {
             // Read inputs
             readAllInputs();
 
-            m_parameters.crankshaft = nullptr;
+            m_parameters.Crankshaft = nullptr;
         }
 
         Camshaft::Parameters m_parameters;

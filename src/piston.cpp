@@ -5,7 +5,6 @@
 #include "../include/cylinder_bank.h"
 
 #include <cmath>
-#include <cstdio>
 
 Piston::Piston() {
     m_rod = nullptr;
@@ -32,8 +31,6 @@ void Piston::initialize(const Parameters &params) {
     m_wristPinLocation = params.WristPinPosition;
     m_mass = params.Mass;
     m_blowby_k = params.BlowbyFlowCoefficient;
-
-    //printf("\nPiston_ : %i", m_cylinderIndex);
 }
 
 void Piston::destroy() {

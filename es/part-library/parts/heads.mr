@@ -2,7 +2,7 @@ private import "engine_sim.mr"
 
 units units()
 
-public node add_flow_sample {
+private node add_flow_sample {
     input lift;
     input flow;
     input this;

@@ -3,8 +3,6 @@
 #include "../include/engine_sim_application.h"
 #include "../include/constants.h"
 
-#include <climits>
-
 Gauge::Gauge() {
     m_thetaMin = (float)constants::pi;
     m_thetaMax = 0.0f;
@@ -50,15 +48,15 @@ void Gauge::destroy() {
 }
 
 void Gauge::update(float dt) {
-    const float value = std::fmax((float)m_min, std::fmin((float)m_max, (float)m_value));
-    const float needle_s = std::pow((value - m_min) / std::abs(m_max - m_min), m_gamma);
+    const float value = std::fmaxf((float)m_min, std::fmin((float)m_max, (float)m_value));
+    const float needle_s = std::powf((value - m_min) / std::abs(m_max - m_min), m_gamma);
     const float F =
         m_needleKs * (needle_s - m_needlePosition)
         - m_needleKd * m_needleVelocity;
 
     m_needleVelocity = std::fminf(
             m_needleMaxVelocity,
-            std::fmax(m_needleVelocity + F * dt, -m_needleMaxVelocity));
+            std::fmaxf(m_needleVelocity + F * dt, -m_needleMaxVelocity));
     m_needlePosition += m_needleVelocity * dt;
     m_needlePosition = std::fmax(0.0f, std::fmin(1.0f, m_needlePosition));
 }
@@ -78,7 +76,7 @@ void Gauge::render() {
     GeometryGenerator::Line2dParameters lineParams;
     generator->startShape();
     for (int i = 0; i <= std::abs(m_max - m_min); i += m_minorStep) {
-        const float s = std::pow((float)i / std::abs(m_max - m_min), m_gamma);
+        const float s = std::powf((float)i / std::abs(m_max - m_min), m_gamma);
         const float theta = s * m_thetaMax + (1 - s) * m_thetaMin;
 
         const float tickLength = (i % m_majorStep) == 0
@@ -141,14 +139,14 @@ void Gauge::render() {
         ringParams.outerRadius = outerRadius + pixelsToUnits(band.radial_offset);
         ringParams.innerRadius = outerRadius + pixelsToUnits(band.radial_offset - band.width);
 
-        const float s0 = std::pow((float)(band.start - m_min) / std::abs(m_max - m_min), m_gamma);
+        const float s0 = std::powf((float)(band.start - m_min) / std::abs(m_max - m_min), m_gamma);
         const float angle0 = s0 * m_thetaMax + (1 - s0) * m_thetaMin;
 
-        const float s1 = std::pow((float)(band.end - m_min) / std::abs(m_max - m_min), m_gamma);
+        const float s1 = std::powf((float)(band.end - m_min) / std::abs(m_max - m_min), m_gamma);
         const float angle1 = s1 * m_thetaMax + (1 - s1) * m_thetaMin;
 
-        ringParams.startAngle = std::fmin(angle0, angle1) + band.shorten_end;
-        ringParams.endAngle = std::fmax(angle0, angle1) - band.shorten_start;
+        ringParams.startAngle = std::fminf(angle0, angle1) + band.shorten_end;
+        ringParams.endAngle = std::fmaxf(angle0, angle1) - band.shorten_start;
 
         GeometryGenerator::GeometryIndices bandIndices;
         generator->startShape();
@@ -159,7 +157,7 @@ void Gauge::render() {
         m_app->drawGenerated(bandIndices, 0x11, m_app->getShaders()->GetUiFlags());
     }
 
-    m_app->getShaders()->SetBaseColor(m_app->getForegroundColor());
+    m_app->getShaders()->SetBaseColor(ysMath::Constants::One);
     m_app->drawGenerated(ticks, 0x11, m_app->getShaders()->GetUiFlags());
 
     m_app->getShaders()->SetBaseColor(m_app->getHightlight1Color());

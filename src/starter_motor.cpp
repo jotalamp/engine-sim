@@ -34,12 +34,6 @@ void StarterMotor::calculate(Output *output, atg_scs::SystemState *state) {
 
     output->v_bias[0] = -m_rotationSpeed;
 
-    if (m_rotationSpeed < 0) {
-        output->limits[0][0] = m_enabled ? -m_maxTorque : 0.0;
-        output->limits[0][1] = 0.0;
-    }
-    else {
-        output->limits[0][0] = 0.0;
-        output->limits[0][1] = m_enabled ? m_maxTorque : 0.0;
-    }
+    output->limits[0][0] = m_enabled ? -m_maxTorque : 0.0;
+    output->limits[0][1] = 0.0;
 }

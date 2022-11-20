@@ -24,33 +24,11 @@ namespace es_script {
             RodJournalNode *rodJournal;
             IntakeNode *intake;
             ExhaustSystemNode *exhaust;
-            double soundAttenuation;
         };
 
     public:
         CylinderBankNode() { /* void */ }
         virtual ~CylinderBankNode() { /* void */ }
-
-        void connectRodAssemblies(EngineContext *context) const {
-            const int n = getCylinderCount();
-            for (int i = 0; i < n; ++i) {
-                ConnectingRodNode *rodNode = m_cylinders[i].rod;
-                ConnectingRod *rod = context->getConnectingRod(rodNode);
-
-                RodJournalNode *journal = m_cylinders[i].rodJournal;
-                if (journal->getRod() != nullptr) {
-                    rod->setMaster(context->getConnectingRod(journal->getRod()));
-                    rod->setCrankshaft(rod->getMasterRod()->getCrankshaft());
-                }
-            }
-        }
-
-        void indexSlaveJournals(EngineContext *context) const {
-            const int n = getCylinderCount();
-            for (int i = 0; i < n; ++i) {
-                m_cylinders[i].rod->indexSlaveJournals(context);
-            }
-        }
 
         void generate(
             int index,
@@ -59,11 +37,11 @@ namespace es_script {
             Crankshaft *crankshaft,
             Engine *engine,
             EngineContext *context) const 
-        {
+       {
             CylinderBank::Parameters params = m_parameters;
             params.CylinderCount = (int)m_cylinders.size();
             params.Index = index;
-            params.crankshaft = crankshaft;
+            params.Crankshaft = crankshaft;
 
             cylinderBank->initialize(params);
 
@@ -72,8 +50,6 @@ namespace es_script {
                 Piston *piston = engine->getPiston(cylinderBaseIndex + i);
                 ConnectingRod *rod = engine->getConnectingRod(cylinderBaseIndex + i);
                 Crankshaft *crankshaft = context->getCrankshaft(m_cylinders[i].rodJournal->getCrankshaft());
-
-                context->addConnectingRod(m_cylinders[i].rod, rod);
 
                 context->setCylinderIndex(
                     this,
@@ -105,7 +81,6 @@ namespace es_script {
 
                 head->setIntake(i, intake);
                 head->setExhaustSystem(i, exhaust);
-                head->setSoundAttenuation(i, getCylinder(i).soundAttenuation);
             }
         }
 
@@ -115,16 +90,14 @@ namespace es_script {
             RodJournalNode *rodJournal,
             IntakeNode *intake,
             ExhaustSystemNode *exhaust,
-            IgnitionWireNode *wire,
-            double soundAttenuation)
+            IgnitionWireNode *wire)
         {
             m_cylinders.push_back({
                 piston,
                 rod,
                 rodJournal,
                 intake,
-                exhaust,
-                soundAttenuation
+                exhaust
             });
 
             wire->connect(this, getCylinderCount() - 1);
@@ -153,7 +126,6 @@ namespace es_script {
             addInput("deck_height", &m_parameters.DeckHeight);
             addInput("position_x", &m_parameters.PositionX);
             addInput("position_y", &m_parameters.PositionY);
-            addInput("display_depth", &m_parameters.DisplayDepth);
 
             ObjectReferenceNode<CylinderBankNode>::registerInputs();
         }

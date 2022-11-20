@@ -29,6 +29,9 @@ class Intake : public Part {
             // Throttle plate position at idle
             double IdleThrottlePlatePosition = 0.975;
 
+            // Gamma value to skew throttle positions
+            double ThrottleGamma = 2.0;
+
             // Runner volume
             double RunnerLength = units::distance(4.0, units::inch);
 
@@ -65,6 +68,7 @@ class Intake : public Part {
         double m_runnerFlowRate;
         double m_molecularAfr;
         double m_idleThrottlePlatePosition;
+        double m_throttleGamma;
         double m_runnerLength;
         double m_velocityDecay;
 

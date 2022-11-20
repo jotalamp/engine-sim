@@ -19,7 +19,6 @@ class CylinderHeadObject : public SimulationObject {
 
         CylinderHead *m_head;
         Engine *m_engine;
-        int m_cylinderIndex;
 
     protected:
         void generateCamshaft(

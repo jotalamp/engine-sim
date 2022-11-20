@@ -1,4 +1,3 @@
-#include "../include/utilities.h"
 #include "../include/shaders.h"
 
 Shaders::Shaders() {
@@ -8,10 +7,10 @@ Shaders::Shaders() {
     m_uiStage = nullptr;
 
     m_objectVariables.ColorReplace = 1;
-    m_objectVariables.Lit = 1;
+    m_objectVariables.Lit = 0;
     m_objectVariables.Transform = ysMath::LoadIdentity();
 
-    m_screenVariables.FogNear = m_uiScreenVariables.FogNear = 0.0f;
+    m_screenVariables.FogNear = m_uiScreenVariables.FogNear = 16000.0f;
     m_screenVariables.FogFar = m_uiScreenVariables.FogFar = 16001.0f;
 }
 
@@ -53,10 +52,6 @@ ysError Shaders::Initialize(
         dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData,
         &m_lightingControls);
 
-        m_mainStage->AddTextureInput(0, &m_mainStageDiffuseTexture);
-    //m_mainStage->AddTextureInput(1, &m_mainStageDiffuseTexture);
-
-
     // UI Stage
     m_uiStage->SetInputLayout(inputLayout);
     m_uiStage->SetRenderTarget(uiRenderTarget);
@@ -86,26 +81,6 @@ ysError Shaders::Initialize(
 
 ysError Shaders::UseMaterial(dbasic::Material *material) {
     YDS_ERROR_DECLARE("UseMaterial");
-    
-    if (material == nullptr) {
-        SetBaseColor(ysMath::LoadVector(1.0f, 0.0f, 1.0f, 1.0f));
-        m_objectVariables.ColorReplace = 1;
-    }
-    else {
-        SetBaseColor(material->GetDiffuseColor());
-
-        if (material->GetDiffuseMap() != nullptr) {
-            m_objectVariables.ColorReplace = 0;
-            SetDiffuseTexture(material->GetDiffuseMap());
-        }
-        else {
-            m_objectVariables.ColorReplace = 1;
-        }
-
-        m_objectVariables.Lit = material->IsLit();
-        m_objectVariables.DiffuseMix = material->GetDiffuseMix();
-        //m_objectVariables.Transform = ysMath::LoadIdentity();
-    }
     return YDS_ERROR_RETURN(ysError::None);
 }
 
@@ -117,22 +92,8 @@ void Shaders::ConfigureModel(float scale, dbasic::ModelAsset *model) {
     /* void */
 }
 
-void Shaders::SetDiffuseTexture(ysTexture *texture) {
-    if(texture)
-        m_mainStage->BindTexture(texture, m_mainStageDiffuseTexture);
-}
-
 void Shaders::SetBaseColor(const ysVector &color) {
-    if((color[0] > 0.99f) && (color[1] < 0.01f))
-    {
-        m_objectVariables.ColorReplace = 0;
-    }
-    else {
-        //m_objectVariables.BaseColor = color;
-        m_objectVariables.ColorReplace = 1;
-    }
     m_objectVariables.BaseColor = color;
-    //m_objectVariables.BaseColor = color;
 }
 
 void Shaders::ResetBaseColor() {
@@ -152,28 +113,13 @@ void Shaders::CalculateCamera(
     float height,
     const Bounds &cameraBounds,
     float screenWidth,
-    float screenHeight,
-    float phi,
-    float theta,
-    float zoom,
-    float targetX,
-    float targetY,
-    float targetZ)
+    float screenHeight)
 {
-    m_zoom = zoom;
-    
-    const ysMatrix projection1 = ysMath::OrthographicProjection(
+    const ysMatrix projection = ysMath::OrthographicProjection(
         width,
         height,
         0.001f,
         500.0f);
-
-    const ysMatrix projection = ysMath::FrustrumPerspective(
-        19.0f,
-        width/height,
-        0.03f,
-        1400.0f);
-
     const Point scale = Point(screenWidth, screenHeight);
     const Point center =
         (cameraBounds.getPosition() - Point(screenWidth / 2, screenHeight / 2))
@@ -194,38 +140,15 @@ void Shaders::CalculateCamera(
 
     m_screenVariables.Projection = ysMath::Transpose(projection);
 
-    
-    ysVector cameraTarget;
-    ysVector cameraEye;
-
-    if(true)
-    {
-        float height = 0.0f;
-
-        float x = m_zoom * sin(theta) * cos(phi);
-        float y = m_zoom * cos(theta);
-        float z = m_zoom * sin(theta) * sin(phi);
-
-        ysVector3 targetPosition(targetX, targetY, targetZ);
-
-        cameraTarget = ysMath::Add(ysMath::LoadVector(targetPosition.x,     targetPosition.y,   targetPosition.z,   1.0f), m_cameraPosition);
-        cameraEye    = ysMath::Add(ysMath::LoadVector(targetPosition.x+x,   targetPosition.y+y, targetPosition.z+z, 1.0f), m_cameraPosition);
-    }
-    else
-    {
-        float height = 15.0f;
-
-        ysVector3 targetPosition(targetX, targetY+0.5f, targetZ+1.0f);
-
-        float x = targetX;
-        float y = targetY+height;
-        float z = targetZ-50.0;
-
-        cameraTarget = ysMath::Add(ysMath::LoadVector(targetPosition.x,     targetPosition.y,   targetPosition.z,   1.0f), m_cameraPosition);
-        cameraEye    = ysMath::Add(ysMath::LoadVector(x, y, z, 1.0f), m_cameraPosition);
-    }
-
-    const ysVector up = ysMath::LoadVector(0.0f, 1.0f, 0.0f);
+    const ysVector cameraEye =
+        ysMath::Add(
+                ysMath::LoadVector(0.0f, 0.0f, 10.0f, 1.0f),
+                m_cameraPosition);
+    const ysVector cameraTarget =
+        ysMath::Add(
+                ysMath::LoadVector(0.0f, 0.0f, 0.0f, 1.0f),
+                m_cameraPosition);
+    const ysVector up = ysMath::LoadVector(0.0f, 1.0f);
 
     m_screenVariables.CameraView =
         ysMath::Transpose(ysMath::CameraTarget(cameraEye, cameraTarget, up));

@@ -7,7 +7,6 @@ EngineView::EngineView() {
     m_checkMouse = true;
     m_lastScroll = 0;
     m_zoom = 1.0f;
-    m_drawFrame = true;
 }
 
 EngineView::~EngineView() {
@@ -20,7 +19,7 @@ void EngineView::update(float dt) {
 
 void EngineView::render() {
     if (m_drawFrame) {
-        drawFrame(m_bounds, 1.0f, m_app->getForegroundColor(), m_app->getBackgroundColor(), false);
+        drawFrame(m_bounds, 1.0f, ysMath::Constants::One, m_app->getBackgroundColor(), false);
     }
 }
 
@@ -40,7 +39,7 @@ void EngineView::onDrag(const Point &p0, const Point &mouse0, const Point &mouse
 }
 
 void EngineView::onMouseScroll(int scroll) {
-    const float f = std::pow(2.0f, (float)scroll / 500.0f);
+    const float f = std::powf(2.0, (float)scroll / 500.0f);
 
     const Point prevCenter = getCenter();
 

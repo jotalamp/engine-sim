@@ -14,12 +14,11 @@ class CylinderBankObject : public SimulationObject {
 
         virtual void generateGeometry();
         virtual void render(const ViewParameters *view);
-        //virtual void render();
         virtual void process(float dt);
         virtual void destroy();
 
         CylinderBank *m_bank;
-        CylinderHead *m_first_head;
+        CylinderHead *m_head;
         GeometryGenerator::GeometryIndices m_walls;
 };
 

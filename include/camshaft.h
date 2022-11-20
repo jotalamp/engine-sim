@@ -17,7 +17,7 @@ class Camshaft : public Part {
             double Advance = 0;
 
             // Corresponding crankshaft
-            Crankshaft *crankshaft;
+            Crankshaft *Crankshaft;
 
             // Lobe profile
             Function *LobeProfile;

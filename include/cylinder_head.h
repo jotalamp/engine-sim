@@ -8,17 +8,16 @@
 #include "exhaust_system.h"
 #include "intake.h"
 
-class Valvetrain;
 class CylinderBank;
 class CylinderHead : public Part {
     public:
         struct Parameters {
             CylinderBank *Bank;
+            Camshaft *ExhaustCam;
+            Camshaft *IntakeCam;
 
             Function *ExhaustPortFlow;
             Function *IntakePortFlow;
-
-            Valvetrain *valvetrain;
 
             double CombustionChamberVolume;
 
@@ -26,8 +25,6 @@ class CylinderHead : public Part {
             double IntakeRunnerCrossSectionArea;
             double ExhaustRunnerVolume;
             double ExhaustRunnerCrossSectionArea;
-
-            int CylinderIndex;
 
             bool FlipDisplay = false;
         };
@@ -48,9 +45,6 @@ class CylinderHead : public Part {
         void setAllExhaustSystems(ExhaustSystem *system);
         void setExhaustSystem(int i, ExhaustSystem *system);
 
-        inline double getSoundAttenuation(int cylinderIndex) const { return m_soundAttenuation[cylinderIndex]; }
-        void setSoundAttenuation(int i, double soundAttenuation);
-
         inline Intake *getIntake(int cylinderIndex) const { return m_intakes[cylinderIndex]; }
         void setAllIntakes(Intake *intake);
         void setIntake(int i, Intake *intake);
@@ -67,15 +61,13 @@ class CylinderHead : public Part {
         Camshaft *getExhaustCamshaft();
         Camshaft *getIntakeCamshaft();
 
-        int m_cylinderIndex;
-
     protected:
         ExhaustSystem **m_exhaustSystems;
         Intake **m_intakes;
-        double *m_soundAttenuation;
 
         CylinderBank *m_bank;
-        Valvetrain *m_valvetrain;
+        Camshaft *m_exhaustCamshaft;
+        Camshaft *m_intakeCamshaft;
 
         Function *m_exhaustPortFlow;
         Function *m_intakePortFlow;

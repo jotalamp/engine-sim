@@ -18,7 +18,7 @@ class ExhaustSystem : public Part {
             double PrimaryFlowRate;
             double VelocityDecay;
             double AudioVolume;
-            ImpulseResponse *impulseResponse;
+            ImpulseResponse *ImpulseResponse;
         };
 
     public:

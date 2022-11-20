@@ -3,7 +3,7 @@
 
 #include "object_reference_node.h"
 
-#include "valvetrain_node.h"
+#include "camshaft_node.h"
 #include "function_node.h"
 #include "exhaust_system_node.h"
 #include "intake_node.h"
@@ -26,9 +26,26 @@ namespace es_script {
             Crankshaft *crankshaft,
             EngineContext *context) const
         {
+            Camshaft
+                *exhaustCam = context->getCamshaft(m_exhaustCam), 
+                *intakeCam = context->getCamshaft(m_intakeCam);
+
+            if (exhaustCam == nullptr) {
+                exhaustCam = new Camshaft;
+                m_exhaustCam->generate(exhaustCam, crankshaft, context);
+                context->addCamshaft(m_exhaustCam, exhaustCam);
+            }
+
+            if (intakeCam == nullptr) {
+                intakeCam = new Camshaft;
+                m_intakeCam->generate(intakeCam, crankshaft, context);
+                context->addCamshaft(m_intakeCam, intakeCam);
+            }
+
             CylinderHead::Parameters params = m_parameters;
             params.Bank = bank;
-            params.valvetrain = m_valvetrain->generate(context, crankshaft);
+            params.ExhaustCam = exhaustCam;
+            params.IntakeCam = intakeCam;
             params.IntakePortFlow = m_intakePortFlow->generate(context);
             params.ExhaustPortFlow = m_exhaustPortFlow->generate(context);
 
@@ -49,8 +66,12 @@ namespace es_script {
                 &m_exhaustPortFlow,
                 InputTarget::Type::Object);
             addInput(
-                "valvetrain",
-                &m_valvetrain,
+                "intake_camshaft",
+                &m_intakeCam,
+                InputTarget::Type::Object);
+            addInput(
+                "exhaust_camshaft",
+                &m_exhaustCam,
                 InputTarget::Type::Object);
             addInput("chamber_volume", &m_parameters.CombustionChamberVolume);
             addInput("flip_display", &m_parameters.FlipDisplay);
@@ -69,7 +90,8 @@ namespace es_script {
             readAllInputs();
 
             m_parameters.Bank = nullptr;
-            m_parameters.valvetrain = nullptr;
+            m_parameters.ExhaustCam = nullptr;
+            m_parameters.IntakeCam = nullptr;
             m_parameters.IntakePortFlow = nullptr;
             m_parameters.ExhaustPortFlow = nullptr;
         }
@@ -79,7 +101,8 @@ namespace es_script {
         CylinderBankNode *m_bank = nullptr;
         FunctionNode *m_intakePortFlow = nullptr;
         FunctionNode *m_exhaustPortFlow = nullptr;
-        ValvetrainNode *m_valvetrain = nullptr;
+        CamshaftNode *m_intakeCam = nullptr;
+        CamshaftNode *m_exhaustCam = nullptr;
     };
 
 } /* namespace es_script */

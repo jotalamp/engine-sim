@@ -43,8 +43,6 @@ void Synthesizer::initialize(const Parameters &p) {
     m_audioSampleRate = p.AudioSampleRate;
     m_audioParameters = p.InitialAudioParameters;
 
-    m_inputSamplesRead = 0;
-
     m_inputWriteOffset = 0;
     m_processed = true;
 
@@ -61,15 +59,14 @@ void Synthesizer::initialize(const Parameters &p) {
             m_audioParameters.AirNoiseFrequencyCutoff);
         m_filters[i].AirNoiseLowPass.m_dt = 1 / m_audioSampleRate;
 
+        m_filters[i].SampleNoiseLowPass.setCutoffFrequency(
+            m_audioParameters.InputSampleNoiseFrequencyCutoff);
+        m_filters[i].SampleNoiseLowPass.m_dt = 1 / m_audioSampleRate;
+
         m_filters[i].Derivative.m_dt = 1 / m_audioSampleRate;
 
         m_filters[i].InputDcFilter.setCutoffFrequency(10.0);
         m_filters[i].InputDcFilter.m_dt = 1 / m_audioSampleRate;
-
-        m_filters[i].jitterFilter.initialize(
-            10,
-            m_audioParameters.InputSampleNoiseFrequencyCutoff,
-            m_audioSampleRate);
     }
 
     m_levelingFilter.p_target = m_audioParameters.LevelerTarget;
@@ -108,15 +105,13 @@ void Synthesizer::startAudioRenderingThread() {
 }
 
 void Synthesizer::endAudioRenderingThread() {
-    if (m_thread != nullptr) {
-        m_run = false;
-        endInputBlock();
+    m_run = false;
+    endInputBlock();
 
-        m_thread->join();
-        delete m_thread;
+    m_thread->join();
+    delete m_thread;
 
-        m_thread = nullptr;
-    }
+    m_thread = nullptr;
 }
 
 void Synthesizer::destroy() {
@@ -128,12 +123,11 @@ void Synthesizer::destroy() {
     }
 
     delete[] m_inputChannels;
+
     delete[] m_filters;
 
     m_inputChannels = nullptr;
     m_filters = nullptr;
-
-    m_inputChannelCount = 0;
 }
 
 int Synthesizer::readAudioOutput(int samples, int16_t *buffer) {
@@ -171,7 +165,7 @@ void Synthesizer::writeInput(const double *data) {
 
     for (int i = 0; i < m_inputChannelCount; ++i) {
         RingBuffer<float> &buffer = m_inputChannels[i].Data;
-        const float lastInputSample = m_inputChannels[i].LastInputSample;
+        const double lastInputSample = m_inputChannels[i].LastInputSample;
         const size_t baseIndex = buffer.writeIndex();
         const double distance =
             inputDistance(m_inputWriteOffset, m_lastInputSampleOffset);
@@ -181,9 +175,12 @@ void Synthesizer::writeInput(const double *data) {
             if (s >= m_inputBufferSize) s -= m_inputBufferSize;
 
             const double f = s / distance;
-            const double sample = lastInputSample * (1 - f) + data[i] * f;
+            const double r = 2.0 * ((double)rand() / RAND_MAX) - 1.0;
+            const double r_filtered = m_filters[i].SampleNoiseLowPass.f(r);
+            const double r_s = m_audioParameters.InputSampleNoise * r_filtered;
+            const double s_aug = f + r_s;
 
-            buffer.write(static_cast<float>(sample));
+            buffer.write(lastInputSample * (1 - s_aug) + data[i] * s_aug);
         }
 
         m_inputChannels[i].LastInputSample = data[i];
@@ -199,11 +196,9 @@ void Synthesizer::endInputBlock() {
         m_inputChannels[i].Data.removeBeginning(m_inputSamplesRead);
     }
 
-    if (m_inputChannelCount != 0) {
-        m_latency = m_inputChannels[0].Data.size();
-    }
-    
     m_inputSamplesRead = 0;
+    m_latency = m_inputChannels[0].Data.size();
+    
     m_processed = false;
 
     lk.unlock();
@@ -243,7 +238,8 @@ void Synthesizer::renderAudio() {
     for (int i = 0; i < m_inputChannelCount; ++i) {
         m_filters[i].AirNoiseLowPass.setCutoffFrequency(
             static_cast<float>(m_audioParameters.AirNoiseFrequencyCutoff));
-        m_filters[i].jitterFilter.setJitterScale(m_audioParameters.InputSampleNoise);
+        m_filters[i].SampleNoiseLowPass.setCutoffFrequency(
+            static_cast<float>(m_audioParameters.InputSampleNoiseFrequencyCutoff));
     }
 
     for (int i = 0; i < n; ++i) {
@@ -283,15 +279,10 @@ int16_t Synthesizer::renderAudio(int inputSample) {
 
     float signal = 0;
     for (int i = 0; i < m_inputChannelCount; ++i) {
-        const float r_0 = 2.0 * ((double)rand() / RAND_MAX) - 1.0;
-
-        const float jitteredSample =
-            m_filters[i].jitterFilter.fast_f(m_inputChannels[i].TransferBuffer[inputSample]);
-
-        const float f_in = jitteredSample;
+        const float f_in = m_inputChannels[i].TransferBuffer[inputSample];
         const float f_dc = m_filters[i].InputDcFilter.fast_f(f_in);
         const float f = f_in - f_dc;
-        const float f_p = m_filters[i].Derivative.f(f_in);
+        const float f_p = m_filters[i].Derivative.f(f);
 
         const float noise = 2.0 * ((double)rand() / RAND_MAX) - 1.0;
         const float r =
@@ -299,20 +290,11 @@ int16_t Synthesizer::renderAudio(int inputSample) {
         const float r_mixed =
             airNoise * r + (1 - airNoise);
 
-        const float v_in =
-            f_p * dF_F_mix
-            + f * r_mixed * (1 - dF_F_mix);
+        const float v_in = f_p * dF_F_mix + f * r_mixed * (1 - dF_F_mix);
         const float v =
-            convAmount * m_filters[i].Convolution.f(v_in)
-            + (1 - convAmount) * v_in;
+            convAmount * m_filters[i].Convolution.f(v_in) + (1 - convAmount) * v_in;
 
         signal += v;
-    }
-
-    if (std::isnan(signal)) {
-        std::fstream f("test.txt");
-        f << "here";
-        f.close();
     }
 
     m_levelingFilter.p_target = m_audioParameters.LevelerTarget;
