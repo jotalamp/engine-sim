@@ -30,10 +30,11 @@ public:
         if (m_buffer != nullptr) {
             delete[] m_buffer;
             m_buffer = nullptr;
-            m_capacity = 0;
-            m_writeIndex = 0;
-            m_start = 0;
         }
+
+        m_capacity = 0;
+        m_writeIndex = 0;
+        m_start = 0;
     }
 
     inline void write(T_Data data) {
@@ -45,7 +46,7 @@ public:
     }
 
     inline void overwrite(T_Data data, size_t index) {
-        if (start + index < m_capacity) {
+        if (m_start + index < m_capacity) {
             m_buffer[m_start + index] = data;
         }
         else {

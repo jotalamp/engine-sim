@@ -57,8 +57,8 @@ void Transmission::addToSystem(
 }
 
 void Transmission::changeGear(int newGear) {
-    if (newGear < -1 || newGear >= m_gearCount) return;
-    else if (newGear != -1) {
+    if (newGear < -2 || newGear >= m_gearCount) return;
+    else if (newGear > -1) {
         const double m_car = m_vehicle->getMass();
         const double gear_ratio = m_gearRatios[newGear];
         const double diff_ratio = m_vehicle->getDiffRatio();
@@ -68,7 +68,9 @@ void Transmission::changeGear(int newGear) {
         const double new_I = m_car * f * f;
         const double E_r =
             0.5 * m_rotatingMass->I * m_rotatingMass->v_theta * m_rotatingMass->v_theta;
-        const double new_v_theta = -std::sqrt(E_r * 2 / new_I);
+        const double new_v_theta = m_rotatingMass->v_theta < 0
+            ? -std::sqrt(E_r * 2 / new_I)
+            : std::sqrt(E_r * 2 / new_I);
 
         m_rotatingMass->I = new_I;
         m_rotatingMass->p_x = m_rotatingMass->p_y = 0;

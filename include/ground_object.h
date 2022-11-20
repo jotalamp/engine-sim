@@ -25,10 +25,6 @@ class GroundObject : public SimulationObject {
         Vehicle *m_vehicle;
         b2Body *m_dynamic_bodies[1];
         b2Body *m_static_bodies[1];
-
-    protected:
-        std::vector<std::string> m_meshNames;
-        std::vector<std::string> m_textureFileNames;
 };
 
 #endif /* ATG_ENGINE_SIM_GROUND_OBJECT_H */

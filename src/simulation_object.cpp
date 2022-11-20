@@ -7,6 +7,7 @@
 
 SimulationObject::SimulationObject() {
     m_app = nullptr;
+    z = -1;
 }
 
 SimulationObject::~SimulationObject() {
@@ -17,14 +18,22 @@ void SimulationObject::initialize(EngineSimApplication *app) {
     m_app = app;
 }
 
+void SimulationObject::printInfo() {
+    //printf("\nSimulationObject");
+}
+
 void SimulationObject::generateGeometry() {
     /* void */
 }
 
+
 void SimulationObject::render(const ViewParameters *settings) {
-    /* void */
 }
 
+/*
+void SimulationObject::render() {
+}
+*/
 void SimulationObject::process(float dt) {
     /* void */
 }
@@ -59,23 +68,50 @@ void SimulationObject::resetShader() {
 
 void SimulationObject::setTransform(
     atg_scs::RigidBody *rigidBody,
-    float scale,
+    float scaleX,
+    float scaleY,
+    float scaleZ,
     float lx,
     float ly,
-    float angle)
+    float lz,
+    float angleX,
+    float angleY,
+    float angleZ,
+    ysTransform *parentTransform)
 {
+    
     double p_x, p_y;
-    rigidBody->localToWorld(lx, ly, &p_x, &p_y);
 
-    const ysMatrix rot = ysMath::RotationTransform(
-            ysMath::Constants::ZAxis,
-            (float)rigidBody->theta + angle);
-    const ysMatrix trans = ysMath::TranslationTransform(
-            ysMath::LoadVector((float)p_x, (float)p_y, 0.0f));
-    const ysMatrix scaleTransform = ysMath::ScaleTransform(ysMath::LoadScalar(scale));
+    ysQuaternion qz = ysMath::LoadQuaternion(0, ysMath::Constants::ZAxis);
 
-    m_app->getShaders()->SetObjectTransform(
-        ysMath::MatMult(ysMath::MatMult(trans, rot), scaleTransform));
+    if(rigidBody != nullptr) {
+        rigidBody->localToWorld(lx, ly, &p_x, &p_y);
+        qz = ysMath::LoadQuaternion((float)rigidBody->theta + angleZ, ysMath::Constants::ZAxis);
+    }
+    else {
+        p_x = lx;
+        p_y = lx;
+    }
+
+    const ysMatrix scaleTransform = ysMath::ScaleTransform(ysMath::LoadVector((float)scaleX, (float)scaleY, (float)scaleZ));
+
+    //L = T * R * S
+    ysQuaternion qx = ysMath::LoadQuaternion(angleX, ysMath::Constants::XAxis);
+    ysQuaternion qy = ysMath::LoadQuaternion(angleY, ysMath::Constants::YAxis);
+
+    ysTransform transform;
+    transform.SetOrientation(ysMath::QuatMultiply(ysMath::QuatMultiply(qx,qy),qz));
+    //transform.SetOrientation(ysMath::QuatMultiply(ysMath::QuatMultiply(qx,qy),qx));
+
+    if(parentTransform != nullptr)
+    {
+        transform.SetParent(parentTransform);
+    }
+    
+    transform.SetPosition(ysMath::LoadVector((float)p_x, (float)p_y, lz, 0.0f));
+   
+    if(m_app != nullptr)
+        m_app->getShaders()->SetObjectTransform(ysMath::MatMult(transform.GetWorldTransform(), scaleTransform));
 }
 
 ysVector SimulationObject::tintByLayer(const ysVector &col, int layers) const {

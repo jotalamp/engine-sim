@@ -59,24 +59,6 @@ GroundObject::GroundObject(EngineSimApplication *app)
 
     // Add the shape to the body.
     m_static_bodies[0]->CreateFixture(&fixtureDef);
-
-    m_meshNames = m_app->getIniReader().GetVector<std::string>("Track", "Meshes");
-    m_textureFileNames = m_app->getIniReader().GetVector<std::string>("Track", "TextureFileNames");
-
-    dbasic::TextureAsset *textureAsset;
-    dbasic::Material *material;
-
-    for (std::vector<std::string>::size_type i = 0; i != m_textureFileNames.size(); i++)
-    {
-        std::string textureName = m_textureFileNames[i];
-        m_app->getAssetManager()->LoadTexture(("../assets/textures/" + textureName).c_str(), ("Texture_" + textureName).c_str());
-        textureAsset = m_app->getAssetManager()->GetTexture(("Texture_" + textureName).c_str());
-        material = m_app->getAssetManager()->NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        std::string materialName = "MaterialTrack_" + m_app->intToString(i);
-        material->SetName(materialName.c_str());
-        printf("\n%s", materialName.c_str());
-    }
 }
 
 void GroundObject::initialize(EngineSimApplication *app)
@@ -98,15 +80,13 @@ void GroundObject::render(const ViewParameters *view)
 {
     resetShader();
 
-    if (true /*m_app->m_debug*/)
+    if (m_app->m_debug)
     {
         b2Fixture *fixture = m_dynamic_bodies[0]->GetFixtureList();
         b2PolygonShape *poly = (b2PolygonShape *)fixture->GetShape();
         b2Vec2 position = m_dynamic_bodies[0]->GetPosition();
         b2Vec2 size = 2.0f * poly->m_vertices[0];
         float angle = m_dynamic_bodies[0]->GetAngle();
-
-
 
         m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
 
