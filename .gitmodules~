@@ -4,9 +4,6 @@
 [submodule "dependencies/submodules/direct-to-video"]
 	path = dependencies/submodules/direct-to-video
 	url = https://github.com/ange-yaghi/direct-to-video
-[submodule "dependencies/submodules/piranha"]
-	path = dependencies/submodules/piranha
-	url = https://github.com/ange-yaghi/piranha.git
 [submodule "dependencies/submodules/box2d"]
 	path = dependencies/submodules/box2d
 	url = https://github.com/erincatto/box2d
@@ -17,3 +14,6 @@
 	path = dependencies/submodules/delta-studio
 	url = https://github.com/phire/delta-studio/
 	branch = clang_linux
+[submodule "dependencies/submodules/piranha"]
+	path = dependencies/submodules/piranha
+	url = https://github.com/ange-yaghi/piranha/

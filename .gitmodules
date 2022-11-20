@@ -1,9 +1,6 @@
 [submodule "dependencies/submodules/simple-2d-constraint-solver"]
 	path = dependencies/submodules/simple-2d-constraint-solver
-	url = https://github.com/ange-yaghi/simple-2d-constraint-solver
-[submodule "dependencies/submodules/direct-to-video"]
-	path = dependencies/submodules/direct-to-video
-	url = https://github.com/ange-yaghi/direct-to-video
+	url = https://github.com/ange-yaghi/simple-2d-constraint-solver/
 [submodule "dependencies/submodules/box2d"]
 	path = dependencies/submodules/box2d
 	url = https://github.com/erincatto/box2d
@@ -17,3 +14,6 @@
 [submodule "dependencies/submodules/piranha"]
 	path = dependencies/submodules/piranha
 	url = https://github.com/ange-yaghi/piranha/
+[submodule "dependencies/submodules/direct-to-video"]
+	path = dependencies/submodules/direct-to-video
+	url = https://github.com/ange-yaghi/direct-to-video/
