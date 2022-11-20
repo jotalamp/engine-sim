@@ -170,22 +170,17 @@ void VehicleObject::render(const ViewParameters *view)
 
     m_vehicle->m_transform = &m_transform;
 
-    if (m_vehicle_model.id == Bluebird)
+    m_app->getShaders()->SetObjectTransform(m_transform_model.GetWorldTransform());
+
+    for (std::vector<std::string>::size_type i = 0; i != m_mesh_names.size(); i++)
     {
-        m_app->getShaders()->SetObjectTransform(m_transform_model.GetWorldTransform());
+        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial(m_material_names[i].c_str()));
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Material_03"));
-
-        for (std::vector<std::string>::size_type i = 0; i != m_mesh_names.size(); i++)
-        {
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial(m_material_names[i].c_str()));
-
-            if (!m_app->m_show_engine || m_mesh_names[i] != "hood")
-                m_app->getEngine()->DrawModel(
-                    m_app->getShaders()->GetRegularFlags(),
-                    m_app->getAssetManager()->GetModelAsset(m_mesh_names[i].c_str()),
-                    1);
-        }
+        if (!m_app->m_show_engine || m_mesh_names[i] != "hood")
+            m_app->getEngine()->DrawModel(
+                m_app->getShaders()->GetRegularFlags(),
+                m_app->getAssetManager()->GetModelAsset(m_mesh_names[i].c_str()),
+                1);
     }
 
     if (m_app->m_debug)

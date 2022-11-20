@@ -98,7 +98,6 @@ EngineSimApplication::EngineSimApplication()
 
 EngineSimApplication::~EngineSimApplication()
 {
-    printf("\nShowing engine: %i", m_show_engine);
     printf("\nQuit\n");
 
     if (gGameController != NULL)
@@ -204,7 +203,6 @@ void EngineSimApplication::initialize()
     m_selected_track = m_iniReader.Get<int>("Settings", "SelectedTrack");
     printf("\nSelected Track: %i", m_selected_track);
     m_show_engine = m_iniReader.Get<bool>("Settings", "ShowEngine");
-    printf("\nShowing engine: %i", m_show_engine);
 
     // Define the gravity vector.
     b2Vec2 gravity(0.0f, 0.0f);
