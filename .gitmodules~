@@ -4,9 +4,6 @@
 [submodule "dependencies/submodules/csv-io"]
 	path = dependencies/submodules/csv-io
 	url = https://github.com/ange-yaghi/csv-io
-[submodule "dependencies/submodules/piranha"]
-	path = dependencies/submodules/piranha
-	url = https://github.com/ange-yaghi/piranha/
 [submodule "dependencies/submodules/direct-to-video"]
 	path = dependencies/submodules/direct-to-video
 	url = https://github.com/ange-yaghi/direct-to-video/
@@ -17,4 +14,8 @@
 [submodule "dependencies/submodules/delta-studio"]
 	path = dependencies/submodules/delta-studio
 	url = https://github.com/bobsayshilol/delta-studio/
+	branch = sdl-build
+[submodule "dependencies/submodules/piranha"]
+	path = dependencies/submodules/piranha
+	url = https://github.com/bobsayshilol/piranha/
 	branch = sdl-build
