@@ -1,3 +1,6 @@
+Engine Simulator by AngeTheGreat: 
+
+https://github.com/ange-yaghi/engine-sim
 
 
 Original 3D models:
@@ -16,5 +19,7 @@ Cars:
 
 
 I have edited 3d models to get them working in Engine Simulator, joining, splitting by material, moving origin etc
+
+Thank you!
 
 -jotalamp
