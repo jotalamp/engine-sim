@@ -659,7 +659,7 @@ void EngineSimApplication::initialize()
 
 void EngineSimApplication::process(float frame_dt)
 {
-    return;
+    
     // Prepare for simulation. Typically we use a time step of 1/60 of a
     // second (60Hz) and 10 iterations. This provides a high quality simulation
     // in most game scenarios.
@@ -704,10 +704,15 @@ void EngineSimApplication::process(float frame_dt)
         speed = 1 / 1000.0;
     }
 
+    
+
     m_simulator.setSimulationSpeed(speed);
 
     m_world->Step(speed * frame_dt, velocityIterations, positionIterations);
-    m_vehicle_object->process(speed * frame_dt);
+    
+    // TODO !!
+    //m_vehicle_object->process(speed * frame_dt);
+    //return;
 
     const double avgFramerate = clamp(m_engine.GetAverageFramerate(), 30.0f, 1000.0f);
     m_simulator.startFrame(1 / avgFramerate);
@@ -1600,7 +1605,7 @@ void EngineSimApplication::renderScene()
     getShaders()->ResetBaseColor();
     getShaders()->SetObjectTransform(ysMath::LoadIdentity());
 
-    m_shaders.SetClearColor(ysColor::linearToSrgb(ysColor::srgbiToLinear(0x115599)));
+    m_shaders.SetClearColor(ysColor::linearToSrgb(ysColor::srgbiToLinear(0x995500)));
 
     const int screenWidth = m_engine.GetGameWindow()->GetGameWidth();
     const int screenHeight = m_engine.GetGameWindow()->GetGameHeight();
@@ -1613,7 +1618,7 @@ void EngineSimApplication::renderScene()
 
     m_screen = m_screen % 4;
 
-    return;
+    
 
     switch (m_screen)
     {
@@ -1750,6 +1755,9 @@ void EngineSimApplication::renderScene()
 
     int mx, my, mz;
     m_engine.GetMousePos(&mx, &my);
+
+    
+
     if (m_engine.IsMouseButtonDown(ysMouse::Button::Left))
     {
         float deltaX = +0.0004f * (mx - m_dragStartMousePosition.x);
@@ -1765,13 +1773,16 @@ void EngineSimApplication::renderScene()
 
         m_cameraRotation.y = clamp(m_cameraRotation.y, 0.01f * ysMath::Constants::PI, 0.5f * ysMath::Constants::PI);
     }
-
     else if (!isTargetEngine)
     {
         float rotationSpeed = 0.06f;
         m_cameraRotation.x = (1.0f - rotationSpeed) * m_cameraRotation.x - rotationSpeed * (m_simulator.getVehicle()->m_rotation + 0.5f * ysMath::Constants::PI);
     }
 
+    
+
+    // TODO
+    if(false)
     if (!isTargetEngine)
     {
         float vehicleAngle = m_simulator.getVehicle()->m_rotation;
@@ -1813,10 +1824,13 @@ void EngineSimApplication::renderScene()
             m_simulator.getVehicle()->m_transform_engine->GetWorldPosition()[1],
             m_simulator.getVehicle()->m_transform_engine->GetWorldPosition()[2] + m_simulator.getEngine()->getCylinderCount() / m_simulator.getEngine()->getCylinderBankCount() * 0.04f);
     }
+    //return;
 
     m_geometryGenerator.reset();
 
     render();
+
+    
 
     m_engine.GetDevice()->EditBufferDataRange(
         m_geometryVertexBuffer,
