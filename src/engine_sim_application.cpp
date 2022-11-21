@@ -98,7 +98,6 @@ EngineSimApplication::EngineSimApplication()
 
 EngineSimApplication::~EngineSimApplication()
 {
-    printf("\nShowing engine: %i", m_show_engine);
     printf("\nQuit\n");
 
     if (gGameController != NULL)
@@ -183,7 +182,6 @@ void EngineSimApplication::initialize(void *instance, ysContextObject::DeviceAPI
     m_engine.InitializeConsoleShaders(&m_shaderSet);
     m_engine.SetShaderSet(&m_shaderSet);
 
-    // m_shaders.SetClearColor(ysColor::srgbiToLinear(0x34, 0x98, 0xdb));
     m_shaders.SetClearColor(ysColor::srgbiToLinear(0xFF, 0xFF, 0xFF));
 
     m_assetManager.SetEngine(&m_engine);
@@ -493,14 +491,6 @@ void EngineSimApplication::initialize()
     material_UI->SetLit(false);
     material_UI->SetName("Material_UI");
 
-    /*
-    m_texture = textureAsset->GetTexture();
-    m_material = m_app->getAssetManager()->NewMaterial();
-    m_material->SetName("TestMaterial1");
-    m_material->SetIndex(99);
-    //m_material->SetDiffuseMap(m_texture);*/
-
-    // m_shaders.SetClearColor(ysColor::srgbiToLinear(0x34, 0x98, 0xdb));
     m_shaders.SetClearColor(ysColor::srgbiToLinear(0x34, 0x98, 0xFF));
 
     float trackScale = getIniReader().Get<float>("Track", "Scale");
@@ -516,13 +506,7 @@ void EngineSimApplication::initialize()
     m_assetManager.CompileInterchangeFile((m_assetPath + "/models/Head_2JZ_GE_Split").c_str(), 1.0f, true);
     m_assetManager.CompileInterchangeFile((m_assetPath + "/models/Camshaft_2JZ_GE").c_str(), 1.0f, true);
 
-    // m_assetManager.CompileInterchangeFile((m_assetPath + "/models/Grid").c_str(), 1.0f, true);
-    // m_assetManager.CompileInterchangeFile((m_assetPath + "/models/toyota_mr2").c_str(), 1.0f, true);
-    // m_assetManager.CompileInterchangeFile((m_assetPath + "/models/roads2").c_str(), 1.0f, true);
-    // m_assetManager.CompileInterchangeFile((m_assetPath + "/models/track_02").c_str(), 1.0f, true);
     m_assetManager.CompileInterchangeFile((m_assetPath + "/models/trackGarda").c_str(), trackScale, true);
-    // m_assetManager.CompileInterchangeFile((m_assetPath + "/models/city").c_str(), 1.0f, true);
-    // m_assetManager.CompileInterchangeFile((m_assetPath + "/models/trackMonza").c_str(), trackScale, true);
     m_assetManager.CompileInterchangeFile((m_assetPath + "/models/cube").c_str(), 1.0f, true);
 
     float vehicleScale = getIniReader().Get<float>("Vehicle", "Scale");
@@ -538,14 +522,8 @@ void EngineSimApplication::initialize()
     m_assetManager.LoadSceneFile((m_assetPath + "/models/Head_2JZ_GE_Split").c_str(), true);
     m_assetManager.LoadSceneFile((m_assetPath + "/models/Camshaft_2JZ_GE").c_str(), true);
 
-    // m_assetManager.LoadSceneFile((m_assetPath + "/models/Grid").c_str(), true);
-    // m_assetManager.LoadSceneFile((m_assetPath + "/models/toyota_mr2").c_str(), true);
-    // m_assetManager.LoadSceneFile((m_assetPath + "/models/roads2").c_str(), true);
-    // m_assetManager.LoadSceneFile((m_assetPath + "/models/track_02").c_str(), true);
     m_assetManager.LoadSceneFile((m_assetPath + "/models/trackGarda").c_str(), true);
-    // m_assetManager.LoadSceneFile((m_assetPath + "/models/trackMonza").c_str(), true);
     m_assetManager.LoadSceneFile((m_assetPath + "/models/cube").c_str(), true);
-    // m_assetManager.LoadSceneFile((m_assetPath + "/models/city").c_str(), true);
     m_assetManager.LoadSceneFile((m_assetPath + "/models/" + vehicleModelFileName).c_str(), true);
 
     if (m_selected_track == 4)
@@ -560,10 +538,6 @@ void EngineSimApplication::initialize()
         m_assetManager.CompileInterchangeFile((path).c_str(), 1.0f, true);
         m_assetManager.LoadSceneFile((path).c_str(), true);
     }
-
-    // printf("\n Error: %i", m_assetManager.LoadSceneFile((m_assetPath + "/models/city").c_str(), true));
-
-    // m_assetManager.LoadTexture("./tire.png", "TestTexture4");
 
     m_textRenderer.SetEngine(&m_engine);
     m_textRenderer.SetRenderer(m_engine.GetUiRenderer());
@@ -663,24 +637,14 @@ void EngineSimApplication::process(float frame_dt)
     // Prepare for simulation. Typically we use a time step of 1/60 of a
     // second (60Hz) and 10 iterations. This provides a high quality simulation
     // in most game scenarios.
-    // float timeStep = 1.0f / 60.0f;
+    float timeStep = 1.0f / 60.0f;
     int32 velocityIterations = 1;
     int32 positionIterations = 1;
 
     // Instruct the world to perform a single step of simulation.
     // It is generally best to keep the time step and iterations fixed.
-    // if(world != nullptr)
-    // world->Step(timeStep, velocityIterations, positionIterations);
 
     frame_dt = clamp(frame_dt, 1 / 200.0f, 1 / 30.0f);
-
-    // process(0.01f);
-
-    // Now print the position and angle of the body.
-    // b2Vec2 position = body2->GetPosition();
-    // float angle = body2->GetAngle();
-
-    // printf("\n%4.2f %4.2f %4.2f\n", position.x, position.y, angle);
 
     double speed = 1.0 / 1.0;
     if (m_engine.IsKeyDown(ysKey::Code::N1))
@@ -704,15 +668,11 @@ void EngineSimApplication::process(float frame_dt)
         speed = 1 / 1000.0;
     }
 
-    
-
     m_simulator.setSimulationSpeed(speed);
 
     m_world->Step(speed * frame_dt, velocityIterations, positionIterations);
     
-    // TODO !!
-    //m_vehicle_object->process(speed * frame_dt);
-    //return;
+    m_vehicle_object->process(speed * frame_dt);
 
     const double avgFramerate = clamp(m_engine.GetAverageFramerate(), 30.0f, 1000.0f);
     m_simulator.startFrame(1 / avgFramerate);
@@ -814,24 +774,11 @@ void EngineSimApplication::render()
         object->generateGeometry();
     }
 
-    //m_viewParameters.Sublayer = 0;
     for (SimulationObject *object : m_objects)
     {
         object->render(&getViewParameters());
     }
-    /*
-        m_viewParameters.Sublayer = 1;
-        for (SimulationObject *object : m_objects)
-        {
-            object->render(&getViewParameters());
-        }
 
-        m_viewParameters.Sublayer = 2;
-        for (SimulationObject *object : m_objects)
-        {
-            object->render(&getViewParameters());
-        }
-    */
     m_shaders.UseMaterial(m_assetManager.FindMaterial("Material_UI"));
     m_uiManager.render();
 }
@@ -871,11 +818,6 @@ void EngineSimApplication::run()
                 m_audioSource->SetMode(ysAudioSource::Mode::Loop);
             }
         }
-        /*
-                if (m_engine.ProcessKeyDown(ysKey::Code::Tab)) {
-                    m_screen++;
-                    if (m_screen > 2) m_screen = 0;
-                }*/
 
         if (m_engine.ProcessKeyDown(ysKey::Code::Tab))
         {
@@ -1264,18 +1206,12 @@ void EngineSimApplication::processEngineInput()
     const float dt = m_engine.GetFrameLength();
     bool fineControlMode = m_engine.IsKeyDown(ysKey::Code::Space);
 
-    // const bool fineControlMode = m_engine.IsKeyDown(ysKey::Code::N9);
-
     int mx, my, mz;
     m_engine.GetMousePos(&mx, &my);
 
     if (m_engine.ProcessMouseButtonDown(ysMouse::Button::Left))
     {
         m_dragStartMousePosition = ysVector2(mx, my);
-    }
-
-    if (m_engine.ProcessMouseButtonUp(ysMouse::Button::Left))
-    {
     }
 
     const int mouseWheel = m_engine.GetMouseWheel();
@@ -1427,9 +1363,7 @@ void EngineSimApplication::processEngineInput()
     if (m_engine.ProcessKeyDown(ysKey::Code::M))
     {
         m_show_engine = !m_show_engine;
-        printf("\nShow engine: %i", m_show_engine);
-        // m_infoCluster->setLogMessage("Show engine: " + std::to_string(m_show_engine));
-        m_infoCluster->setLogMessage("Show engine: " + std::to_string(m_vehicle->m_brakes));
+        m_infoCluster->setLogMessage("Show engine: " + std::to_string(m_show_engine));
     }
     if (m_engine.ProcessKeyDown(ysKey::Code::N))
     {
@@ -1605,7 +1539,7 @@ void EngineSimApplication::renderScene()
     getShaders()->ResetBaseColor();
     getShaders()->SetObjectTransform(ysMath::LoadIdentity());
 
-    m_shaders.SetClearColor(ysColor::linearToSrgb(ysColor::srgbiToLinear(0x995500)));
+    m_shaders.SetClearColor(ysColor::linearToSrgb(ysColor::srgbiToLinear(0x225599)));
 
     const int screenWidth = m_engine.GetGameWindow()->GetGameWidth();
     const int screenHeight = m_engine.GetGameWindow()->GetGameHeight();
@@ -1782,13 +1716,13 @@ void EngineSimApplication::renderScene()
     
 
     // TODO
-    if(false)
+    //if(false)
     if (!isTargetEngine)
     {
         float vehicleAngle = 0;//m_simulator.getVehicle()->m_rotation;
         float cameraTargetForward = 0.9f;
 
-        if(false)
+        //if(false)
         m_shaders.CalculateCamera(
             cameraAspectRatio * m_displayHeight / m_engineView->m_zoom,
             m_displayHeight / m_engineView->m_zoom,
@@ -1808,7 +1742,7 @@ void EngineSimApplication::renderScene()
     }
     else
     {
-        if(false)
+        //if(false)
         m_shaders.CalculateCamera(
             cameraAspectRatio * m_displayHeight / m_engineView->m_zoom,
             m_displayHeight / m_engineView->m_zoom,

@@ -8,10 +8,6 @@
 	path = dependencies/submodules/simple-2d-constraint-solver
 	url = https://github.com/bobsayshilol/simple-2d-constraint-solver/
 	branch = gcc-fixes
-[submodule "dependencies/submodules/delta-studio"]
-	path = dependencies/submodules/delta-studio
-	url = https://github.com/bobsayshilol/delta-studio/
-	branch = sdl-build
 [submodule "dependencies/submodules/piranha"]
 	path = dependencies/submodules/piranha
 	url = https://github.com/bobsayshilol/piranha/
@@ -19,3 +15,6 @@
 [submodule "dependencies/submodules/box2d"]
 	path = dependencies/submodules/box2d
 	url = https://github.com/erincatto/box2d
+[submodule "dependencies/submodules/delta-studio"]
+	path = dependencies/submodules/delta-studio
+	url = https://github.com/jotalamp/delta-studio

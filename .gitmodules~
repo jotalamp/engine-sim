@@ -1,6 +1,3 @@
-[submodule "dependencies/submodules/box2d"]
-	path = dependencies/submodules/box2d
-	url = https://github.com/erincatto/box2d
 [submodule "dependencies/submodules/csv-io"]
 	path = dependencies/submodules/csv-io
 	url = https://github.com/ange-yaghi/csv-io
@@ -19,3 +16,6 @@
 	path = dependencies/submodules/piranha
 	url = https://github.com/bobsayshilol/piranha/
 	branch = sdl-build
+[submodule "dependencies/submodules/box2d"]
+	path = dependencies/submodules/box2d
+	url = https://github.com/erincatto/box2d

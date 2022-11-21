@@ -129,8 +129,6 @@ VehicleObject::VehicleObject(EngineSimApplication *app, b2World *world, Vehicle 
     m_tires[2] = new TireObject(app, world, m_vehicle, &m_transform, m_body, b2Vec2(-m_vehicle_model.tireX, m_vehicle_model.tireRearZ), vehicleModel.tireY, true);
     m_tires[3] = new TireObject(app, world, m_vehicle, &m_transform, m_body, b2Vec2(-m_vehicle_model.tireX, m_vehicle_model.tireFrontZ), vehicleModel.tireY, true);
 
-    printf("\nMass: %f", m_body->GetMass());
-
     m_tires[0]->m_joint->SetLimits(0.0f, 0.0f);
     m_tires[2]->m_joint->SetLimits(0.0f, 0.0f);
 
