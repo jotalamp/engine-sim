@@ -10,6 +10,6 @@ cmake --build . --target engine-sim-app -j
 
 # or
 
-#cmake -DCMAKE_BUILD_TYPE=Release ../
-#cmake --build . --target engine-sim-app -j
-#./engine-sim-app
+cmake -DCMAKE_BUILD_TYPE=Release ../
+cmake --build . --target engine-sim-app -j
+./engine-sim-app
