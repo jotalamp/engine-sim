@@ -595,7 +595,7 @@ void EngineSimApplication::initialize()
     }
     else
     {
-        std::string mappingFilePath = "./gamecontrollerdb.txt";
+        std::string mappingFilePath = "../gamecontrollerdb.txt";
         int i = SDL_GameControllerAddMappingsFromFile(mappingFilePath.c_str());
         if (i == -1)
         {
@@ -659,6 +659,7 @@ void EngineSimApplication::initialize()
 
 void EngineSimApplication::process(float frame_dt)
 {
+    return;
     // Prepare for simulation. Typically we use a time step of 1/60 of a
     // second (60Hz) and 10 iterations. This provides a high quality simulation
     // in most game scenarios.
@@ -1595,6 +1596,7 @@ void EngineSimApplication::processEngineInput()
 
 void EngineSimApplication::renderScene()
 {
+    
     getShaders()->ResetBaseColor();
     getShaders()->SetObjectTransform(ysMath::LoadIdentity());
 
@@ -1610,6 +1612,8 @@ void EngineSimApplication::renderScene()
     m_shaders.CalculateUiCamera(screenWidth, screenHeight);
 
     m_screen = m_screen % 4;
+
+    return;
 
     switch (m_screen)
     {

@@ -33,7 +33,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "box2d/box2d.h"
+#include "../dependencies/submodules/box2d/include/box2d/box2d.h"
 #include "ini/ini.h"
 #include "vehicle_object.h"
 

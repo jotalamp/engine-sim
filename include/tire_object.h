@@ -1,7 +1,7 @@
 #ifndef ATG_ENGINE_SIM_TIRE_OBJECT_H
 #define ATG_ENGINE_SIM_TIRE_OBJECT_H
 
-#include "box2d/box2d.h"
+#include "../dependencies/submodules/box2d/include/box2d/box2d.h"
 
 #include "simulation_object.h"
 

@@ -7,7 +7,7 @@
 #include "vehicle.h"
 #include "geometry_generator.h"
 
-#include "box2d/box2d.h"
+#include "../dependencies/submodules/box2d/include/box2d/box2d.h"
 
 class GroundObject : public SimulationObject {
     public:

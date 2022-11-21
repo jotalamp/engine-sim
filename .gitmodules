@@ -16,3 +16,6 @@
 	path = dependencies/submodules/piranha
 	url = https://github.com/bobsayshilol/piranha/
 	branch = sdl-build
+[submodule "dependencies/submodules/box2d"]
+	path = dependencies/submodules/box2d
+	url = https://github.com/erincatto/box2d

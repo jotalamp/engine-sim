@@ -30,3 +30,5 @@ set_property(TARGET piranha_test PROPERTY FOLDER "piranha")
 set_property(TARGET piranha_reference_compiler PROPERTY FOLDER "piranha")
 
 add_subdirectory(box2d)
+
+set_property(TARGET box2d PROPERTY FOLDER "box2d")

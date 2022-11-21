@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 option(DTV "Enable video output" OFF)
 option(PIRANHA_ENABLED "Enable scripting input" OFF)
-option(DISCORD_ENABLED "Enable Discord Rich Presence" ON)
+option(DISCORD_ENABLED "Enable Discord Rich Presence" OFF)
 
 if (DTV)
     add_compile_definitions(ATG_ENGINE_SIM_VIDEO_CAPTURE)
@@ -78,6 +78,14 @@ add_library(engine-sim STATIC
     src/low_pass_filter.cpp
     src/vehicle_drag_constraint.cpp
     src/impulse_response.cpp
+    src/ground.cpp
+    src/ground_object.cpp
+    src/tire.cpp
+    src/tire_object.cpp
+    src/vehicle.cpp
+    src/vehicle_object.cpp
+    src/custom_gauge_cluster.cpp
+    src/jitter_filter.cpp
 
     # Include files
     include/crankshaft.h
@@ -113,12 +121,21 @@ add_library(engine-sim STATIC
     include/low_pass_filter.h
     include/vehicle_drag_constraint.h
     include/impulse_response.h
+    include/ground.h
+    include/ground_object.h
+    include/tire.h
+    include/tire_object.h
+    include/vehicle.h
+    include/vehicle_object.h
+    include/custom_gauge_cluster.h
+    include/jitter_filter.cpp
 )
 
 target_link_libraries(engine-sim
     simple-2d-constraint-solver
     csv-io
-    delta-basic)
+    delta-basic
+    box2d)
 
 target_include_directories(engine-sim
     PUBLIC dependencies/submodules)
@@ -164,7 +181,8 @@ if (PIRANHA_ENABLED)
 
     target_link_libraries(engine-sim-script-interpreter
         csv-io
-        piranha)
+        piranha
+        box2d)
 endif (PIRANHA_ENABLED)
 
 if (DISCORD_ENABLED)
@@ -213,6 +231,8 @@ add_executable(engine-sim-app WIN32
     src/load_simulation_cluster.cpp
     src/mixer_cluster.cpp
     src/info_cluster.cpp
+    src/ground.cpp
+    src/ground_object.cpp
 
     # Include files
     include/delta.h
@@ -248,6 +268,8 @@ add_executable(engine-sim-app WIN32
     include/load_simulation_cluster.h
     include/mixer_cluster.h
     include/info_cluster.h
+    include/ground.h
+    include/ground_object.h
 )
 
 target_link_libraries(engine-sim-app
