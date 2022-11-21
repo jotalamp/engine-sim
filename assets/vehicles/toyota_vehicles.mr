@@ -1,0 +1,43 @@
+import "engine_sim.mr"
+
+units units()  
+
+public node toyota_vehicle {
+    alias output __out:
+        vehicle(
+            mass: 1300 * units.kg,
+            drag_coefficient: 0.31,
+            cross_sectional_area: (1690 * units.mm) * (1385 * units.mm),
+            diff_ratio: 4.058,
+            tire_radius: 292 * units.mm,
+            rolling_resistance: 255 * units.N
+        );
+}
+
+public node toyota_transmission {
+    alias output __out:
+        transmission(
+            max_clutch_torque: 200 * units.lb_ft
+        )
+        
+	.add_gear(5)
+	.add_gear(2.5)
+	.add_gear(1.6666666666667)
+	.add_gear(1.25)
+	.add_gear(1)
+	.add_gear(0.83333333333333)
+	.add_gear(0.71428571428571)
+	.add_gear(0.625)
+	.add_gear(0.55555555555556)
+	.add_gear(0.5)
+	.add_gear(0.45454545454545)
+	.add_gear(0.41666666666667)
+	.add_gear(0.38461538461538)
+	.add_gear(0.35714285714286)
+	.add_gear(0.33333333333333)
+	.add_gear(0.3125)
+	.add_gear(0.29411764705882)
+	.add_gear(0.27777777777778)
+	.add_gear(0.26315789473684)
+	.add_gear(0.25);
+}

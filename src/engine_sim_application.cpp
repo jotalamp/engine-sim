@@ -1785,9 +1785,10 @@ void EngineSimApplication::renderScene()
     if(false)
     if (!isTargetEngine)
     {
-        float vehicleAngle = m_simulator.getVehicle()->m_rotation;
+        float vehicleAngle = 0;//m_simulator.getVehicle()->m_rotation;
         float cameraTargetForward = 0.9f;
 
+        if(false)
         m_shaders.CalculateCamera(
             cameraAspectRatio * m_displayHeight / m_engineView->m_zoom,
             m_displayHeight / m_engineView->m_zoom,
@@ -1807,6 +1808,7 @@ void EngineSimApplication::renderScene()
     }
     else
     {
+        if(false)
         m_shaders.CalculateCamera(
             cameraAspectRatio * m_displayHeight / m_engineView->m_zoom,
             m_displayHeight / m_engineView->m_zoom,

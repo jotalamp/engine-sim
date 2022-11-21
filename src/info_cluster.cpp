@@ -69,7 +69,7 @@ void InfoCluster::render() {
     drawFrame(engineInfoBounds, 1.0f, m_app->getForegroundColor(), m_app->getBackgroundColor());
 
     drawAlignedText(
-        (m_engine != nullptr) ? m_engine->getName() : "<NO ENGINE>",
+        (m_engine != nullptr) ? m_engine->getName() : "<NO ENGINE> :(",
         engineInfoBounds.inset(10.0f),
         24.0f,
         Bounds::lm,

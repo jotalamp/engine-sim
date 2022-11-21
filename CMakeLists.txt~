@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 option(DTV "Enable video output" OFF)
-option(PIRANHA_ENABLED "Enable scripting input" OFF)
+option(PIRANHA_ENABLED "Enable scripting input" ON)
 option(DISCORD_ENABLED "Enable Discord Rich Presence" OFF)
 
 if (DTV)
@@ -128,7 +128,7 @@ add_library(engine-sim STATIC
     include/vehicle.h
     include/vehicle_object.h
     include/custom_gauge_cluster.h
-    include/jitter_filter.cpp
+    include/jitter_filter.h
 )
 
 target_link_libraries(engine-sim
