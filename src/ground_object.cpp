@@ -80,7 +80,7 @@ void GroundObject::render(const ViewParameters *view)
 {
     resetShader();
 
-    if (m_app->m_debug)
+    if (true/*m_app->m_debug*/)
     {
         b2Fixture *fixture = m_dynamic_bodies[0]->GetFixtureList();
         b2PolygonShape *poly = (b2PolygonShape *)fixture->GetShape();

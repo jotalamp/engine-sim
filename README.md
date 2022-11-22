@@ -1,3 +1,56 @@
+## Unofficial 3D version related instructions (WIP) (Original README below)
+
+This is Unofficial 3D version of AngeTheGreat's Engine Simulator
+
+## **Warning: project is in development and will change frequently**
+
+# How do I build and run it?
+**Note: this project currently only builds (maybe) on Linux!**
+
+```
+sudo apt-get install git clang libsdl2-dev flex bison cmake
+git clone --recurse-submodules https://github.com/jotalamp/engine-sim
+cd engine-sim
+mkdir build
+cd build
+
+CC=clang CXX=clang++ cmake -DCMAKE_BUILD_TYPE=Release ../
+cmake --build . --target engine-sim-app -j
+./engine-sim-app
+```
+
+## How do I use it?
+
+You find original controls below, most of them work
+
+New controls (you need game controller connected before strating the app for driving the car, i'm using PS4 controller as an example):
+
+This uses mappings from: 
+# https://github.com/gabomdq/SDL_GameControllerDB
+you can edit gamecontrollerdb.txt file if you need to change mappings for your game controller
+
+| Key/Input | Action |
+| :---: | :---: |
+| M | Toggle debug cubes visiblity |
+| N | Toggle show engine |
+
+| PS4 controller button | Action |
+| :---: | :---: |
+| Triangle | Toggle ignition |
+| Circle | Hold for starter |
+| Cross | Up Gear | 
+| Square | Down Gear |
+| R2 | Throttle |
+| L2 | Clutch |
+| L1 | Brakes |
+| Left Stick | Steering |
+
+(There is some other buttons too.)
+
+(These instructions are WIP)
+
+## ------- ORIGINAL README STARTS HERE --------------------------
+
 # Engine Simulator
 ![Alt text](docs/public/screenshot_v01.png?raw=true)
 ---
