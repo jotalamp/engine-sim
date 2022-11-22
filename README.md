@@ -23,7 +23,7 @@ cmake --build . --target engine-sim-app -j
 
 You find original controls below, most of them work
 
-New controls (you need game controller connected before strating the app for driving the car, i'm using PS4 controller as an example):
+New controls (you need game controller connected before starting the app for driving the car, i'm using PS4 controller as an example):
 
 This uses mappings from: 
 # https://github.com/gabomdq/SDL_GameControllerDB
