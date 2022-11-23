@@ -51,6 +51,8 @@ class EngineSimApplication {
         void run();
         void destroy();
 
+        void loadMaterial(std::string filename, std::string name);
+
         void loadEngine(Engine *engine, Vehicle *vehicle, Transmission *transmission);
         void drawGenerated(
                 const GeometryGenerator::GeometryIndices &indices,

@@ -33,8 +33,8 @@ CustomGaugeCluster::~CustomGaugeCluster() {
 void CustomGaugeCluster::initialize(EngineSimApplication *app) {
     UiElement::initialize(app);
 
-    m_tachometer                = addElement<LabeledGauge>();
-    m_speedometer               = addElement<LabeledGauge>();
+    m_tachometer                = addElement<CustomLabeledGauge>();
+    m_speedometer               = addElement<CustomLabeledGauge>();
     //m_manifoldVacuumGauge       = addElement<LabeledGauge>();
     //m_intakeCfmGauge            = addElement<LabeledGauge>();
     //m_volumetricEffGauge        = addElement<LabeledGauge>();
@@ -259,11 +259,11 @@ void CustomGaugeCluster::render() {
 
     const Bounds gearBounds = grid.get(m_bounds, 11, 8);
     const Bounds insetBounds = gearBounds.inset(10.0f);
-    const Bounds title = insetBounds.verticalSplit(0.9f, 1.0f);
-    const Bounds body = insetBounds.verticalSplit(0.0f, 0.9f);
+    const Bounds title = insetBounds.verticalSplit(0.0f, 0.1f);
+    const Bounds body = insetBounds.verticalSplit(0.1f, 0.9f);
 
-    drawFrame(gearBounds, 1.0f, m_app->getForegroundColor(), m_app->getBackgroundColor());
-    drawCenteredText("Gear", title.inset(10.0f), 24.0f);
+    //drawFrame(gearBounds, 1.0f, m_app->getForegroundColor(), m_app->getBackgroundColor());
+    //drawCenteredText("Gear", title.inset(10.0f), 24.0f);
 
     const int gear = (m_simulator->getTransmission() != nullptr)
         ? m_simulator->getTransmission()->getGear()
