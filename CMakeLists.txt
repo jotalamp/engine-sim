@@ -224,6 +224,7 @@ add_executable(engine-sim-app WIN32
     src/custom_gauge_cluster.cpp
     src/cylinder_temperature_gauge.cpp
     src/labeled_gauge.cpp
+    src/custom_labeled_gauge.cpp
     src/throttle_display.cpp
     src/afr_cluster.cpp
     src/fuel_cluster.cpp
@@ -263,6 +264,7 @@ add_executable(engine-sim-app WIN32
     include/custom_gauge_cluster.h
     include/cylinder_temperature_gauge.h
     include/labeled_gauge.h
+    include/custom_labeled_gauge.h
     include/throttle_display.h
     include/afr_cluster.h
     include/fuel_cluster.h

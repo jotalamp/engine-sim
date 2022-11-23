@@ -196,6 +196,23 @@ void EngineSimApplication::initialize(void *instance, ysContextObject::DeviceAPI
     initialize();
 }
 
+void EngineSimApplication::loadMaterial(std::string filename, std::string name) {
+    dbasic::TextureAsset *textureAsset;
+    dbasic::Material *material;
+
+    printf(("Loading Material: " + name + "\n").c_str());
+
+    const char* textureName = ("Texture" + name).c_str();
+    const char* materialName = ("Material" + name).c_str();
+
+    m_assetManager.LoadTexture(filename.c_str(), textureName);
+    textureAsset = m_assetManager.GetTexture(textureName);
+    material = m_assetManager.NewMaterial();
+    material->SetDiffuseColor(ysColor::srgbiToLinear(0x777777));
+    material->SetDiffuseMap(textureAsset->GetTexture());
+    material->SetName(materialName);
+}
+
 void EngineSimApplication::initialize()
 {
     m_iniReader = inih::INIReader{"../settings.ini"};
@@ -212,53 +229,18 @@ void EngineSimApplication::initialize()
 
     zoom = 20.0f;
 
-    dbasic::TextureAsset *textureAsset;
-    dbasic::Material *material;
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     if (m_selected_car == 1)
     {
-        m_assetManager.LoadTexture("../assets/textures/bluebird/wheel_sj30_dff.png", "TextureWheel");
-        textureAsset = m_assetManager.GetTexture("TextureWheel");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseColor(ysColor::srgbiToLinear(0x777777));
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialWheel");
-
-        m_assetManager.LoadTexture("../assets/textures/bluebird/wp_tire_01_diff.png", "TextureTire");
-        textureAsset = m_assetManager.GetTexture("TextureTire");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialTire");
-
-        m_assetManager.LoadTexture("../assets/textures/bluebird/ucb_interior_2800x2800.png", "TextureInterior");
-        textureAsset = m_assetManager.GetTexture("TextureInterior");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialInterior");
-
-        m_assetManager.LoadTexture("../assets/textures/bluebird/headlights_ucb.png", "TextureHeadlights");
-        textureAsset = m_assetManager.GetTexture("TextureHeadlights");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialHeadlights");
-
-        m_assetManager.LoadTexture("../assets/textures/bluebird/UCB_Bottom_2048x2048.png", "TextureBottom");
-        textureAsset = m_assetManager.GetTexture("TextureBottom");
-
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialBottom");
-
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetDiffuseMix(0.5f);
-        material->SetName("MaterialBottom2");
-
-        m_assetManager.LoadTexture("../assets/textures/bluebird/ucb_coil.png", "TextureCoil");
-        textureAsset = m_assetManager.GetTexture("TextureCoil");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialCoil");
+        // new
+        loadMaterial("../assets/textures/bluebird/wheel_sj30_dff.png", "Wheel");
+        loadMaterial("../assets/textures/bluebird/wp_tire_01_diff.png", "Tire");
+        loadMaterial("../assets/textures/bluebird/ucb_interior_2800x2800.png", "Interior");
+        loadMaterial("../assets/textures/bluebird/headlights_ucb.png", "Headlights");
+        loadMaterial("../assets/textures/bluebird/UCB_Bottom_2048x2048.png", "Bottom");
+        loadMaterial("../assets/textures/bluebird/UCB_Bottom_2048x2048.png", "Bottom2");
+        loadMaterial("../assets/textures/bluebird/ucb_coil.png", "Coil");
     }
 
     m_assetManager.LoadTexture("../assets/textures/wheel_sj30_nrm.png", "NormalMap");
@@ -287,6 +269,9 @@ void EngineSimApplication::initialize()
     // material_03->SetDiffuseMap(textureAsset_03->GetTexture());
     material_03->SetLit(true);
     material_03->SetName("Material_03");
+
+    dbasic::TextureAsset *textureAsset;
+    dbasic::Material *material;
 
     material = m_assetManager.NewMaterial();
     material->SetDiffuseColor(ysColor::srgbiToLinear(0x00FF00));
@@ -425,65 +410,16 @@ void EngineSimApplication::initialize()
 
     if (true)
     {
-        m_assetManager.LoadTexture("../assets/textures/city/Roads_Grounds.png", "TextureCityRoads");
-        textureAsset = m_assetManager.GetTexture("TextureCityRoads");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialCityRoads");
-
-        m_assetManager.LoadTexture("../assets/textures/city/Filler_Buildings_1.png", "TextureFiller");
-        textureAsset = m_assetManager.GetTexture("TextureFiller");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialFiller");
-
-        m_assetManager.LoadTexture("../assets/textures/city/LM_Basketball.png", "TextureBasketball");
-        textureAsset = m_assetManager.GetTexture("TextureBasketball");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialBasketball");
-
-        m_assetManager.LoadTexture("../assets/textures/city/City_Props.png", "TextureProps");
-        textureAsset = m_assetManager.GetTexture("TextureProps");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialProps");
-
-        m_assetManager.LoadTexture("../assets/textures/city/LM_Clinic.png", "TextureClinic");
-        textureAsset = m_assetManager.GetTexture("TextureClinic");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialClinic");
-
-        m_assetManager.LoadTexture("../assets/textures/city/LM_FishFactory.png", "TextureFish");
-        textureAsset = m_assetManager.GetTexture("TextureFish");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialFish");
-
-        m_assetManager.LoadTexture("../assets/textures/city/LM_Laundrymat.png", "TextureLaundry");
-        textureAsset = m_assetManager.GetTexture("TextureLaundry");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialLaundry");
-
-        m_assetManager.LoadTexture("../assets/textures/city/LM_Pawnshop.png", "TexturePawn");
-        textureAsset = m_assetManager.GetTexture("TexturePawn");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialPawn");
-
-        m_assetManager.LoadTexture("../assets/textures/city/LM_Projects.png", "TextureProjects");
-        textureAsset = m_assetManager.GetTexture("TextureProjects");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialProjects");
-
-        m_assetManager.LoadTexture("../assets/textures/city/Paramount.png", "TextureParamount");
-        textureAsset = m_assetManager.GetTexture("TextureParamount");
-        material = m_assetManager.NewMaterial();
-        material->SetDiffuseMap(textureAsset->GetTexture());
-        material->SetName("MaterialParamount");
+        loadMaterial("../assets/textures/city/Roads_Grounds.png", "CityRoads");
+        loadMaterial("../assets/textures/city/Filler_Buildings_1.png", "Filler");
+        loadMaterial("../assets/textures/city/LM_Basketball.png", "Basketball");
+        loadMaterial("../assets/textures/city/City_Props.png", "Props");
+        loadMaterial("../assets/textures/city/LM_Clinic.png", "Clinic");
+        loadMaterial("../assets/textures/city/LM_FishFactory.png", "Fish");
+        loadMaterial("../assets/textures/city/LM_Laundrymat.png", "Laundry");
+        loadMaterial("../assets/textures/city/LM_Pawnshop.png", "Pawn");
+        loadMaterial("../assets/textures/city/LM_Projects.png", "Projects");
+        loadMaterial("../assets/textures/city/Paramount.png", "Paramount");
     }
 
     dbasic::Material *material_UI;
@@ -492,6 +428,13 @@ void EngineSimApplication::initialize()
     material_UI->SetName("Material_UI");
 
     m_shaders.SetClearColor(ysColor::srgbiToLinear(0x34, 0x98, 0xFF));
+
+    std::chrono::steady_clock::time_point material_end = std::chrono::steady_clock::now();
+    printf("Model loading took: ");
+    printf((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds> (material_end - begin).count())).c_str());
+    printf(" ms.\n");
+
+    std::chrono::steady_clock::time_point model_begin = std::chrono::steady_clock::now();
 
     float trackScale = getIniReader().Get<float>("Track", "Scale");
     std::string vehicleModelFileName = getIniReader().Get<std::string>("Vehicle", "ModelFileName");
@@ -560,6 +503,13 @@ void EngineSimApplication::initialize()
     m_audioSource->SetPan(0.0f);
     m_audioSource->SetVolume(1.0f);
 
+    std::chrono::steady_clock::time_point model_end = std::chrono::steady_clock::now();
+    printf("Model/ES loading took: ");
+    printf((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds> (model_end - model_begin).count())).c_str());
+    printf(" ms.\n");
+
+    std::chrono::steady_clock::time_point joy_begin = std::chrono::steady_clock::now();
+
     int selectedController = 0;
     std::string joyOrGC;
 
@@ -616,6 +566,16 @@ void EngineSimApplication::initialize()
             }
         }
     }
+
+    std::chrono::steady_clock::time_point joy_end = std::chrono::steady_clock::now();
+    printf("Joystick Loading took: ");
+    printf((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds> (joy_end - joy_begin).count())).c_str());
+    printf(" ms.\n");
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    printf("Loading took: ");
+    printf((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count())).c_str());
+    printf(" ms.\n");
 
 #ifdef ATG_ENGINE_DISCORD_ENABLED
     // Create a global instance of discord-rpc
@@ -1120,7 +1080,7 @@ void EngineSimApplication::createObjects(Engine *engine)
 
     engine->scaleZ = engine->getHead(0)->getCylinderBank()->getBore() * 1.042f;
 
-    printf("\nObjects created");
+    printf("\nObjects created\n");
 }
 
 void EngineSimApplication::destroyObjects()

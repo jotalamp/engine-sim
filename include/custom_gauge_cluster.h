@@ -7,7 +7,7 @@
 #include "simulator.h"
 #include "gauge.h"
 #include "firing_order_display.h"
-#include "labeled_gauge.h"
+#include "custom_labeled_gauge.h"
 #include "throttle_display.h"
 #include "afr_cluster.h"
 #include "fuel_cluster.h"
@@ -41,8 +41,8 @@ class CustomGaugeCluster : public UiElement {
         void renderTachSpeedCluster(const Bounds &bounds);
         void renderFuelAirCluster(const Bounds &bounds);
 
-        LabeledGauge *m_tachometer;
-        LabeledGauge *m_speedometer;
+        CustomLabeledGauge *m_tachometer;
+        CustomLabeledGauge *m_speedometer;
         //LabeledGauge *m_manifoldVacuumGauge;
         //LabeledGauge *m_intakeCfmGauge;
         //LabeledGauge *m_volumetricEffGauge;
