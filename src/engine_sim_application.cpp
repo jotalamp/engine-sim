@@ -201,7 +201,7 @@ void EngineSimApplication::loadMaterial(std::string filename, std::string name)
     dbasic::TextureAsset *textureAsset;
     dbasic::Material *material;
 
-    printf(("Loading Material: " + name + "\n").c_str());
+    printf(("\nLoading Material: " + name).c_str());
 
     const char *textureName = ("Texture" + name).c_str();
     const char *materialName = ("Material" + name).c_str();
@@ -217,18 +217,24 @@ void EngineSimApplication::loadMaterial(std::string filename, std::string name)
 void EngineSimApplication::initialize()
 {
     m_iniReader = inih::INIReader{"../settings.ini"};
+
     m_selected_track = m_iniReader.Get<int>("Settings", "SelectedTrack");
     printf("\nSelected Track: %i", m_selected_track);
+
     m_show_engine = m_iniReader.Get<bool>("Settings", "ShowEngine");
     printf("\nShowing engine: %i", m_show_engine);
+
+    m_fovY = m_iniReader.Get<float>("Camera", "FovY") * (ysMath::Constants::PI / 180.0f);
+    printf("\nFovY: %f", m_fovY);
+
+    m_zoom = m_iniReader.Get<float>("Camera", "Zoom");
+    printf("\nZoom: %f", m_fovY);
 
     // Define the gravity vector.
     b2Vec2 gravity(0.0f, 0.0f);
 
     // Construct a world object, which will hold and simulate the rigid bodies.
     m_world = new b2World(gravity);
-
-    zoom = 20.0f;
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -1179,7 +1185,7 @@ void EngineSimApplication::processEngineInput()
     const int mouseWheelDelta = mouseWheel - m_lastMouseWheel;
     m_lastMouseWheel = mouseWheel;
 
-    zoom = clamp(zoom - 0.01f * mouseWheelDelta, 0.9f, 90.0f);
+    m_zoom = clamp(m_zoom - 0.01f * mouseWheelDelta, 0.9f, 90.0f);
 
     if (m_engine.ProcessJoystickButtonDown(ysJoystick::Button::Button_Back))
     {
@@ -1653,9 +1659,7 @@ void EngineSimApplication::renderScene()
         float deltaY = -0.0004f * (my - m_dragStartMousePosition.y);
 
         if (abs(deltaX) > 0.001f)
-        {
             m_cameraRotation.x += deltaX;
-        }
 
         if (abs(deltaY) > 0.001f)
             m_cameraRotation.y += deltaY;
@@ -1682,9 +1686,11 @@ void EngineSimApplication::renderScene()
             m_screenWidth,
             m_screenHeight,
 
+            m_fovY,
+
             m_cameraRotation.x,
             m_cameraRotation.y,
-            zoom,
+            m_zoom,
 
             m_simulator.getVehicle()->m_transform_camera->GetWorldPosition()[0] + cameraTargetForward * sin(vehicleAngle),
             m_simulator.getVehicle()->m_transform_camera->GetWorldPosition()[1],
@@ -1701,9 +1707,11 @@ void EngineSimApplication::renderScene()
             m_screenWidth,
             m_screenHeight,
 
+            m_fovY,
+
             m_cameraRotation.x,
             m_cameraRotation.y,
-            zoom,
+            m_zoom,
 
             m_simulator.getVehicle()->m_transform_engine->GetWorldPosition()[0],
             m_simulator.getVehicle()->m_transform_engine->GetWorldPosition()[1],
