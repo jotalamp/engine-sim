@@ -224,11 +224,12 @@ void EngineSimApplication::initialize()
     m_show_engine = m_iniReader.Get<bool>("Settings", "ShowEngine");
     printf("\nShowing engine: %i", m_show_engine);
 
-    m_fovY = m_iniReader.Get<float>("Camera", "FovY") * (ysMath::Constants::PI / 180.0f);
+    m_fovY = m_iniReader.Get<float>("Camera", "FovY");
     printf("\nFovY: %f", m_fovY);
+    m_fovY *= (ysMath::Constants::PI / 180.0f);
 
     m_zoom = m_iniReader.Get<float>("Camera", "Zoom");
-    printf("\nZoom: %f", m_fovY);
+    printf("\nZoom: %f", m_zoom);
 
     // Define the gravity vector.
     b2Vec2 gravity(0.0f, 0.0f);
@@ -564,7 +565,7 @@ void EngineSimApplication::initialize()
             std::string selectedControllerName = SDL_JoystickNameForIndex(selectedController);
             m_infoCluster->setLogMessage(joyOrGC + ": " + selectedControllerName);
             printf("\n%s: %s\n\n", joyOrGC.c_str(), selectedControllerName.c_str());
-
+            
             gJoystick = SDL_JoystickOpen(selectedController);
 
             if (gJoystick == NULL)
@@ -1626,6 +1627,9 @@ void EngineSimApplication::renderScene()
         m_rightGaugeCluster->setVisible(false);
 
         m_customGaugeCluster->setVisible(true);
+
+        SDL_ShowCursor(SDL_DISABLE);
+
         break;
     }
     }
@@ -1664,13 +1668,30 @@ void EngineSimApplication::renderScene()
         if (abs(deltaY) > 0.001f)
             m_cameraRotation.y += deltaY;
 
-        m_cameraRotation.y = clamp(m_cameraRotation.y, 0.01f * ysMath::Constants::PI, 0.5f * ysMath::Constants::PI);
+        
     }
     else if (!isTargetEngine)
     {
         float rotationSpeed = 0.06f;
         m_cameraRotation.x = (1.0f - rotationSpeed) * m_cameraRotation.x - rotationSpeed * (m_simulator.getVehicle()->m_rotation + 0.5f * ysMath::Constants::PI);
+        
+        int ry = m_engine.GetJoystickAxisRY();
+
+        if(abs(ry)>2000)
+            m_cameraRotation.y += 0.000001f * ry;
     }
+    else
+    {
+        int rx = m_engine.GetJoystickAxisRX();
+        int ry = m_engine.GetJoystickAxisRY();
+
+        if(abs(rx)>2000)
+            m_cameraRotation.x -= 0.000001f * rx;
+        if(abs(ry)>2000)
+            m_cameraRotation.y += 0.000001f * ry;
+    }
+
+    m_cameraRotation.y = clamp(m_cameraRotation.y, 0.01f * ysMath::Constants::PI, 0.5f * ysMath::Constants::PI);
 
     if (!isTargetEngine)
     {
