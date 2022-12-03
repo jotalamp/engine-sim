@@ -102,6 +102,13 @@ class EngineSimApplication {
         inih::INIReader getIniReader() { return m_iniReader; }
         static std::string intToString(int number);
 
+        std::string getModeAsString() {
+                switch(m_mode) {
+                        case ENGINE: return "Engine";
+                        case DRIVING: return "Driving";
+                }
+        }
+
         dbasic::Material* m_material_1;
 
         b2World* m_world;
@@ -111,6 +118,8 @@ class EngineSimApplication {
         //int m_selected_layer;
         int m_selected_camera;
         int m_selected_car;
+
+        enum Mode { ENGINE, DRIVING };
 
     protected:
         void loadScript();
@@ -215,6 +224,8 @@ class EngineSimApplication {
         int m_screen;
         float m_fovY;
         float m_zoom;
+
+        Mode m_mode; 
 
 #ifdef ATG_ENGINE_SIM_VIDEO_CAPTURE
         atg_dtv::Encoder m_encoder;
