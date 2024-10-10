@@ -33,6 +33,13 @@
 
 #include <SDL2/SDL.h>
 
+#include "btBulletDynamicsCommon.h"
+/*
+#include "LinearMath/btVector3.h"
+#include <LinearMath/btAlignedObjectArray.h>
+#include <CommonInterfaces/CommonRigidBodyBase.h>
+#include <BulletCollision/CollisionShapes/btShapeHull.h>*/
+
 #include "../dependencies/submodules/box2d/include/box2d/box2d.h"
 #include "ini/ini.h"
 #include "vehicle_object.h"
@@ -118,6 +125,8 @@ class EngineSimApplication {
         //int m_selected_layer;
         int m_selected_camera;
         int m_selected_car;
+
+        btVector3 m_simulated_position = btVector3();
 
         enum Mode { ENGINE, DRIVING };
 
@@ -226,6 +235,22 @@ class EngineSimApplication {
         float m_zoom;
 
         Mode m_mode; 
+
+           ///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
+	btDefaultCollisionConfiguration* collisionConfiguration = nullptr;
+
+	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+	btCollisionDispatcher* dispatcher = nullptr;
+
+	///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
+	btBroadphaseInterface* overlappingPairCache = nullptr;
+
+	///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+	btSequentialImpulseConstraintSolver* solver = nullptr;
+
+	btDiscreteDynamicsWorld* dynamicsWorld = nullptr;
+
+        btAlignedObjectArray<btCollisionShape*> collisionShapes;
 
 #ifdef ATG_ENGINE_SIM_VIDEO_CAPTURE
         atg_dtv::Encoder m_encoder;
