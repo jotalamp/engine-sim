@@ -97,9 +97,9 @@ void GroundObject::render(const ViewParameters *view)
             0.5f,
             size.y,
 
-            m_app->m_simulated_position.x(),
-            m_app->m_simulated_position.y(),
-            m_app->m_simulated_position.z(),
+            position.x,
+            1,
+            position.y,
 
             0.0f,
             -angle,

@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 
+
+INCLUDE_DIRECTORIES(
+/usr/include/bullet
+)
+
+LINK_LIBRARIES(
+ BulletDynamics BulletCollision LinearMath
+)
+
 include(CMakeDependentOption)
 
 option(DTV "Enable video output" OFF)

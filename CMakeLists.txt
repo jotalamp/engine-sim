@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-
 INCLUDE_DIRECTORIES(
 /usr/include/bullet
 )
@@ -98,6 +97,7 @@ add_library(engine-sim STATIC
     src/vehicle.cpp
     src/vehicle_drag_constraint.cpp
     src/vtec_valvetrain.cpp
+    src/physical_object.cpp
 
     # Include files
     include/audio_buffer.h
@@ -143,6 +143,7 @@ add_library(engine-sim STATIC
     include/vehicle.h
     include/vehicle_drag_constraint.h
     include/vtec_valvetrain.h
+    include/physical_object.h
 )
 
 target_link_libraries(engine-sim
@@ -243,6 +244,7 @@ add_executable(engine-sim-app WIN32
     src/load_simulation_cluster.cpp
     src/mixer_cluster.cpp
     src/info_cluster.cpp
+    src/physical_object.cpp
 
     # Include files
     include/delta.h
@@ -283,6 +285,7 @@ add_executable(engine-sim-app WIN32
     include/load_simulation_cluster.h
     include/mixer_cluster.h
     include/info_cluster.h
+    include/physical_object.h
 )
 
 if (DTV)
