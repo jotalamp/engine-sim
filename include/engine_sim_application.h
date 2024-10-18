@@ -26,7 +26,7 @@
 #include "application_settings.h"
 #include "transmission.h"
 
-#include "physical_object.h"
+//#include "physical_object.h"
 
 #include "delta.h"
 #include "dtv.h"
@@ -42,11 +42,15 @@
 #include <CommonInterfaces/CommonRigidBodyBase.h>
 #include <BulletCollision/CollisionShapes/btShapeHull.h>*/
 
-#include "../dependencies/submodules/box2d/include/box2d/box2d.h"
+//#include "../dependencies/submodules/box2d/include/box2d/box2d.h"
 #include "ini/ini.h"
 #include "vehicle_object.h"
 
 #define PHYSICAL_OBJECTS_COUNT 9
+
+class World;
+class PhysicalObject;
+class VehicleObject;
 
 class EngineSimApplication {
     private:
@@ -122,7 +126,7 @@ class EngineSimApplication {
 
         dbasic::Material* m_material_1;
 
-        b2World* m_world;
+        //b2World* m_world;
         World *world = nullptr;
         PhysicalObject *m_physicalObjects[PHYSICAL_OBJECTS_COUNT];
         bool m_debug;

@@ -8,7 +8,10 @@
 //#include "CommonInterfaces/CommonRigidBodyBase.h"
 #include "BulletCollision/CollisionShapes/btShapeHull.h"
 //#include "engine_sim_application.h"
+#include "../include/engine_sim_application.h"
+//#include "yds_math.h"
 
+class ysTransform;
 class EngineSimApplication;
 
 // Collider shape
@@ -39,6 +42,7 @@ public:
     void AddCollisionShape(btCollisionShape *shape);
     void AddRigidBody(btRigidBody* body);
 	void Update(float delta, int maxSubSteps=10);
+	btDiscreteDynamicsWorld *getDynamicsWorld();
     PhysicalObject* GetObject(std::string name);
 
 private:
@@ -65,8 +69,8 @@ public:
 		Shape shape, 
 		PhysicsType type, 
 		float mass, 
-		std::string modelName="",
-		btVector3 modelScale=btVector3(1,1,1),
+		std::string model_asset="",
+		bool scaleModelBySize=true,
 		btVector3 modelTranslation=btVector3(0,0,0),
 		std::string textureName="");
 	~PhysicalObject();
@@ -74,19 +78,28 @@ public:
     void AddImpulse(btVector3 impulse);
     void ApplyForce(btVector3 force);
 	void ApplyTorque(btVector3 torque);
-    void Render(float scale=1.0f);
+    void Render(float scale=1.0f, std::string model_asset="");
 	void DebugRender();
 	bool IsReady();
 	bool SetTexture(int materialID, std::string textureFilePath);
+	void setScale(btVector3 scale);
+	void setModelTransform();
+	ysTransform *getTransform();
+	btRigidBody *getBody();
 	btVector3 getLinearVelocity();
+	btQuaternion getOrientation();
 
 protected:
 	btRigidBody* body;
 	btCollisionShape* collider_shape;
 	btVector3 modelScale;
+	btVector3 debugModelScale;
 	btVector3 modelTranslation;
 	std::string name;
 	friend class World;
 	bool isGeneratedModel = false;
 	World* m_world = nullptr;
+	std::string m_model_asset = "";
+	ysMatrix m_modelTransform;
+	ysTransform m_transform;
 };

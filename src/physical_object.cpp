@@ -63,32 +63,48 @@ void World::Update(float delta, int maxSubSteps)
 	dynamics_world->stepSimulation(delta, maxSubSteps); // Update physics
 }
 
+
+
 PhysicalObject::PhysicalObject(
-	std::string name,
-	World* world,
+    std::string name,
+    World *world,
     btVector3 position = {0, 0, 0},
     btVector3 rotation = {0, 0, 0},
     btVector3 size = {1, 1, 1},
     Shape shape = CUBE,
     PhysicsType type = STATIC,
     float mass = 0,
-	std::string modelName,
-	btVector3 modelScale,
-	btVector3 modelTranslation,
-	std::string textureName)
+    std::string model_asset,
+    bool scaleModelBySize,
+    btVector3 modelTranslation,
+    std::string textureName)
 {
 	m_world = world;
 	this->name = name;
-	this->modelScale=size;
-	this->modelTranslation=modelTranslation;
 
-	if(modelName.compare("")==0)
+	m_modelTransform = ysMatrix();
+
+	debugModelScale = size;
+
+	if(scaleModelBySize)
 	{
-		this->isGeneratedModel = true;
+		this->modelScale=size;
 	}
 	else
 	{
-		this->isGeneratedModel = false;
+		this->modelScale = btVector3(1,1,1);
+	}
+
+	
+	this->modelTranslation=modelTranslation;
+
+	if(model_asset.compare("")==0)
+	{
+		m_model_asset = "DebugCube";
+	}
+	else
+	{
+		m_model_asset = model_asset;
 	}
 
 	switch(shape)
@@ -218,7 +234,7 @@ PhysicalObject::PhysicalObject(
 	world->collision_shapes.push_back(collider_shape);
 	world->dynamics_world->addRigidBody(body); // Add the body to the dynamics world
 
-	printf("\n[ %s ] created!\n", name.c_str());
+	printf("[ %s ] created!\n", name.c_str());
 }
 
 PhysicalObject::~PhysicalObject()
@@ -261,9 +277,8 @@ void PhysicalObject::ApplyTorque(btVector3 torque)
 	body->applyTorque(torque);
 }
 
-void PhysicalObject::Render(float scale)
+void PhysicalObject::Render(float scale, std::string model_asset)
 {
-	const float radian_scale = 57.296;
 	btTransform trans;
 
 	// Get the transform of the body
@@ -292,6 +307,48 @@ void PhysicalObject::Render(float scale)
 	const ysMatrix scaleTransform = ysMath::ScaleTransform(ysMath::LoadVector(modelScale.x(),modelScale.y(),modelScale.z()));
 
 	m_world->m_app->getShaders()->SetObjectTransform(ysMath::MatMult(transform.GetWorldTransform(), scaleTransform));
+	//m_world->m_app->getShaders()->SetObjectTransform(ysMath::MatMult(ysMath::MatMult(transform.GetWorldTransform(), scaleTransform),m_modelTransform));
+
+	m_world->m_app->getShaders()->UseMaterial(m_world->m_app->getAssetManager()->FindMaterial("MaterialWhite"));
+
+	if(model_asset.compare("")==0) model_asset = m_model_asset;
+
+	m_world->m_app->getEngine()->DrawModel(
+                m_world->m_app->getShaders()->GetRegularFlags(),
+                m_world->m_app->getAssetManager()->GetModelAsset(model_asset.c_str()),
+                1);
+}
+
+void PhysicalObject::DebugRender()
+{
+	btTransform trans;
+
+	// Get the transform of the body
+	if (body && body->getMotionState())
+		body->getMotionState()->getWorldTransform(trans);
+	else
+		return;
+
+	// Get position from transform
+	btVector3 position = trans.getOrigin();
+	btVector3 modelPosition = position + modelTranslation;
+	
+	// Get rotation from transform
+	btQuaternion quat = trans.getRotation();
+
+    //L = T * R * S
+	btVector3 quat_axis = quat.getAxis();
+	ysQuaternion quat2 = ysMath::LoadQuaternion(quat.getAngle(), ysMath::LoadVector(quat_axis.x(), quat_axis.y(), quat_axis.z()));
+
+	ysTransform transform;
+
+	transform.SetOrientation(quat2);
+
+	transform.SetPosition(ysMath::LoadVector(position.x(),position.y(),position.z(),0));
+
+	const ysMatrix scaleTransform = ysMath::ScaleTransform(ysMath::LoadVector(debugModelScale.x(),debugModelScale.y(),debugModelScale.z()));
+
+	m_world->m_app->getShaders()->SetObjectTransform(ysMath::MatMult(transform.GetWorldTransform(), scaleTransform));
 
 	m_world->m_app->getShaders()->UseMaterial(m_world->m_app->getAssetManager()->FindMaterial("MaterialWhite"));
 
@@ -301,39 +358,72 @@ void PhysicalObject::Render(float scale)
                 1);
 }
 
-void PhysicalObject::DebugRender()
+void PhysicalObject::setScale(btVector3 scale)
 {
-	const float radian_scale = 57.296;
+	modelScale = scale;
+}
+
+void PhysicalObject::setModelTransform()
+{
+}
+
+ysTransform *PhysicalObject::getTransform()
+{
+	btTransform trans;
+
+	// Get the transform of the body
+	if (body && body->getMotionState())
+		body->getMotionState()->getWorldTransform(trans);
+
+	// Get position from transform
+	btVector3 position = trans.getOrigin();
+	btVector3 modelPosition = position + modelTranslation;
+	
+	// Get rotation from transform
+	btQuaternion quat = trans.getRotation();
+
+    //L = T * R * S
+	btVector3 quat_axis = quat.getAxis();
+	ysQuaternion quat2 = ysMath::LoadQuaternion(quat.getAngle(), ysMath::LoadVector(quat_axis.x(), quat_axis.y(), quat_axis.z()));
+
+	m_transform.SetOrientation(quat2);
+
+	m_transform.SetPosition(ysMath::LoadVector(position.x(),position.y(),position.z(),0));
+
+	return &m_transform;
+}
+
+btDiscreteDynamicsWorld *World::getDynamicsWorld()
+{
+    return dynamics_world;
+}
+
+btRigidBody *PhysicalObject::getBody()
+{
+    return body;
+}
+
+btVector3 PhysicalObject::getLinearVelocity()
+{
+    return body->getLinearVelocity();
+}
+
+btQuaternion PhysicalObject::getOrientation()
+{
 	btTransform trans;
 
 	// Get the transform of the body
 	if (body && body->getMotionState())
 		body->getMotionState()->getWorldTransform(trans);
 	else
-		return;
-
+		return btQuaternion();
 
 	// Get position from transform
 	btVector3 position = trans.getOrigin();
+	btVector3 modelPosition = position + modelTranslation;
 	
 	// Get rotation from transform
 	btQuaternion quat = trans.getRotation();
 
-	/* Vector3 axis = 
-	{
-		float(quat.getAxis().getX()),
-		float(quat.getAxis().getY()),
-		float(quat.getAxis().getZ())
-	};
-	float angle = float( quat.getAngle() ) * radian_scale; // Convert radians to degrees
-	
-	// Render model
-	if(this->shader!=nullptr) BeginShaderMode(*this->shader);
-		DrawModelEx(debugModel, {position[0],position[1],position[2]}, axis, angle, {1,1,1}, color);
-	if(this->shader!=nullptr) EndShaderMode(); */
-}
-
-btVector3 PhysicalObject::getLinearVelocity()
-{
-    return body->getLinearVelocity();
+    return quat;
 }

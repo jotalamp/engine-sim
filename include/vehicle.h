@@ -57,7 +57,9 @@ class Vehicle : public Part {
         ysTransform *m_transform;
         ysTransform *m_transform2;
         ysTransform *m_transform_engine;
+        ysTransform *m_transform_engine2;
         ysTransform *m_transform_camera;
+        ysTransform *m_transform_camera2;
         double m_rotation;
         float m_brakes;
 };

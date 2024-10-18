@@ -11,7 +11,7 @@ GroundObject::GroundObject(EngineSimApplication *app)
     m_ground = nullptr;
     m_vehicle = nullptr;
 
-    // Define the ground body.
+    /* // Define the ground body.
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
     bodyDef.position.Set(0.0f, 3.0f);
@@ -58,7 +58,7 @@ GroundObject::GroundObject(EngineSimApplication *app)
     fixtureDef.density = 0.0f;
 
     // Add the shape to the body.
-    m_static_bodies[0]->CreateFixture(&fixtureDef);
+    m_static_bodies[0]->CreateFixture(&fixtureDef); */
 }
 
 void GroundObject::initialize(EngineSimApplication *app)
@@ -79,65 +79,6 @@ void GroundObject::generateGeometry()
 void GroundObject::render(const ViewParameters *view)
 {
     resetShader();
-
-    if (true/*m_app->m_debug*/)
-    {
-        b2Fixture *fixture = m_dynamic_bodies[0]->GetFixtureList();
-        b2PolygonShape *poly = (b2PolygonShape *)fixture->GetShape();
-        b2Vec2 position = m_dynamic_bodies[0]->GetPosition();
-        b2Vec2 size = 2.0f * poly->m_vertices[0];
-        float angle = m_dynamic_bodies[0]->GetAngle();
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
-
-        setTransform(
-            &m_atg_body,
-
-            size.x,
-            0.5f,
-            size.y,
-
-            position.x,
-            1,
-            position.y,
-
-            0.0f,
-            -angle,
-            0.0f);
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("DebugCube"),
-            0);
-
-        b2Fixture *fixture2 = m_static_bodies[0]->GetFixtureList();
-        b2PolygonShape *poly2 = (b2PolygonShape *)fixture2->GetShape();
-        b2Vec2 position2 = m_static_bodies[0]->GetPosition();
-        b2Vec2 size2 = 2.0f * poly2->m_vertices[0];
-        float angle2 = m_static_bodies[0]->GetAngle();
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
-
-        setTransform(
-            &m_atg_body,
-
-            size2.x,
-            0.5f,
-            size2.y,
-
-            position2.x,
-            -0.5f,
-            position2.y,
-
-            0.0f,
-            -angle2,
-            0.0f);
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("DebugCube"),
-            0);
-    }
 
     int i = 0;
 

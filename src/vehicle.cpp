@@ -2,7 +2,8 @@
 
 #include <cmath>
 
-Vehicle::Vehicle() {
+Vehicle::Vehicle() 
+{
     m_rotatingMass = nullptr;
     m_mass = 0;
     m_dragCoefficient = 0;
@@ -34,13 +35,7 @@ void Vehicle::initialize(const Parameters &params) {
 void Vehicle::update(double dt) {
     m_travelledDistance += getSpeed() * dt;
 
-    //if(getSpeed() > 0.01f) 
-    float f = clamp(1.0f - 4.0f * getSpeed(), 0.0001f, 1.0f);
-
-
-    //m_rotation = clamp((float)(0.00007f * steeringAngle * getSpeed()), -0.0002f, 0.0002f);
-    //m_rotation = -steeringAngle * getSpeed();
-    //clamp((float)(0.00007f * steeringAngle * getSpeed()), -0.0002f, 0.0002f);
+    //float f = clamp(1.0f - 4.0f * getSpeed(), 0.0001f, 1.0f);
 }
 
 void Vehicle::addToSystem(atg_scs::RigidBodySystem *system, atg_scs::RigidBody *rotatingMass) {

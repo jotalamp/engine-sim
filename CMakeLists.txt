@@ -149,8 +149,7 @@ add_library(engine-sim STATIC
 target_link_libraries(engine-sim
     simple-2d-constraint-solver
     csv-io
-    delta-basic
-    box2d)
+    delta-basic)
 
 target_include_directories(engine-sim
     PUBLIC dependencies/submodules)
@@ -201,8 +200,7 @@ if (PIRANHA_ENABLED)
 
     target_link_libraries(engine-sim-script-interpreter
         csv-io
-        piranha
-        box2d)
+        piranha)
 endif (PIRANHA_ENABLED)
 
 add_executable(engine-sim-app WIN32
@@ -219,7 +217,7 @@ add_executable(engine-sim-app WIN32
     src/ui_math.cpp
     src/gauge.cpp
     src/crankshaft_object.cpp
-    src/tire_object.cpp
+    #src/tire_object.cpp
     src/ground_object.cpp
     src/vehicle_object.cpp
     src/cylinder_bank_object.cpp
@@ -260,7 +258,7 @@ add_executable(engine-sim-app WIN32
     include/ui_math.h
     include/units.h
     include/crankshaft_object.h
-    include/tire_object.h
+    #include/tire_object.h
     include/ground_object.h
     include/vehicle_object.h
     include/cylinder_bank_object.h

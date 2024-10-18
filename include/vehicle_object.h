@@ -4,8 +4,15 @@
 #include "simulation_object.h"
 
 #include "vehicle.h"
-#include "tire_object.h"
+//#include "tire_object.h"
 #include "geometry_generator.h"
+
+#include "physical_object.h"
+
+#include "BulletDynamics/Vehicle/btRaycastVehicle.h"
+
+class World;
+class PhysicalObject;
 
 enum VehicleModelID {
     Niva,
@@ -29,7 +36,9 @@ struct VehicleModel {
 
 class VehicleObject : public SimulationObject {
 public:
-    VehicleObject(EngineSimApplication *app, b2World *world, Vehicle *vehicle);
+    VehicleObject(EngineSimApplication *app, World *world, Vehicle *vehicle);
+    void addWheels(btVector3 *halfExtents, btRaycastVehicle *vehicle, btRaycastVehicle::btVehicleTuning tuning);
+    ysTransform *getTransform();
     virtual ~VehicleObject();
 
     virtual void initialize(EngineSimApplication *app);
@@ -39,17 +48,11 @@ public:
     virtual void destroy();
 
     inline int getTireCount() const { return m_tireCount; }
+    btRaycastVehicle *getRaycastVehicle();
 
-    b2World *m_world;
     Vehicle *m_vehicle;
-    b2Body *m_body;
-    TireObject *m_tires[4];
     float rotation;
     VehicleModel m_vehicle_model;
-    // float position_x;
-    // float position_y;
-    // ysVector m_translation;
-    // ysTransform m_transform;
     ysTransform m_transform;
     ysTransform m_transform_engine;
     ysTransform m_transform_camera;
@@ -70,6 +73,9 @@ protected:
     std::vector<float> m_modelRotation;
     std::vector<float> m_engineModelRotation;
     std::vector<float> m_engineModelPosition;
+    PhysicalObject *m_physicalVehicle;
+    btRaycastVehicle *m_raycastVehicle = nullptr;
+    World* m_world;
 };
 
 #endif /* ATG_ENGINE_SIM_VEHICLE_OBJECT_H */

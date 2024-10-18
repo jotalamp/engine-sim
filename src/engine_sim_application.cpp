@@ -6,7 +6,7 @@
 #include "../include/units.h"
 #include "../include/crankshaft_object.h"
 #include "../include/ground_object.h"
-#include "../include/tire_object.h"
+//#include "../include/tire_object.h"
 #include "../include/vehicle_object.h"
 #include "../include/cylinder_bank_object.h"
 #include "../include/cylinder_head_object.h"
@@ -32,7 +32,7 @@ std::string EngineSimApplication::s_buildVersion = "0.1.10a";
 EngineSimApplication::EngineSimApplication()
 {
     m_debug = false;
-    m_world = nullptr;
+    //m_world = nullptr;
 
     m_selected_car = 1;
 
@@ -110,9 +110,6 @@ EngineSimApplication::~EngineSimApplication()
         SDL_JoystickClose(gJoystick);
         gJoystick = NULL;
     }
-
-    m_world->~b2World();
-    m_world = nullptr;
 
     for (PhysicalObject *object : m_physicalObjects)
     {
@@ -202,18 +199,7 @@ void EngineSimApplication::initialize(void *instance, ysContextObject::DeviceAPI
 
 
 
-    // BULLET ------------------------------------------
-
-    world = new World(this);
-
-    m_physicalObjects[0] = new PhysicalObject("Ground", world, btVector3(0.0f, -1.8f, 0.0f), btVector3(0.0f,0.0f,0.0f), btVector3(200.0f,2.0f,200.0f), 
-        CUBE, STATIC, 0);
-
-    for(int i=1;i<PHYSICAL_OBJECTS_COUNT;i++)
-    {
-        m_physicalObjects[i] = new PhysicalObject("Cube " + std::to_string(i), world, btVector3(0.4f*i, 10.0f+3.0f*i, 0.0f), btVector3(0.0f,0.0f,0.0f), btVector3(2.0f,2.0f,2.0f), 
-        CUBE, DYNAMIC, 10);
-    }
+   
 
     initialize();
 }
@@ -223,17 +209,17 @@ void EngineSimApplication::loadMaterial(std::string filename, std::string name)
     dbasic::TextureAsset *textureAsset;
     dbasic::Material *material;
 
-    printf(("\nLoading Material: " + name).c_str());
+    printf("\nLoading Material: %s", name.c_str());
 
-    const char *textureName = ("Texture" + name).c_str();
-    const char *materialName = ("Material" + name).c_str();
+    std::string textureName = "Texture" + name;
+    std::string materialName = "Material" + name;
 
-    m_assetManager.LoadTexture(filename.c_str(), textureName);
-    textureAsset = m_assetManager.GetTexture(textureName);
+    m_assetManager.LoadTexture(filename.c_str(), textureName.c_str());
+    textureAsset = m_assetManager.GetTexture(textureName.c_str());
     material = m_assetManager.NewMaterial();
     material->SetDiffuseColor(ysColor::srgbiToLinear(0x777777));
     material->SetDiffuseMap(textureAsset->GetTexture());
-    material->SetName(materialName);
+    material->SetName(materialName.c_str());
 }
 
 void EngineSimApplication::initialize()
@@ -259,10 +245,10 @@ void EngineSimApplication::initialize()
     printf("\nZoom: %f", m_zoom);
 
     // Define the gravity vector.
-    b2Vec2 gravity(0.0f, 0.0f);
+    //b2Vec2 gravity(0.0f, 0.0f);
 
     // Construct a world object, which will hold and simulate the rigid bodies.
-    m_world = new b2World(gravity);
+    //m_world = new b2World(gravity);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -465,9 +451,7 @@ void EngineSimApplication::initialize()
     m_shaders.SetClearColor(ysColor::srgbiToLinear(0x34, 0x98, 0xFF));
 
     std::chrono::steady_clock::time_point material_end = std::chrono::steady_clock::now();
-    printf("Model loading took: ");
-    printf((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(material_end - begin).count())).c_str());
-    printf(" ms.\n");
+    printf("Model loading took: %li ms. \n", std::chrono::duration_cast<std::chrono::milliseconds>(material_end - begin).count());
 
     std::chrono::steady_clock::time_point model_begin = std::chrono::steady_clock::now();
 
@@ -539,9 +523,7 @@ void EngineSimApplication::initialize()
     m_audioSource->SetVolume(1.0f);
 
     std::chrono::steady_clock::time_point model_end = std::chrono::steady_clock::now();
-    printf("Model/ES loading took: ");
-    printf((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(model_end - model_begin).count())).c_str());
-    printf(" ms.\n");
+    printf("Model/ES loading took: %li ms.\n", std::chrono::duration_cast<std::chrono::milliseconds>(model_end - model_begin).count());
 
     std::chrono::steady_clock::time_point joy_begin = std::chrono::steady_clock::now();
 
@@ -603,14 +585,10 @@ void EngineSimApplication::initialize()
     }
 
     std::chrono::steady_clock::time_point joy_end = std::chrono::steady_clock::now();
-    printf("Joystick Loading took: ");
-    printf((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(joy_end - joy_begin).count())).c_str());
-    printf(" ms.\n");
+    printf("Joystick Loading took: %li ms.\n", std::chrono::duration_cast<std::chrono::milliseconds>(joy_end - joy_begin).count());
 
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    printf("Loading took: ");
-    printf((std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count())).c_str());
-    printf(" ms.\n");
+    printf("Loading took: %li ms.\n", std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
 
 #ifdef ATG_ENGINE_DISCORD_ENABLED
     // Create a global instance of discord-rpc
@@ -621,14 +599,11 @@ void EngineSimApplication::initialize()
     DiscordRichPresence passMe = {0};
     GetDiscordManager()->SetStatus(passMe, m_iceEngine->getName(), s_buildVersion);
 #endif /* ATG_ENGINE_DISCORD_ENABLED */
-
-    // m_assetManager.LoadTexture("./tire.png", "TestTexture4");
-    // dbasic::TextureAsset *textureAsset = m_assetManager.GetTexture("TestTexture2");
 }
 
 void EngineSimApplication::process(float frame_dt)
 {
-    world->Update(frame_dt, 10);
+    //return;
 
     // Prepare for simulation. Typically we use a time step of 1/60 of a
     // second (60Hz) and 10 iterations. This provides a high quality simulation
@@ -667,7 +642,8 @@ void EngineSimApplication::process(float frame_dt)
     m_simulator.setSimulationSpeed(speed);
 
     if ( m_mode == DRIVING ) {
-        m_world->Step(speed * frame_dt, velocityIterations, positionIterations);
+        //m_world->Step(speed * frame_dt, velocityIterations, positionIterations);
+        world->Update(speed * frame_dt, 10);
         m_vehicle_object->process(speed * frame_dt);
     }
 
@@ -1040,7 +1016,20 @@ void EngineSimApplication::configure(const ApplicationSettings &settings)
 
 void EngineSimApplication::createObjects(Engine *engine)
 {
-    VehicleObject *vehicleObject = new VehicleObject(this, m_world, m_vehicle);
+     // BULLET ------------------------------------------
+
+    world = new World(this);
+
+    m_physicalObjects[0] = new PhysicalObject("Ground", world, btVector3(0.0f, -1.8f, 0.0f), btVector3(0.0f,0.0f,0.0f), btVector3(500.0f,2.0f,500.0f), 
+        CUBE, STATIC, 0);
+
+    for(int i=1;i<PHYSICAL_OBJECTS_COUNT;i++)
+    {
+        m_physicalObjects[i] = new PhysicalObject("Cube " + std::to_string(i), world, btVector3(0.4f*i, 10.0f+3.0f*i, 10.0f), btVector3(0.0f,0.0f,0.0f), btVector3(2.0f,2.0f,2.0f), 
+        CUBE, DYNAMIC, 10);
+    }
+
+    VehicleObject *vehicleObject = new VehicleObject(this, this->world, m_vehicle);
 
     m_vehicle->m_transform = &vehicleObject->m_transform;
     m_vehicle->m_transform_engine = &vehicleObject->m_transform_engine;
@@ -1713,9 +1702,13 @@ void EngineSimApplication::renderScene()
     }
     else if (!isTargetEngine)
     {
-        float rotationSpeed = 0.06f;
-        m_cameraRotation.x = (1.0f - rotationSpeed) * m_cameraRotation.x - rotationSpeed * (m_simulator.getVehicle()->m_rotation + 0.5f * ysMath::Constants::PI);
 
+        float rotationSpeed = 0.05f;
+        float deltaAngle = m_simulator.getVehicle()->m_rotation - m_cameraRotation.x; 
+        if(deltaAngle>M_PI) deltaAngle-=2.0f*M_PI;
+        if(deltaAngle<-M_PI) deltaAngle+=2.0f*M_PI;
+        //m_cameraRotation.x = (1.0f - rotationSpeed) * m_cameraRotation.x - rotationSpeed * (m_simulator.getVehicle()->m_rotation - M_PI);
+        m_cameraRotation.x += rotationSpeed * deltaAngle;
         int ry = m_engine.GetJoystickAxisRY();
 
         if (abs(ry) > 2000)

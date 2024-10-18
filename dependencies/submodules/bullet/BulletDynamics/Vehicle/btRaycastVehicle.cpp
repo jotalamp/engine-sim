@@ -648,7 +648,9 @@ void btRaycastVehicle::updateFriction(btScalar timeStep)
 #else
 				rel_pos[m_indexUpAxis] *= wheelInfo.m_rollInfluence;
 #endif
-				m_chassisBody->applyImpulse(sideImp, rel_pos);
+				//m_chassisBody->applyImpulse(sideImp, rel_pos);
+				printf("\nAAAAAAAAAAAAAAAAAAAAAAAAA");
+				m_chassisBody->applyImpulse(btVector3(1000.0,0,0), rel_pos);
 
 				//apply friction impulse on the ground
 				groundObject->applyImpulse(-sideImp, rel_pos2);
