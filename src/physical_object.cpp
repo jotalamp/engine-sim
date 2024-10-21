@@ -1,6 +1,7 @@
 #include "../include/physical_object.h"
 #include <stdio.h>
 #include "../include/engine_sim_application.h"
+#include <delta-studio/include/yds_opengl_gpu_buffer.h>
 
 World::World(EngineSimApplication *app)
 {
@@ -74,13 +75,15 @@ PhysicalObject::PhysicalObject(
     Shape shape = CUBE,
     PhysicsType type = STATIC,
     float mass = 0,
-    std::string model_asset,
+    std::string modelAssetName,
     bool scaleModelBySize,
     btVector3 modelTranslation,
     std::string textureName)
 {
 	m_world = world;
 	this->name = name;
+
+	
 
 	m_modelTransform = ysMatrix();
 
@@ -98,14 +101,18 @@ PhysicalObject::PhysicalObject(
 	
 	this->modelTranslation=modelTranslation;
 
-	if(model_asset.compare("")==0)
+	m_modelAssetName = modelAssetName;
+
+	if(modelAssetName.compare("") != 0) 
 	{
-		m_model_asset = "DebugCube";
+		m_modelAssetName = modelAssetName;
 	}
 	else
 	{
-		m_model_asset = model_asset;
+		m_modelAssetName = "DebugCube";
 	}
+
+	m_modelAsset = world->m_app->getAssetManager()->GetModelAsset(m_modelAssetName.c_str());
 
 	switch(shape)
 	{
@@ -171,41 +178,10 @@ PhysicalObject::PhysicalObject(
 				break;
 			}
 		case TREE_COLLISION:
-			btTriangleMesh* mesh = new btTriangleMesh();
-			//int meshCount = model.meshCount;
-			/* for(int m=0;m<meshCount;m++)
-			{
-				int vertexCount = model.meshes[m].vertexCount;
-				int triangleCount = model.meshes[m].triangleCount;
-
-				for (int i = 0; i < triangleCount; i+=3)
-				{
-					int a = 3*model.meshes[m].indices[i*3+0];
-					int b = 3*model.meshes[m].indices[i*3+1];
-					int c = 3*model.meshes[m].indices[i*3+2];
-					btVector3 bv1 = modelScale*btVector3(model.meshes[m].vertices[a+0],model.meshes[m].vertices[a+1],model.meshes[m].vertices[a+2]);
-					btVector3 bv2 = modelScale*btVector3(model.meshes[m].vertices[b+0],model.meshes[m].vertices[b+1],model.meshes[m].vertices[b+2]);
-					btVector3 bv3 = modelScale*btVector3(model.meshes[m].vertices[c+0],model.meshes[m].vertices[c+1],model.meshes[m].vertices[c+2]);
-					mesh->addTriangle(bv1, bv2, bv3);
-				}     
-			} */
+			btTriangleMesh* mesh = m_world->m_app->getAssetManager()->LoadSceneFile2("../assets/models/trackGarda");
 		    collider_shape = new btBvhTriangleMeshShape(mesh, true);
 			break;
 	}
-
-	if(textureName.compare("")!=0)
-	{
-		//this->texture = LoadTexture(textureName.c_str());
-		// Assign texture to default model material
-		//SetTextureFilter(this->texture, TEXTURE_FILTER_ANISOTROPIC_8X); // Makes the texture smoother when upscaled
-		//model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-	}
-
-	/* model.materials[0].maps[MATERIAL_MAP_ALBEDO].color = Color({255,255,255,255});
-    model.materials[0].maps[MATERIAL_MAP_METALNESS].value = 1.0f;
-    model.materials[0].maps[MATERIAL_MAP_ROUGHNESS].value = 0.0f;
-    model.materials[0].maps[MATERIAL_MAP_OCCLUSION].value = 1.0f;
-    model.materials[0].maps[MATERIAL_MAP_EMISSION].color = BLACK; */
 
 	// Set location and rotation
 	btTransform transform;
@@ -226,15 +202,12 @@ PhysicalObject::PhysicalObject(
 	rb_info.m_restitution = 0.7f;
 	body = new btRigidBody(rb_info);
 	body->setDamping(0.2f,0.2f);
-	//body->setActivationState(DISABLE_DEACTIVATION);
-	//body->setDeactivationTime(20000.0f);
 	body->setSleepingThresholds(0.01f,0.01f);
 
-	//world->AddPhysicalObject(*this);
 	world->collision_shapes.push_back(collider_shape);
 	world->dynamics_world->addRigidBody(body); // Add the body to the dynamics world
 
-	printf("[ %s ] created!\n", name.c_str());
+	printf("\n[ %s ] created!\n", name.c_str());
 }
 
 PhysicalObject::~PhysicalObject()
@@ -302,7 +275,7 @@ void PhysicalObject::Render(float scale, std::string model_asset)
 
 	transform.SetOrientation(quat2);
 
-	transform.SetPosition(ysMath::LoadVector(position.x(),position.y(),position.z(),0));
+	transform.SetPosition(ysMath::LoadVector(position.x(),position.y(),position.z()));
 
 	const ysMatrix scaleTransform = ysMath::ScaleTransform(ysMath::LoadVector(modelScale.x(),modelScale.y(),modelScale.z()));
 
@@ -311,7 +284,7 @@ void PhysicalObject::Render(float scale, std::string model_asset)
 
 	m_world->m_app->getShaders()->UseMaterial(m_world->m_app->getAssetManager()->FindMaterial("MaterialWhite"));
 
-	if(model_asset.compare("")==0) model_asset = m_model_asset;
+	if(model_asset.compare("")==0) model_asset = m_modelAssetName;
 
 	m_world->m_app->getEngine()->DrawModel(
                 m_world->m_app->getShaders()->GetRegularFlags(),

@@ -73,7 +73,7 @@ VehicleObject::VehicleObject(EngineSimApplication *app, World *world, Vehicle *v
 
     ysQuaternion engineOrientation = ysMath::QuatMultiply(ysMath::QuatMultiply(eqx, eqy),eqz);
 
-    m_physicalVehicle = new PhysicalObject("Car", world, btVector3(5.0f, 1.0f, 0.0f), btVector3(0,0,0), 
+    m_physicalVehicle = new PhysicalObject("Car", world, btVector3(5.0f, 10.0f, 0.0f), btVector3(0,0,0), 
         btVector3(1.2,0.4,4.0), CUBE, DYNAMIC, 1500, "", false);
 
     m_transform_engine = m_vehicle_model.transformEngine;
@@ -336,7 +336,7 @@ void VehicleObject::process(float dt)
 
     m_brakes = m_vehicle->m_brakes;
 
-    float scale = 0.1f;
+    float scale = 1.0f;
 
     m_wheel_rotation_speed = (1.0f - m_brakes) * scale * (float)m_vehicle->getSpeed() / (2.0f * ysMath::Constants::PI * m_tire_radius);
 
@@ -373,13 +373,13 @@ void VehicleObject::process(float dt)
 
     float throttle = 300.0f * targetSpeedFromTireRotationSpeed2;
 
-    if(throttle<0.0f) 
+    //if(throttle<0.0f) 
     {
-        throttle = 0.0f;
+        //throttle = 0.0f;
     }
 
-    m_raycastVehicle->setSteeringValue(-angle,0);
-    m_raycastVehicle->setSteeringValue(-angle,1);
+    m_raycastVehicle->setSteeringValue(-1.2f*angle,0);
+    m_raycastVehicle->setSteeringValue(-1.2f*angle,1);
 
     m_raycastVehicle->applyEngineForce(throttle, 2);
 	m_raycastVehicle->applyEngineForce(throttle, 3);

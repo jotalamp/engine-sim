@@ -99,7 +99,8 @@ protected:
 	friend class World;
 	bool isGeneratedModel = false;
 	World* m_world = nullptr;
-	std::string m_model_asset = "";
+	std::string m_modelAssetName = "";
 	ysMatrix m_modelTransform;
 	ysTransform m_transform;
+	dbasic::ModelAsset *m_modelAsset = nullptr;
 };

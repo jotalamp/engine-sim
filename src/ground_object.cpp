@@ -10,55 +10,6 @@ GroundObject::GroundObject(EngineSimApplication *app)
 
     m_ground = nullptr;
     m_vehicle = nullptr;
-
-    /* // Define the ground body.
-    b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(0.0f, 3.0f);
-
-    // Call the body factory which allocates memory for the ground body
-    // from a pool and creates the ground box shape (also from a pool).
-    // The body is also added to the world.
-    m_dynamic_bodies[0] = m_app->m_world->CreateBody(&bodyDef);
-
-    b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(1.0f, 1.0f);
-
-    // Define the dynamic body fixture.
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &dynamicBox;
-    fixtureDef.density = 0.1f;
-    fixtureDef.friction = 0.9f;
-
-    // Add the shape to the body.
-    m_dynamic_bodies[0]->CreateFixture(&fixtureDef);
-    m_dynamic_bodies[0]->SetAngularDamping(0.9f);
-    m_dynamic_bodies[0]->SetLinearDamping(0.9f);
-
-    //////////7
-    // Define the ground body.
-    b2BodyDef groundBodyDef;
-    groundBodyDef.type = b2_staticBody;
-    groundBodyDef.position.Set(-51.0f, 11.0f);
-
-    // Call the body factory which allocates memory for the ground body
-    // from a pool and creates the ground box shape (also from a pool).
-    // The body is also added to the world.
-    m_static_bodies[0] = m_app->m_world->CreateBody(&groundBodyDef);
-
-    // Define another box shape for our dynamic body.
-    b2PolygonShape box;
-    box.SetAsBox(10.0f, 7.0f);
-
-    // Define the dynamic body fixture.
-    // b2FixtureDef fixtureDef;
-    fixtureDef.shape = &box;
-
-    // Set the box density to be non-zero, so it will be dynamic.
-    fixtureDef.density = 0.0f;
-
-    // Add the shape to the body.
-    m_static_bodies[0]->CreateFixture(&fixtureDef); */
 }
 
 void GroundObject::initialize(EngineSimApplication *app)
@@ -85,6 +36,29 @@ void GroundObject::render(const ViewParameters *view)
     int l = 20;
 
     float scale = 1.0f;
+
+    setTransform(
+            &m_ground->m_body,
+
+            scale,
+            scale,
+            scale,
+
+            0*-24.0f,
+            0*-1.15f,
+            0.0f,
+
+            0 * -0.5f * ysMath::Constants::PI,
+            0*0.5f * ysMath::Constants::PI,
+            0.0f * ysMath::Constants::PI);
+
+        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialMat"));
+
+        /* m_app->getEngine()->DrawModel(
+            m_app->getShaders()->GetRegularFlags(),
+            m_app->getAssetManager()->GetModelAsset("track"),
+            0); */
+    //return;
 
     setTransform(
         &m_ground->m_body,
@@ -297,12 +271,12 @@ void GroundObject::render(const ViewParameters *view)
             scale,
             scale,
 
-            -24.0f,
-            -1.15f,
+            0*-24.0f,
+            0*-1.15f,
             0.0f,
 
             0 * -0.5f * ysMath::Constants::PI,
-            0.5f * ysMath::Constants::PI,
+            0*0.5f * ysMath::Constants::PI,
             0.0f * ysMath::Constants::PI);
 
         m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialMat"));
@@ -312,7 +286,29 @@ void GroundObject::render(const ViewParameters *view)
             m_app->getAssetManager()->GetModelAsset("track"),
             0);
 
-        // m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFence"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialStandard"));
+
+        setTransform(
+            &m_ground->m_body,
+
+            scale,
+            scale,
+            scale,
+
+            0*-24.0f,
+            -0.1f,
+            0.0f,
+
+            0 * -0.5f * ysMath::Constants::PI,
+            0*0.5f * ysMath::Constants::PI,
+            0.0f * ysMath::Constants::PI);
+
+        m_app->getEngine()->DrawModel(
+            m_app->getShaders()->GetRegularFlags(),
+            m_app->getAssetManager()->GetModelAsset("grass"),
+            0); */
+
+        //m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFence"));
 
         if (false)
             m_app->getEngine()->DrawModel(

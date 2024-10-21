@@ -46,7 +46,7 @@
 #include "ini/ini.h"
 #include "vehicle_object.h"
 
-#define PHYSICAL_OBJECTS_COUNT 9
+#define PHYSICAL_OBJECTS_COUNT 11
 
 class World;
 class PhysicalObject;

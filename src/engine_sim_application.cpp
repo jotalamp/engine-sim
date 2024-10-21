@@ -244,12 +244,6 @@ void EngineSimApplication::initialize()
     m_zoom = m_iniReader.Get<float>("Camera", "Zoom");
     printf("\nZoom: %f", m_zoom);
 
-    // Define the gravity vector.
-    //b2Vec2 gravity(0.0f, 0.0f);
-
-    // Construct a world object, which will hold and simulate the rigid bodies.
-    //m_world = new b2World(gravity);
-
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     if (m_selected_car == 1)
@@ -1020,10 +1014,16 @@ void EngineSimApplication::createObjects(Engine *engine)
 
     world = new World(this);
 
-    m_physicalObjects[0] = new PhysicalObject("Ground", world, btVector3(0.0f, -1.8f, 0.0f), btVector3(0.0f,0.0f,0.0f), btVector3(500.0f,2.0f,500.0f), 
-        CUBE, STATIC, 0);
+    m_physicalObjects[0] = new PhysicalObject("Ground", world, btVector3(0,0,0), btVector3(0,0,0), btVector3(1,1,1), 
+        TREE_COLLISION, STATIC, 0, "track");
 
-    for(int i=1;i<PHYSICAL_OBJECTS_COUNT;i++)
+    m_physicalObjects[1] = new PhysicalObject("Ground 2", world, btVector3(0.0f, -1.0, 0.0f), btVector3(0.0f,0.0f,0.0f), btVector3(500.0f,1.99f,500.0f), 
+        CUBE, STATIC, 0, "");
+
+    m_physicalObjects[2] = new PhysicalObject("Ground 3", world, btVector3(-20.0f, 1.0, 0.0f), btVector3(-0.3f,0.0f,0.0f), btVector3(20.0f,1.0f,10.0f), 
+        CUBE, STATIC, 0, "");
+
+    for(int i=3;i<PHYSICAL_OBJECTS_COUNT;i++)
     {
         m_physicalObjects[i] = new PhysicalObject("Cube " + std::to_string(i), world, btVector3(0.4f*i, 10.0f+3.0f*i, 10.0f), btVector3(0.0f,0.0f,0.0f), btVector3(2.0f,2.0f,2.0f), 
         CUBE, DYNAMIC, 10);
