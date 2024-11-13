@@ -1,4 +1,3 @@
-#include "../include/utilities.h"
 #include "../include/shaders.h"
 
 Shaders::Shaders() {
@@ -8,10 +7,10 @@ Shaders::Shaders() {
     m_uiStage = nullptr;
 
     m_objectVariables.ColorReplace = 1;
-    m_objectVariables.Lit = 1;
+    m_objectVariables.Lit = 0;
     m_objectVariables.Transform = ysMath::LoadIdentity();
 
-    m_screenVariables.FogNear = m_uiScreenVariables.FogNear = 0.0f;
+    m_screenVariables.FogNear = m_uiScreenVariables.FogNear = 16000.0f;
     m_screenVariables.FogFar = m_uiScreenVariables.FogFar = 16001.0f;
 }
 
@@ -53,10 +52,6 @@ ysError Shaders::Initialize(
         dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData,
         &m_lightingControls);
 
-        m_mainStage->AddTextureInput(0, &m_mainStageDiffuseTexture);
-    //m_mainStage->AddTextureInput(1, &m_mainStageDiffuseTexture);
-
-
     // UI Stage
     m_uiStage->SetInputLayout(inputLayout);
     m_uiStage->SetRenderTarget(uiRenderTarget);
@@ -81,15 +76,18 @@ ysError Shaders::Initialize(
         dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData,
         &m_lightingControls);
 
+    m_mainStage->AddTextureInput(0, &m_mainStageDiffuseTexture);
+
     return YDS_ERROR_RETURN(ysError::None);
 }
 
 ysError Shaders::UseMaterial(dbasic::Material *material) {
     YDS_ERROR_DECLARE("UseMaterial");
-    
+
     if (material == nullptr) {
         SetBaseColor(ysMath::LoadVector(1.0f, 0.0f, 1.0f, 1.0f));
         m_objectVariables.ColorReplace = 1;
+        m_objectVariables.Lit = true;
     }
     else {
         SetBaseColor(material->GetDiffuseColor());
@@ -102,10 +100,12 @@ ysError Shaders::UseMaterial(dbasic::Material *material) {
             m_objectVariables.ColorReplace = 1;
         }
 
-        m_objectVariables.Lit = material->IsLit();
+        //m_objectVariables.Lit = material->IsLit();
+        m_objectVariables.Lit = true;
         m_objectVariables.DiffuseMix = material->GetDiffuseMix();
         //m_objectVariables.Transform = ysMath::LoadIdentity();
     }
+
     return YDS_ERROR_RETURN(ysError::None);
 }
 
@@ -117,22 +117,14 @@ void Shaders::ConfigureModel(float scale, dbasic::ModelAsset *model) {
     /* void */
 }
 
-void Shaders::SetDiffuseTexture(ysTexture *texture) {
-    if(texture)
+void Shaders::SetDiffuseTexture(ysTexture* texture) {
+    if (texture)
         m_mainStage->BindTexture(texture, m_mainStageDiffuseTexture);
 }
 
-void Shaders::SetBaseColor(const ysVector &color) {
-    if((color[0] > 0.99f) && (color[1] < 0.01f))
-    {
-        m_objectVariables.ColorReplace = 0;
-    }
-    else {
-        //m_objectVariables.BaseColor = color;
-        m_objectVariables.ColorReplace = 1;
-    }
+void Shaders::SetBaseColor(const ysVector& color) {
+    m_objectVariables.ColorReplace = 1;
     m_objectVariables.BaseColor = color;
-    //m_objectVariables.BaseColor = color;
 }
 
 void Shaders::ResetBaseColor() {
@@ -147,10 +139,11 @@ dbasic::StageEnableFlags Shaders::GetUiFlags() const {
     return m_uiStage->GetFlags();
 }
 
+
 void Shaders::CalculateCamera(
     float width,
     float height,
-    const Bounds &cameraBounds,
+    const Bounds& cameraBounds,
     float screenWidth,
     float screenHeight,
     float fovY,
@@ -161,8 +154,9 @@ void Shaders::CalculateCamera(
     float targetY,
     float targetZ)
 {
-    m_zoom = zoom;
-    
+    //phi -= 0.5f * ysMath::Constants::PI;
+    //m_zoom = zoom;
+
     const ysMatrix projection1 = ysMath::OrthographicProjection(
         width,
         height,
@@ -171,7 +165,7 @@ void Shaders::CalculateCamera(
 
     const ysMatrix projection = ysMath::FrustrumPerspective(
         fovY,
-        width/height,
+        width / height,
         0.03f,
         1400.0f);
 
@@ -195,35 +189,35 @@ void Shaders::CalculateCamera(
 
     m_screenVariables.Projection = ysMath::Transpose(projection);
 
-    
+
     ysVector cameraTarget;
     ysVector cameraEye;
 
-    if(true)
+    if (true)
     {
         float height = 0.0f;
 
-        float x = m_zoom * sin(theta) * cos(phi);
-        float y = m_zoom * cos(theta);
-        float z = m_zoom * sin(theta) * sin(phi);
+        float x = zoom * sin(theta) * cos(phi);
+        float y = zoom * cos(theta);
+        float z = zoom * sin(theta) * sin(phi);
 
         ysVector3 targetPosition(targetX, targetY, targetZ);
 
-        cameraTarget = ysMath::Add(ysMath::LoadVector(targetPosition.x,     targetPosition.y,   targetPosition.z,   1.0f), m_cameraPosition);
-        cameraEye    = ysMath::Add(ysMath::LoadVector(targetPosition.x+x,   targetPosition.y+y, targetPosition.z+z, 1.0f), m_cameraPosition);
+        cameraTarget = ysMath::Add(ysMath::LoadVector(targetPosition.x, targetPosition.y, targetPosition.z, 1.0f), m_cameraPosition);
+        cameraEye = ysMath::Add(ysMath::LoadVector(targetPosition.x + x, targetPosition.y + y, targetPosition.z + z, 1.0f), m_cameraPosition);
     }
     else
     {
-        float height = 15.0f;
+        float height = 5.0f;
 
-        ysVector3 targetPosition(targetX, targetY+0.5f, targetZ+1.0f);
+        ysVector3 targetPosition(targetX, targetY + 0.5f, targetZ + 1.0f);
 
         float x = targetX;
-        float y = targetY+height;
-        float z = targetZ-50.0;
+        float y = targetY + height;
+        float z = targetZ - 10.0;
 
-        cameraTarget = ysMath::Add(ysMath::LoadVector(targetPosition.x,     targetPosition.y,   targetPosition.z,   1.0f), m_cameraPosition);
-        cameraEye    = ysMath::Add(ysMath::LoadVector(x, y, z, 1.0f), m_cameraPosition);
+        cameraTarget = ysMath::Add(ysMath::LoadVector(targetPosition.x, targetPosition.y, targetPosition.z, 1.0f), m_cameraPosition);
+        cameraEye = ysMath::Add(ysMath::LoadVector(x, y, z, 1.0f), m_cameraPosition);
     }
 
     const ysVector up = ysMath::LoadVector(0.0f, 1.0f, 0.0f);
@@ -232,7 +226,60 @@ void Shaders::CalculateCamera(
         ysMath::Transpose(ysMath::CameraTarget(cameraEye, cameraTarget, up));
     m_screenVariables.Eye = ysMath::LoadVector(cameraEye);
 }
+/*
+void Shaders::CalculateCamera(
+    float width,
+    float height,
+    const Bounds &cameraBounds,
+    float screenWidth,
+    float screenHeight,
+    float angle)
+{
+    const ysMatrix projection = ysMath::OrthographicProjection(
+        width,
+        height,
+        0.001f,
+        500.0f);
+    const Point scale = Point(screenWidth, screenHeight);
+    const Point center =
+        (cameraBounds.getPosition() - Point(screenWidth / 2, screenHeight / 2))
+        / scale;
 
+    m_screenVariables.Projection = ysMath::Transpose(
+        ysMath::MatMult(
+            projection,
+            ysMath::MatMult(
+                ysMath::ScaleTransform(ysMath::LoadVector(
+                    cameraBounds.width() / screenWidth,
+                    cameraBounds.height() / screenHeight,
+                    1.0f)),
+                ysMath::TranslationTransform(ysMath::LoadVector(center.x, center.y, 0.0f))
+            )
+        )
+    );
+
+    m_screenVariables.Projection = ysMath::Transpose(projection);
+
+    const float sinAngle = std::sin(angle);
+    const float cosAngle = std::cos(angle);
+
+    const ysVector cameraEye =
+        ysMath::Add(
+                ysMath::LoadVector(-10.0f * sinAngle, -10.0f * cosAngle, 5.05f, 1.0f),
+                m_cameraPosition);
+
+    const ysVector cameraTarget =
+        ysMath::Add(
+                ysMath::LoadVector(0.0f, 0.0f, 0.05f, 1.0f),
+                m_cameraPosition);
+
+    const ysVector up = ysMath::LoadVector(0.0f, 1.0f);
+
+    m_screenVariables.CameraView =
+        ysMath::Transpose(ysMath::CameraTarget(cameraEye, cameraTarget, up));
+    m_screenVariables.Eye = ysMath::LoadVector(cameraEye);
+}
+*/
 void Shaders::CalculateUiCamera(float screenWidth, float screenHeight) {
     m_uiScreenVariables.Projection = ysMath::Transpose(
         ysMath::OrthographicProjection(

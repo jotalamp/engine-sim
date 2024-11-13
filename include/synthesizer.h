@@ -7,6 +7,7 @@
 #include "low_pass_filter.h"
 #include "jitter_filter.h"
 #include "ring_buffer.h"
+#include "butterworth_low_pass_filter.h"
 
 #include <cinttypes>
 #include <thread>
@@ -17,39 +18,40 @@
 class Synthesizer {
     public:
         struct AudioParameters {
-            float Volume = 1.0f;
-            float Convolution = 1.0f;
+            float volume = 1.0f;
+            float convolution = 1.0f;
             float dF_F_mix = 0.01f;
-            float InputSampleNoise = 0.5f;
-            float InputSampleNoiseFrequencyCutoff = 80000.0f;
-            float AirNoise = 1.0f;
-            float AirNoiseFrequencyCutoff = 10000.0f;
-            float LevelerTarget = 30000.0f;
-            float LevelerMaxGain = 1.9f;
-            float LevelerMinGain = 0.00001f;
+            float inputSampleNoise = 0.5f;
+            float inputSampleNoiseFrequencyCutoff = 10000.0f;
+            float airNoise = 1.0f;
+            float airNoiseFrequencyCutoff = 2000.0f;
+            float levelerTarget = 30000.0f;
+            float levelerMaxGain = 1.9f;
+            float levelerMinGain = 0.00001f;
         };
 
         struct Parameters {
-            int InputChannelCount = 1;
-            int InputBufferSize = 1024;
-            int AudioBufferSize = 44100;
-            float InputSampleRate = 10000;
-            float AudioSampleRate = 44100;
-            AudioParameters InitialAudioParameters;
+            int inputChannelCount = 1;
+            int inputBufferSize = 1024;
+            int audioBufferSize = 44100;
+            float inputSampleRate = 10000;
+            float audioSampleRate = 44100;
+            AudioParameters initialAudioParameters;
         };
 
         struct InputChannel {
-            RingBuffer<float> Data;
-            float *TransferBuffer = nullptr;
-            float LastInputSample = 0.0f;
+            RingBuffer<float> data;
+            float *transferBuffer = nullptr;
+            double lastInputSample = 0.0f;
         };
 
         struct ProcessingFilters {
-            ConvolutionFilter Convolution;
-            DerivativeFilter Derivative;
+            ConvolutionFilter convolution;
+            DerivativeFilter derivative;
             JitterFilter jitterFilter;
-            LowPassFilter AirNoiseLowPass;
-            LowPassFilter InputDcFilter;
+            ButterworthLowPassFilter<float> airNoiseLowPass;
+            LowPassFilter inputDcFilter;
+            ButterworthLowPassFilter<double> antialiasing;
         };
 
     public:
@@ -91,6 +93,7 @@ class Synthesizer {
         void setAudioParameters(const AudioParameters &params);
 
     //protected:
+        ButterworthLowPassFilter<float> m_antialiasing;
         LevelingFilter m_levelingFilter;
         InputChannel *m_inputChannels;
         AudioParameters m_audioParameters;

@@ -1,10 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 
-include(CMakeDependentOption)
-
 option(DTV "Enable video output" OFF)
 option(PIRANHA_ENABLED "Enable scripting input" ON)
-cmake_dependent_option(DISCORD_ENABLED "Enable Discord Rich Presence" ON WIN32 OFF)
+option(DISCORD_ENABLED "Enable Discord Rich Presence" OFF)
 
 if (DTV)
     add_compile_definitions(ATG_ENGINE_SIM_VIDEO_CAPTURE)
@@ -44,6 +42,28 @@ set_property(TARGET gmock_main PROPERTY FOLDER "gtest")
 set_property(TARGET gtest PROPERTY FOLDER "gtest")
 set_property(TARGET gtest_main PROPERTY FOLDER "gtest")
 
+set(SDL2_INCLUDE_DIR G:/local/SDL2/include)
+set(SDL2_LIBRARY G:/local/SDL2/lib/x64/SDL2.lib)
+set(SDL2_DIR G:/local/SDL2)
+set(SDL2MAIN_LIBRARY G:/local/SDL2/lib/x64/SDL2main.lib)
+
+set(SDL2_IMAGE_INCLUDE_DIR G:/local/SDL2_image/include)
+set(SDL2_IMAGE_LIBRARY G:/local/SDL2_image/lib/x64/SDL2_image.lib)
+
+set(Boost_DIR G:/local/Boost_1_80_0)
+set(Boost_INCLUDE_DIR G:/local/Boost_1_80_0)
+set(Boost_FILESYSTEM_LIBRARY_RELEASE G:/local/Boost_1_80_0/lib64-msvc-14.3/libboost_filesystem-vc143-mt-x64-1_80.lib)
+set(Boost_FILESYSTEM_LIBRARY_DEBUG G:/local/Boost_1_80_0/lib64-msvc-14.3/libboost_filesystem-vc143-mt-gd-x64-1_80.lib)
+set(Boost_LIBRARY_DIR_DEBUG G:/local/Boost_1_80_0/lib64-msvc-14.3)
+set(Boost_LIBRARY_DIR_RELEASE G:/local/Boost_1_80_0/lib64-msvc-14.3)
+
+set(FLEX_EXECUTABLE G:/local/WinFlexBison/win_flex.exe)
+set(BISON_EXECUTABLE G:/local/WinFlexBison/win_bison.exe)
+
+include_directories(${Boost_INCLUDE_DIR})
+include_directories(${SDL2_INCLUDE_DIR})
+include_directories(${SDL2_IMAGE_INCLUDE_DIR})
+
 # ========================================================
 
 add_library(engine-sim STATIC
@@ -56,6 +76,7 @@ add_library(engine-sim STATIC
     src/convolution_filter.cpp
     src/cylinder_bank.cpp
     src/cylinder_head.cpp
+    src/delay_filter.cpp
     src/derivative_filter.cpp
     src/direct_throttle_linkage.cpp
     src/dynamometer.cpp
@@ -68,38 +89,47 @@ add_library(engine-sim STATIC
     src/gas_system.cpp
     src/gaussian_filter.cpp
     src/governor.cpp
+    src/ground.cpp
+    src/ground_object.cpp
     src/ignition_module.cpp
     src/impulse_response.cpp
     src/intake.cpp
     src/jitter_filter.cpp
+    src/joystick.cpp
     src/leveling_filter.cpp
     src/low_pass_filter.cpp
     src/part.cpp
     src/piston.cpp
+    src/piston_engine_simulator.cpp
     src/simulator.cpp
     src/standard_valvetrain.cpp
     src/starter_motor.cpp
     src/synthesizer.cpp
     src/throttle.cpp
     src/tire.cpp
-    src/ground.cpp
+    src/tire_object.cpp
     src/transmission.cpp
     src/utilities.cpp
     src/valvetrain.cpp
     src/vehicle.cpp
+    src/vehicle_object.cpp
     src/vehicle_drag_constraint.cpp
     src/vtec_valvetrain.cpp
+    src/loader/logger.cpp
 
     # Include files
     include/audio_buffer.h
     include/application_settings.h
     include/camshaft.h
+    include/custom_labeled_gauge.h
+    include/custom_gauge_cluster.h
     include/crankshaft.h
     include/combustion_chamber.h
     include/connecting_rod.h
     include/convolution_filter.h
     include/cylinder_bank.h
     include/cylinder_head.h
+    include/delay_filter.h
     include/derivative_filter.h
     include/direct_throttle_linkage.h
     include/dynamometer.h
@@ -112,35 +142,41 @@ add_library(engine-sim STATIC
     include/gas_system.h
     include/gaussian_filter.h
     include/governor.h
+    include/ground.h
+    include/ground_object.h
     include/ignition_module.h
     include/impulse_response.h
     include/intake.h
     include/jitter_filter.h
+    include/joystick.h
     include/leveling_filter.h
     include/low_pass_filter.h
     include/part.h
     include/piston.h
+    include/piston_engine_simulator.h
     include/simulator.h
     include/standard_valvetrain.h
     include/starter_motor.h
     include/synthesizer.h
     include/throttle.h
-    include/tire.h
-    include/ground.h
     include/transmission.h
+    include/tire_object.h
+    include/tire.h
     include/units.h
     include/utilities.h
     include/valvetrain.h
     include/vehicle.h
+    include/vehicle_object.h
     include/vehicle_drag_constraint.h
     include/vtec_valvetrain.h
+    include/loader/logger.h
 )
 
 target_link_libraries(engine-sim
+    box2d
     simple-2d-constraint-solver
     csv-io
-    delta-basic
-    box2d)
+    delta-basic)
 
 target_include_directories(engine-sim
     PUBLIC dependencies/submodules)
@@ -190,10 +226,22 @@ if (PIRANHA_ENABLED)
         PUBLIC dependencies/submodules)
 
     target_link_libraries(engine-sim-script-interpreter
+        box2d
         csv-io
-        piranha
-        box2d)
+        piranha)
 endif (PIRANHA_ENABLED)
+
+if (DISCORD_ENABLED)
+    add_library(discord STATIC
+        # Source files
+        dependencies/discord/Discord.cpp
+
+        # Include files
+        dependencies/discord/Discord.h
+        dependencies/discord/discord_register.h
+        dependencies/discord/discord_rpc.h
+    )
+endif (DISCORD_ENABLED)
 
 add_executable(engine-sim-app WIN32
     # Source files
@@ -209,9 +257,6 @@ add_executable(engine-sim-app WIN32
     src/ui_math.cpp
     src/gauge.cpp
     src/crankshaft_object.cpp
-    src/tire_object.cpp
-    src/ground_object.cpp
-    src/vehicle_object.cpp
     src/cylinder_bank_object.cpp
     src/cylinder_head_object.cpp
     src/ui_button.cpp
@@ -221,10 +266,8 @@ add_executable(engine-sim-app WIN32
     src/shaders.cpp
     src/engine_view.cpp
     src/right_gauge_cluster.cpp
-    src/custom_gauge_cluster.cpp
     src/cylinder_temperature_gauge.cpp
     src/labeled_gauge.cpp
-    src/custom_labeled_gauge.cpp
     src/throttle_display.cpp
     src/afr_cluster.cpp
     src/fuel_cluster.cpp
@@ -234,6 +277,8 @@ add_executable(engine-sim-app WIN32
     src/load_simulation_cluster.cpp
     src/mixer_cluster.cpp
     src/info_cluster.cpp
+    src/custom_gauge_cluster.cpp
+    src/custom_labeled_gauge.cpp
 
     # Include files
     include/delta.h
@@ -249,9 +294,6 @@ add_executable(engine-sim-app WIN32
     include/ui_math.h
     include/units.h
     include/crankshaft_object.h
-    include/tire_object.h
-    include/ground_object.h
-    include/vehicle_object.h
     include/cylinder_bank_object.h
     include/cylinder_head_object.h
     include/ui_button.h
@@ -261,10 +303,8 @@ add_executable(engine-sim-app WIN32
     include/shaders.h
     include/engine_view.h
     include/right_gauge_cluster.h
-    include/custom_gauge_cluster.h
     include/cylinder_temperature_gauge.h
     include/labeled_gauge.h
-    include/custom_labeled_gauge.h
     include/throttle_display.h
     include/afr_cluster.h
     include/fuel_cluster.h
@@ -274,6 +314,12 @@ add_executable(engine-sim-app WIN32
     include/load_simulation_cluster.h
     include/mixer_cluster.h
     include/info_cluster.h
+    include/custom_labeled_gauge.h
+    include/custom_gauge_cluster.h
+)
+
+target_link_libraries(engine-sim-app
+    engine-sim
 )
 
 if (DTV)
@@ -286,21 +332,18 @@ if (PIRANHA_ENABLED)
         engine-sim-script-interpreter)
 endif (PIRANHA_ENABLED)
 
+if (DISCORD_ENABLED)
+    add_library(discord-rpc STATIC IMPORTED)
+    set_property(TARGET discord-rpc PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/dependencies/discord/lib/discord-rpc.lib)
+    target_link_libraries(engine-sim-app
+    	discord
+	discord-rpc)
+endif (DISCORD_ENABLED)
+
 target_include_directories(engine-sim-app
     PUBLIC dependencies/submodules)
 
 add_subdirectory(dependencies)
-
-if (DISCORD_ENABLED)
-    target_link_libraries(engine-sim-app
-        discord
-        discord-rpc
-    )
-endif (DISCORD_ENABLED)
-
-target_link_libraries(engine-sim-app
-    engine-sim
-)
 
 # GTEST
 

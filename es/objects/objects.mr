@@ -79,6 +79,9 @@ private node _engine => __engine_sim__engine {
     input redline [float];
     input starter_speed [float];
     input starter_torque [float];
+    input dyno_min_speed [float];
+    input dyno_max_speed [float];
+    input dyno_hold_step [float];
 
     input fuel [fuel];
     input throttle [throttle_channel];
@@ -98,6 +101,9 @@ public node engine {
     input redline: params.redline;
     input starter_speed: params.starter_speed;
     input starter_torque: params.starter_torque;
+    input dyno_min_speed: 1000 * units.rpm;
+    input dyno_max_speed: redline;
+    input dyno_hold_step: 100 * units.rpm;
 
     input fuel: params.fuel;
     input throttle_gamma: 1.0;
@@ -116,6 +122,9 @@ public node engine {
             redline: redline,
             starter_speed: starter_speed,
             starter_torque: starter_torque,
+            dyno_min_speed: dyno_min_speed,
+            dyno_max_speed: dyno_max_speed,
+            dyno_hold_step: dyno_hold_step,
 
             fuel: fuel,
             throttle: throttle,
@@ -535,6 +544,7 @@ public node impulse_response => __engine_sim__impulse_response {
 
 public node exhaust_system_parameters {
     input volume: 100.0 * units.L;
+    input length: volume / collector_cross_section_area;
     input collector_cross_section_area: circle_area(2.0 * units.inch);
     input outlet_flow_rate: k_carb(1000.0);
     input primary_tube_length: 10.0 * units.inch;
@@ -544,7 +554,7 @@ public node exhaust_system_parameters {
 }
 
 private node _exhaust_system => __engine_sim__exhaust_system {
-    input volume [float];
+    input length [float];
     input collector_cross_section_area [float];
     input outlet_flow_rate [float];
     input primary_tube_length [float];
@@ -557,7 +567,7 @@ private node _exhaust_system => __engine_sim__exhaust_system {
 
 public node exhaust_system {
     input parameters: exhaust_system_parameters();
-    input volume: parameters.volume;
+    input length: parameters.length;
     input collector_cross_section_area: parameters.collector_cross_section_area;
     input outlet_flow_rate: parameters.outlet_flow_rate;   
     input primary_tube_length: parameters.primary_tube_length;
@@ -567,7 +577,7 @@ public node exhaust_system {
     input impulse_response;
     alias output __out [_exhaust_system]:
         _exhaust_system(
-            volume: volume,
+            length: length,
             collector_cross_section_area: collector_cross_section_area,
             outlet_flow_rate: outlet_flow_rate,
             primary_tube_length: primary_tube_length,

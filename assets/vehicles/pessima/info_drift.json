@@ -1,0 +1,45 @@
+{
+  "0-100 km/h":9,
+  "0-100 mph":16.5,
+  "0-200 km/h":25.2,
+  "0-60 mph":8.7,
+  "100-0 km/h":36.6,
+  "100-200 km/h":16.2,
+  "60-0 mph":111.6,
+  "60-100 mph":7.7,
+  "BoundingBox":[
+    [
+      -0.66,
+      -1.93,
+      -0.215
+    ],
+    [
+      1.3,
+      2.6,
+      1.14
+    ]
+  ],
+  "Braking G":1.076,
+  "Config Type":"Custom",
+  "Configuration":"Drift (M)",
+  "Description":"An answer to the age-old question of 'What do you get when you combine an AWD Pessima GTz with a reciprocating saw and a welder?'",
+  "Drivetrain":"RWD",
+  "Fuel Type":"Gasoline",
+  "Induction Type":"Turbo",
+  "Off-Road Score":21,
+  "Performance Class":"0",
+  "Population":1,
+  "Power":257,
+  "PowerPeakRPM":"6550 - 7350",
+  "Propulsion":"ICE",
+  "Top Speed":66.02132236,
+  "Torque":285,
+  "TorquePeakRPM":"5150 - 6400",
+  "Transmission":"Manual",
+  "Value":92000,
+  "Weight":1355,
+  "Weight/Power":5.272373541,
+  "defaultPaintName1":"Quicksilver",
+  "defaultPaintName2":"Pearl White",
+  "defaultPaintName3":"Carbon Gray"
+}

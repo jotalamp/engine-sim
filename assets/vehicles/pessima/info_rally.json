@@ -1,0 +1,45 @@
+{
+  "0-100 km/h":4.7,
+  "0-100 mph":10.6,
+  "0-200 km/h":16.5,
+  "0-60 mph":4.5,
+  "100-0 km/h":33.7,
+  "100-200 km/h":11.8,
+  "60-0 mph":102.2,
+  "60-100 mph":6,
+  "BoundingBox":[
+    [
+      -0.66,
+      -1.93,
+      -0.224
+    ],
+    [
+      1.3,
+      2.6,
+      1.14
+    ]
+  ],
+  "Braking G":1.166,
+  "Config Type":"Rally",
+  "Configuration":"Rally - Gravel (M)",
+  "Description":"A rally variant with all-wheel drive, tuned for dirt and gravel, based on a production chassis",
+  "Drivetrain":"AWD",
+  "Fuel Type":"Gasoline",
+  "Induction Type":"Turbo",
+  "Off-Road Score":34,
+  "Performance Class":"8",
+  "Population":10,
+  "Power":339,
+  "PowerPeakRPM":"5700 - 6500",
+  "Propulsion":"ICE",
+  "Top Speed":66.37924031,
+  "Torque":435,
+  "TorquePeakRPM":"4500 - 5500",
+  "Transmission":"Manual",
+  "Value":135000,
+  "Weight":1400,
+  "Weight/Power":4.12979351,
+  "defaultPaintName1":"Seafoam Green",
+  "defaultPaintName2":"Pearl White",
+  "defaultPaintName3":"Pearl White"
+}

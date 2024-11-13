@@ -5,11 +5,6 @@
 
 #include "constants.h"
 
-#ifndef _MSC_VER
-// Trust in the compiler
-#define __forceinline inline
-#endif
-
 class LowPassFilter : public Filter {
     public:
         LowPassFilter();

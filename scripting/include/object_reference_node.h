@@ -18,6 +18,11 @@ namespace es_script {
             /* void */
         }
 
+        template <typename Type>
+        void overrideType() {
+            m_output.overrideType(LookupChannelType<Type>());
+        }
+
     protected:
         virtual void registerOutputs() {
             setPrimaryOutput("__out");

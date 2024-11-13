@@ -1,0 +1,32 @@
+{
+  "0-100 km/h":10.9,
+  "0-60 mph":10.2,
+  "BoundingBox":[
+    [
+      -0.98,
+      -2.45042,
+      -0.2057848112
+    ],
+    [
+      0.98,
+      2.08439,
+      1.12627
+    ]
+  ],
+  "Drivetrain":"FWD",
+  "Fuel Type":"Gasoline",
+  "Induction Type":"NA",
+  "Off-Road Score":27,
+  "Population":3000,
+  "Power":145,
+  "PowerPeakRPM":"5800 - 6850",
+  "Propulsion":"ICE",
+  "Top Speed":37.95620559,
+  "Torque":190,
+  "TorquePeakRPM":"4100 - 5350",
+  "Transmission":"Automatic",
+  "Type":"PropTraffic",
+  "Weight":1300,
+  "Weight/Power":8.965517241,
+  "isAuxiliary":true
+}

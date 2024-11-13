@@ -278,10 +278,6 @@ void GasSystem::dissipateExcessVelocity() {
     m_state.E_k += 0.5 * mass() * (v_squared - c_squared);
 
     if (m_state.E_k < 0) m_state.E_k = 0;
-
-    if (std::isnan(m_state.momentum[0]) || std::isnan(m_state.E_k)) {
-        int a = 0;
-    }
 }
 
 void GasSystem::updateVelocity(double dt, double beta) {
@@ -402,7 +398,6 @@ double GasSystem::flow(const FlowParameters &params) {
 
     const double maxFlow = source->pressureEquilibriumMaxFlow(sink);
     flow = clamp(flow, 0.0, 0.9 * source->n());
-    //flow = clamp(flow, 0.0, maxFlow);
 
     const double fraction = flow / source->n();
     const double fractionVolume = fraction * source->volume();
@@ -439,7 +434,9 @@ double GasSystem::flow(const FlowParameters &params) {
     }
     
     const double sourceMass = source->mass();
+    const double invSourceMass = 1 / sourceMass;
     const double sinkMass = sink->mass();
+    const double invSinkMass = 1 / sinkMass;
 
     const double c_source = source->c();
     const double c_sink = sink->c();
@@ -479,8 +476,6 @@ double GasSystem::flow(const FlowParameters &params) {
     }
 
     if (sourceMass != 0) {
-        const double invSourceMass = 1 / sourceMass;
-
         // Energy conservation
         const double sourceVelocity0_x = sourceInitialMomentum_x * invSourceMass;
         const double sourceVelocity0_y = sourceInitialMomentum_y * invSourceMass;
@@ -498,8 +493,6 @@ double GasSystem::flow(const FlowParameters &params) {
     }
 
     if (sinkMass > 0) {
-        const double invSinkMass = 1 / sinkMass;
-
         const double sinkVelocity0_x = sinkInitialMomentum_x * invSinkMass;
         const double sinkVelocity0_y = sinkInitialMomentum_y * invSinkMass;
 

@@ -1,12 +1,14 @@
 #include "../include/cylinder_head_object.h"
+
 #include "../include/cylinder_bank.h"
 #include "../include/engine_sim_application.h"
 #include "../include/constants.h"
 
-CylinderHeadObject::CylinderHeadObject() {
+CylinderHeadObject::CylinderHeadObject(int cylinderIndex) {
     m_head = nullptr;
     m_engine = nullptr;
-    m_cylinderIndex = -1;
+    m_cylinderIndex = cylinderIndex;
+    Logger::DebugLine("2 Cylinder index: " + std::to_string(m_cylinderIndex));
 }
 
 CylinderHeadObject::~CylinderHeadObject() {
@@ -18,84 +20,200 @@ void CylinderHeadObject::generateGeometry() {
 }
 
 void CylinderHeadObject::render(const ViewParameters *view) {
-    if(!m_app->m_show_engine) return;
-    
+
+    if (!m_app->getShowEngine()) return;
+
     resetShader();
-    ysTransform *parentTransform = m_app->getSimulator()->getVehicle()->m_transform_engine;
+
+    ysTransform* parentTransform = m_app->getSimulator()->getVehicle()->m_transform_engine;
     ysMatrix parentMatrix = parentTransform->GetWorldTransform();
 
     CylinderBank *bank = m_head->getCylinderBank();
-    const double s = (float)bank->getBore() / 2.0f;
-    const double boreSurfaceArea = constants::pi * bank->getBore() * bank->getBore() / 4.0;
+    int cylinderBankIndex = bank->getIndex();
+    const double s = m_app->getScaleModel() * (float)bank->getBore() / 2.0f;
+    const double boreSurfaceArea =
+        constants::pi * bank->getBore() * bank->getBore() / 4.0;
     const double chamberHeight = m_head->getCombustionChamberVolume() / boreSurfaceArea;
 
-    Piston *frontmostPiston = getForemostPiston(bank, m_cylinderIndex);
-
+    Piston *frontmostPiston = getForemostPiston(bank, view->Layer0);
     if (frontmostPiston == nullptr) return;
 
     const double theta = bank->getAngle();
     double x, y;
-    bank->getPositionAboveDeck(chamberHeight, &x, &y);
+    bank->getPositionAboveDeck(chamberHeight * 1.5f, &x, &y);
+
+    float startZ = (float)m_head->getCylinderBank()->m_dz;
+
+    float z = 0.0f;
+    if (m_app->getSimulator()->getEngine()->getEngineType() == Engine::V_SPLIT)
+        z = m_head->getCylinderBank()->getIndex() * m_app->getCylinderDifferenceZ() + m_cylinderIndex * m_engine->getCylinderBankCount() * m_app->getCylinderDifferenceZ();
+    else
+        z = startZ + m_cylinderIndex * m_app->getCylinderDifferenceZ();
 
     const ysMatrix scale = ysMath::ScaleTransform(ysMath::LoadScalar((float)s));
-
+    const ysMatrix rotation = ysMath::RotationTransform(
+            ysMath::Constants::ZAxis, (float)theta);
     const ysMatrix translation = ysMath::TranslationTransform(
-            ysMath::LoadVector((float)x, (float)y, m_cylinderIndex*m_app->getSimulator()->getEngine()->scaleZ));
+            ysMath::LoadVector((float)x, (float)y, z));
+    const ysMatrix T_headObject = ysMath::MatMult(parentMatrix, ysMath::MatMult(translation, rotation));
+    const ysMatrix T_head = ysMath::MatMult(
+            T_headObject,
+            scale);
 
-    const ysMatrix T_headObject 
-        = ysMath::MatMult(parentMatrix, ysMath::MatMult(translation, ysMath::RotationTransform(ysMath::Constants::ZAxis, (float)theta)));
-
-    const ysMatrix scaleHead = ysMath::ScaleTransform( m_engine->scale * ysMath::LoadScalar((float)s));
-
-    const ysMatrix T_head   = ysMath::MatMult(T_headObject, scale);
-    const ysMatrix T_head2  = ysMath::MatMult(T_headObject, scaleHead);
+    const ysVector col = m_app->getPink();  ysMath::Add(
+        ysMath::Mul(m_app->getForegroundColor(), ysMath::LoadScalar(0.01f)),
+        ysMath::Mul(m_app->getBackgroundColor(), ysMath::LoadScalar(0.99f))
+    );
+    const ysVector moving = m_app->getForegroundColor();
 
     constexpr float rollerRadius = (float)units::distance(300.0, units::thou);
 
-    m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialEngine"));
+    /*
+    GeometryGenerator::GeometryIndices
+        valveShadow,
+        valveRoller,
+        valveRollerShadow,
+        valveRollerPin,
+        camCenter;
+    GeometryGenerator *gen = m_app->getGeometryGenerator();
+    GeometryGenerator::Line2dParameters params;
 
-    if(m_cylinderIndex == 0) 
-    {
-        m_app->getShaders()->SetObjectTransform(T_head2);
-        
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Head_2JZ_GE_Start"),
-            0x0
-        );
-    }
+    gen->startShape();
+    params.lineWidth = 0.2f;
+    params.x0 = -0.689352f;
+    params.y0 = 0.085f;
+    params.x1 = -0.88632f;
+    params.y1 = -0.077975f;
+    gen->generateLine2d(params);
 
-    if(m_cylinderIndex == m_app->getSimulator()->getEngine()->getCylinderCount()/m_app->getSimulator()->getEngine()->getCylinderBankCount()-1) 
-    {
-        m_app->getShaders()->SetObjectTransform(T_head2);
-        
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Head_2JZ_GE_End"),
-            0x0
-        );
-    }
-    else if(m_cylinderIndex > 0) 
-    {
-        m_app->getShaders()->SetObjectTransform(T_head2);
-        
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Head_2JZ_GE_Middle"),
-            0x0
-        );
-    }
+    params.x0 = -(params.x0 + 0.5f) - 0.5f;
+    params.x1 = -(params.x1 + 0.5f) - 0.5f;
+    gen->generateLine2d(params);
+
+    params.x0 = 0.689352f;
+    params.x1 = 0.88632f;
+    gen->generateLine2d(params);
+
+    params.x0 = -(params.x0 - 0.5f) + 0.5f;
+    params.x1 = -(params.x1 - 0.5f) + 0.5f;
+    gen->generateLine2d(params);
+
+    params.lineWidth = 0.0917f + m_app->pixelsToUnits(5.0f) / (float)s;
+    params.x0 = -0.5f;
+    params.y0 = 0.2f;
+    params.x1 = -0.5f;
+    params.y1 = 1.5f;
+    gen->generateLine2d(params);
+
+    params.x0 = 0.5f;
+    params.x1 = 0.5f;
+    gen->generateLine2d(params);
+
+    gen->endShape(&valveShadow);
+
+    
+    GeometryGenerator::Circle2dParameters circleParams;
+    circleParams.radius = rollerRadius / (float)s;
+    circleParams.center_x = 0.0f;
+    circleParams.center_y = 1.99f;
+    gen->startShape();
+    gen->generateCircle2d(circleParams);
+    gen->endShape(&valveRoller);
+
+    circleParams.radius = (rollerRadius + m_app->pixelsToUnits(5.0f) / 2) / (float)s;
+    gen->startShape();
+    gen->generateCircle2d(circleParams);
+    gen->endShape(&valveRollerShadow);
+
+    circleParams.radius = (rollerRadius * 0.25f) / (float)s;
+    gen->startShape();
+    gen->generateCircle2d(circleParams);
+    gen->endShape(&valveRollerPin);
+
+    circleParams.radius = (rollerRadius * 0.25f);
+    circleParams.center_x = 0.0f;
+    circleParams.center_y = 0.0f;
+    gen->startShape();
+    gen->generateCircle2d(circleParams);
+    gen->endShape(&camCenter);
+    */
 
     m_app->getShaders()->SetObjectTransform(T_head);
+    m_app->getShaders()->SetBaseColor(col);
+
+    int lastCylinderIndex = m_engine->getCylinderCount() / m_engine->getCylinderBankCount() - 1;
+
+    if (m_app->getSimulator()->getEngine()->getEngineType() == Engine::V_SPLIT) {
+        if (m_cylinderIndex == 0)
+        {
+            m_app->getEngine()->DrawModel(
+                m_app->getShaders()->GetRegularFlags(),
+                m_app->getAssetManager()->GetModelAsset("Head_2JZ_GE_V_Start"),
+                0x0
+            );
+        }
+        else if (m_cylinderIndex < lastCylinderIndex)
+        {
+            m_app->getEngine()->DrawModel(
+                m_app->getShaders()->GetRegularFlags(),
+                m_app->getAssetManager()->GetModelAsset("Head_2JZ_GE_V_Middle"),
+                0x0
+            );
+        }
+
+        if (m_cylinderIndex == lastCylinderIndex)
+        {
+
+            m_app->getEngine()->DrawModel(
+                m_app->getShaders()->GetRegularFlags(),
+                m_app->getAssetManager()->GetModelAsset("Head_2JZ_GE_V_End"),
+                0x0
+            );
+        }
+    }
+    else {
+        if (m_cylinderIndex == 0)
+        {
+            m_app->getEngine()->DrawModel(
+                m_app->getShaders()->GetRegularFlags(),
+                m_app->getAssetManager()->GetModelAsset("Head_2JZ_GE_Start"),
+                0x0
+            );
+        }
+        else if (m_cylinderIndex < lastCylinderIndex)
+        {
+            m_app->getEngine()->DrawModel(
+                m_app->getShaders()->GetRegularFlags(),
+                m_app->getAssetManager()->GetModelAsset("Head_2JZ_GE_Middle"),
+                0x0
+            );
+        }
+
+        if (m_cylinderIndex == lastCylinderIndex)
+        {
+
+            m_app->getEngine()->DrawModel(
+                m_app->getShaders()->GetRegularFlags(),
+                m_app->getAssetManager()->GetModelAsset("Head_2JZ_GE_End"),
+                0x0
+            );
+        }
+    }
+    
+    
+
+    m_app->getShaders()->SetObjectTransform(T_head);
+    m_app->getShaders()->SetBaseColor(m_app->getBackgroundColor());
+    //m_app->drawGenerated(valveShadow, 0x1);
 
     const double intakeValvePosition = (m_head->getFlipDisplay())
         ? 0.5f
         : -0.5f;
 
-    const int layer = frontmostPiston->getCylinderIndex();
+    //const int layer = frontmostPiston->getCylinderIndex();
+    const int layer = m_cylinderIndex;
 
     const float intakeLift = (float)m_head->intakeValveLift(layer);
-    
     const ysMatrix T_intakeValve = ysMath::MatMult(
             T_head,
             ysMath::TranslationTransform(
@@ -108,13 +226,28 @@ void CylinderHeadObject::render(const ViewParameters *view) {
     m_app->getShaders()->SetObjectTransform(T_intakeValve);
     m_app->getShaders()->SetBaseColor(m_app->getBlue());
 
+    
     m_app->getEngine()->DrawModel(
         m_app->getShaders()->GetRegularFlags(),
-        m_app->getAssetManager()->GetModelAsset("Valve3D"),
+        //m_app->getAssetManager()->GetModelAsset("Valve"),
+        m_app->getAssetManager()->GetModelAsset("Valve3DPart1"),
         0x33);
 
-    const double exhaustLift = (float)m_head->exhaustValveLift(layer);
+    m_app->getEngine()->DrawModel(
+        m_app->getShaders()->GetRegularFlags(),
+        //m_app->getAssetManager()->GetModelAsset("Valve"),
+        m_app->getAssetManager()->GetModelAsset("Valve3DPart2"),
+        0x33);
 
+    /*
+    m_app->getShaders()->SetBaseColor(m_app->getBackgroundColor());
+    m_app->drawGenerated(valveRollerShadow, 0x33);
+    m_app->getShaders()->SetBaseColor(m_app->getBlue());
+    m_app->drawGenerated(valveRoller, 0x33);
+    m_app->getShaders()->SetBaseColor(m_app->getBackgroundColor());
+    m_app->drawGenerated(valveRollerPin, 0x33);*/
+
+    const double exhaustLift = (float)m_head->exhaustValveLift(layer);
     const ysMatrix T_exhaustValve = ysMath::MatMult(
         T_head,
         ysMath::TranslationTransform(
@@ -129,20 +262,34 @@ void CylinderHeadObject::render(const ViewParameters *view) {
 
     m_app->getEngine()->DrawModel(
         m_app->getShaders()->GetRegularFlags(),
-        m_app->getAssetManager()->GetModelAsset("Valve3D"),
+        //m_app->getAssetManager()->GetModelAsset("Valve"),
+        m_app->getAssetManager()->GetModelAsset("Valve3DPart1"),
         0x33);
 
+    m_app->getEngine()->DrawModel(
+        m_app->getShaders()->GetRegularFlags(),
+        //m_app->getAssetManager()->GetModelAsset("Valve"),
+        m_app->getAssetManager()->GetModelAsset("Valve3DPart2"),
+        0x33);
+
+    /*
+    m_app->getShaders()->SetBaseColor(m_app->getBackgroundColor());
+    m_app->drawGenerated(valveRollerShadow, 0x33);
     m_app->getShaders()->SetBaseColor(m_app->getYellow());
+    m_app->drawGenerated(valveRoller, 0x33);
+    m_app->getShaders()->SetBaseColor(m_app->getBackgroundColor());
+    m_app->drawGenerated(valveRollerPin, 0x33);
+    */
 
     Camshaft *intakeCam = m_head->getIntakeCamshaft();
     Camshaft *exhaustCam = m_head->getExhaustCamshaft();
+    //GeometryGenerator::GeometryIndices intake, intakeShadow, exhaust;
+    //generateCamshaft(intakeCam, 0.0, rollerRadius, &intake);
+    //generateCamshaft(intakeCam, m_app->pixelsToUnits(5.0) / 2, rollerRadius, &intakeShadow);
+    //generateCamshaft(exhaustCam, 0.0, rollerRadius, &exhaust);
 
     ysMatrix T_exhaustCam = ysMath::MatMult(
         T_headObject,
-        ysMath::ScaleTransform(ysMath::LoadVector(1.0f,1.0f,9.1f*m_app->getSimulator()->getEngine()->scaleZ)));
-
-    T_exhaustCam = ysMath::MatMult(
-        T_exhaustCam,
         ysMath::TranslationTransform(ysMath::LoadVector(
             (float)(-intakeValvePosition * s),
             m_app->pixelsToUnits(5.0f) / 2 + (float)(1.99 * s + exhaustCam->getBaseRadius() + rollerRadius),
@@ -157,6 +304,11 @@ void CylinderHeadObject::render(const ViewParameters *view) {
                 exhaustCam->getAngle()
                 + exhaustCam->getLobeCenterline(layer))));
 
+    if (m_app->getSimulator()->getEngine()->getEngineType() == Engine::V_SPLIT)
+    T_exhaustCam = ysMath::MatMult(
+        T_exhaustCam,
+        ysMath::ScaleTransform(ysMath::LoadVector(1.0f, 1.0f, (float)m_engine->getCylinderBankCount(), 1.0f)));
+
     m_app->getShaders()->SetObjectTransform(T_exhaustCam);
     m_app->getShaders()->SetBaseColor(m_app->getYellow());
 
@@ -165,12 +317,12 @@ void CylinderHeadObject::render(const ViewParameters *view) {
         m_app->getAssetManager()->GetModelAsset("Camshaft_2JZ_GE"),
         0x32 - layer);
 
+    //m_app->drawGenerated(exhaust);
+    m_app->getShaders()->SetBaseColor(m_app->getBackgroundColor());
+    //m_app->drawGenerated(camCenter);
+
     ysMatrix T_intakeCam = ysMath::MatMult(
         T_headObject,
-        ysMath::ScaleTransform(ysMath::LoadVector(1.0f,1.0f,9.1f*m_app->getSimulator()->getEngine()->scaleZ)));
-
-    T_intakeCam = ysMath::MatMult(
-        T_intakeCam,
         ysMath::TranslationTransform(ysMath::LoadVector(
             (float)(intakeValvePosition * s),
             rollerRadius + m_app->pixelsToUnits(5.0f) / 2 + (float)(1.99 * s + intakeCam->getBaseRadius()),
@@ -182,16 +334,28 @@ void CylinderHeadObject::render(const ViewParameters *view) {
         ysMath::RotationTransform(
             ysMath::Constants::ZAxis,
             (float)(
-                0.0f*ysMath::Constants::PI + intakeCam->getAngle()
+                intakeCam->getAngle()
                 + intakeCam->getLobeCenterline(layer))));
+
+    /*
+    m_app->getShaders()->SetObjectTransform(T_intakeCam);
+    m_app->getShaders()->SetBaseColor(m_app->getBackgroundColor());
+    m_app->drawGenerated(intakeShadow);
+    */
+    if (m_app->getSimulator()->getEngine()->getEngineType() == Engine::V_SPLIT)
+    T_intakeCam = ysMath::MatMult(
+        T_intakeCam,
+        ysMath::ScaleTransform(ysMath::LoadVector(1.0f, 1.0f, (float)m_engine->getCylinderBankCount(), 1.0f)));
 
     m_app->getShaders()->SetObjectTransform(T_intakeCam);
     m_app->getShaders()->SetBaseColor(m_app->getBlue());
-
+    //m_app->drawGenerated(intake);
     m_app->getEngine()->DrawModel(
         m_app->getShaders()->GetRegularFlags(),
         m_app->getAssetManager()->GetModelAsset("Camshaft_2JZ_GE"),
         0x32 - layer);
+    //m_app->getShaders()->SetBaseColor(m_app->getBackgroundColor());
+    //m_app->drawGenerated(camCenter);
 }
 
 void CylinderHeadObject::process(float dt) {

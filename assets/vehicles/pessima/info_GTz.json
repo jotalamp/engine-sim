@@ -1,0 +1,43 @@
+{
+  "0-100 km/h":6.7,
+  "0-100 mph":16,
+  "0-200 km/h":26.2,
+  "0-60 mph":6.1,
+  "100-0 km/h":35.9,
+  "100-200 km/h":19.5,
+  "60-0 mph":109.4,
+  "60-100 mph":9.9,
+  "BoundingBox":[
+    [
+      -0.66,
+      -1.93,
+      -0.215
+    ],
+    [
+      1.3,
+      2.6,
+      1.14
+    ]
+  ],
+  "Braking G":1.094,
+  "Config Type":"Factory",
+  "Configuration":"2.0 GTz (M)",
+  "Description":"Equipped with a turbo and all-wheel drive, the GTz is the ultimate Pessima",
+  "Drivetrain":"AWD",
+  "Fuel Type":"Gasoline",
+  "Induction Type":"Turbo",
+  "Off-Road Score":34,
+  "Performance Class":"6",
+  "Population":1500,
+  "Power":232,
+  "PowerPeakRPM":6550,
+  "Propulsion":"ICE",
+  "Top Speed":66.4435753,
+  "Torque":275,
+  "TorquePeakRPM":"4050 - 5700",
+  "Transmission":"Manual",
+  "Value":49000,
+  "Weight":1375,
+  "Weight/Power":5.926724138,
+  "defaultPaintName1":"Jet Black"
+}

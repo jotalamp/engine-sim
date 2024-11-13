@@ -4,7 +4,7 @@
 
 CylinderBankObject::CylinderBankObject() {
     m_bank = nullptr;
-    m_first_head = nullptr;
+    m_head = nullptr;
 }
 
 CylinderBankObject::~CylinderBankObject() {
@@ -15,7 +15,7 @@ void CylinderBankObject::generateGeometry() {
     const double s = m_bank->getBore() / 2.0;
     const double boreSurfaceArea =
         constants::pi * m_bank->getBore() * m_bank->getBore() / 4.0;
-    const double chamberHeight = m_first_head->getCombustionChamberVolume() / boreSurfaceArea;
+    const double chamberHeight = m_head->getCombustionChamberVolume() / boreSurfaceArea;
 
     GeometryGenerator *gen = m_app->getGeometryGenerator();
 
@@ -67,6 +67,10 @@ void CylinderBankObject::generateGeometry() {
 
 void CylinderBankObject::render(const ViewParameters *view) {
 
+    if (!m_app->getShowEngine()) return;
+
+    if (view->Sublayer != 0) return;
+
     resetShader();
 
     const ysVector col = ysMath::Add(
@@ -74,11 +78,8 @@ void CylinderBankObject::render(const ViewParameters *view) {
         ysMath::Mul(m_app->getBackgroundColor(), ysMath::LoadScalar(0.99f))
     );
 
-    /*
-    m_app->getEngine()->DrawModel(
-        m_app->getShaders()->GetRegularFlags(),
-        m_app->getAssetManager()->GetModelAsset("Top_2JZ_GE"),
-        0x32 - 0);*/
+    m_app->getShaders()->SetBaseColor(m_app->getPink());
+    //m_app->drawGenerated(m_walls, 0x0);
 }
 
 void CylinderBankObject::process(float dt) {

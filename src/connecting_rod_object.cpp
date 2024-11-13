@@ -4,107 +4,109 @@
 #include "../include/units.h"
 #include "../include/ui_utilities.h"
 
-ConnectingRodObject::ConnectingRodObject()
-{
+ConnectingRodObject::ConnectingRodObject() {
     m_connectingRod = nullptr;
 }
 
-ConnectingRodObject::~ConnectingRodObject()
-{
+ConnectingRodObject::~ConnectingRodObject() {
     /* void */
 }
 
-void ConnectingRodObject::generateGeometry()
-{
-    GeometryGenerator *gen = m_app->getGeometryGenerator();
-    const int rodJournalCount = m_connectingRod->getRodJournalCount();
+void ConnectingRodObject::render(const ViewParameters *view) {
 
-    GeometryGenerator::Line2dParameters params;
-    params.x0 = params.x1 = 0;
-    params.y0 = (float)(m_connectingRod->getBigEndLocal() + m_connectingRod->getCrankshaft()->getThrow() * 0.6);
-    params.y1 = (float)m_connectingRod->getLittleEndLocal();
-    params.lineWidth = (float)(m_connectingRod->getCrankshaft()->getThrow() * 0.5);
+    if (!m_app->getShowEngine()) return;
 
-    gen->startShape();
-    gen->generateLine2d(params);
+    const int layer = m_connectingRod->getLayer();
+    float length = (float)m_connectingRod->getLength();
 
-    if (rodJournalCount > 0)
-    {
-        GeometryGenerator::Circle2dParameters circleParams;
-        circleParams.radius = static_cast<float>(m_connectingRod->getSlaveThrow()) * 1.5f;
-        circleParams.center_x = 0.0f;
-        circleParams.center_y = static_cast<float>(m_connectingRod->getBigEndLocal());
+    ysVector4 scaleEnds = ysVector4(1.0f, 1.0f, 1.0f, 1.0f);
+    scaleEnds.Scale((float)m_connectingRod->getCrankshaft()->getThrow());
 
-        gen->generateCircle2d(circleParams);
-    }
+    if(m_app->getSimulator()->getEngine()->getCylinderBankCount() > 3)
+        scaleEnds.Scale(0.5f);
 
-    gen->endShape(&m_connectingRodBody);
+    if (m_app->getSimulator()->getEngine()->getEngineType() == Engine::V_COMMON)
+        scaleEnds.z = 0.05f;
+    else
+        scaleEnds.z = 0.06f;
 
-    if (rodJournalCount > 0)
-    {
-        gen->startShape();
+    ysVector4 scaleMiddle = scaleEnds;
+    scaleMiddle.y *= 9.4f * length;
 
-        GeometryGenerator::Circle2dParameters circleParams;
-        circleParams.radius = static_cast<float>(m_connectingRod->getCrankshaft()->getThrow()) * 0.2f;
-        for (int i = 0; i < rodJournalCount; ++i)
-        {
-            double x, y;
-            m_connectingRod->getRodJournalPositionLocal(i, &x, &y);
-
-            circleParams.center_x = static_cast<float>(x);
-            circleParams.center_y = static_cast<float>(y);
-
-            gen->generateCircle2d(circleParams);
-        }
-
-        gen->endShape(&m_pins);
-    }
-}
-
-void ConnectingRodObject::render(const ViewParameters *view)
-{
-    if(!m_app->m_show_engine) return;
-    //const int layer = m_connectingRod->getLayer();
+    if (m_app->getSimulator()->getEngine()->getEngineType() == Engine::RADIAL)
+        scaleMiddle.y = 0.5f * length;
+    else
+        scaleMiddle.y = 0.3f * length;
 
     resetShader();
 
-    float scale = m_app->getSimulator()->getEngine()->scale;
-
-    float f = scale * (float)m_connectingRod->getCrankshaft()->getThrow();
-
-    float f2 = 12.9f * (float)m_connectingRod->getLittleEndLocal() - (float)m_connectingRod->getBigEndLocal();
+    float angle = 0.25f * ysMath::Constants::PI;
 
     setTransform(
         &m_connectingRod->m_body,
 
-        f2,
-        f2,
-        1.0f,
+        scaleEnds,
 
         0.0f,
         (float)m_connectingRod->getBigEndLocal(),
-        m_app->getSimulator()->getEngine()->scaleZ * z,
 
-        0,
-        0,
-        0,
-        
+        0.0f,
+
+        layer * m_app->getCylinderDifferenceZ() + (float)m_connectingRod->getPiston()->getCylinderBank()->m_dz,
+
         m_app->getSimulator()->getVehicle()->m_transform_engine);
 
-    m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialEngine"));
+    m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
 
     m_app->getEngine()->DrawModel(
         m_app->getShaders()->GetRegularFlags(),
-        m_app->getAssetManager()->GetModelAsset("Rod_2JZ_GE"),
+        m_app->getAssetManager()->GetModelAsset("Rod_2JZ_GE_BigEnd"),
+        0);
+
+    setTransform(
+        &m_connectingRod->m_body,
+
+        scaleEnds,
+
+        0.0f,
+        1.0f * (float)m_connectingRod->getLittleEndLocal() + 0.0f * (float)m_connectingRod->getBigEndLocal(),
+
+        0.0f,
+
+        layer * m_app->getCylinderDifferenceZ() + (float)m_connectingRod->getPiston()->getCylinderBank()->m_dz,
+
+        m_app->getSimulator()->getVehicle()->m_transform_engine);
+
+    m_app->getEngine()->DrawModel(
+        m_app->getShaders()->GetRegularFlags(),
+        m_app->getAssetManager()->GetModelAsset("Rod_2JZ_GE_LittleEnd"),
+        0);
+
+   
+    setTransform(
+        &m_connectingRod->m_body,
+
+        scaleMiddle,
+
+        0.0f,
+        0.48f * (float)m_connectingRod->getLittleEndLocal() + 0.52f * (float)m_connectingRod->getBigEndLocal(),
+
+        0.0f,
+
+        layer * m_app->getCylinderDifferenceZ() + (float)m_connectingRod->getPiston()->getCylinderBank()->m_dz,
+
+        m_app->getSimulator()->getVehicle()->m_transform_engine);
+
+    m_app->getEngine()->DrawModel(
+        m_app->getShaders()->GetRegularFlags(),
+        m_app->getAssetManager()->GetModelAsset("Rod_2JZ_GE_Middle"),
         0);
 }
 
-void ConnectingRodObject::process(float dt)
-{
+void ConnectingRodObject::process(float dt) {
     /* void */
 }
 
-void ConnectingRodObject::destroy()
-{
+void ConnectingRodObject::destroy() {
     /* void */
 }

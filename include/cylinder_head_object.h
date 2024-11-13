@@ -9,7 +9,7 @@
 
 class CylinderHeadObject : public SimulationObject {
     public:
-        CylinderHeadObject();
+        CylinderHeadObject(int cylinderIndex);
         virtual ~CylinderHeadObject();
 
         virtual void generateGeometry();
@@ -19,7 +19,6 @@ class CylinderHeadObject : public SimulationObject {
 
         CylinderHead *m_head;
         Engine *m_engine;
-        int m_cylinderIndex;
 
     protected:
         void generateCamshaft(
@@ -27,6 +26,8 @@ class CylinderHeadObject : public SimulationObject {
             double padding,
             double rollerRadius,
             GeometryGenerator::GeometryIndices *indices);
+
+        int m_cylinderIndex;
 };
 
 #endif /* ATG_ENGINE_SIM_CYLINDER_HEAD_OBJECT_H */

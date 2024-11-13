@@ -1,0 +1,32 @@
+{
+"pessima_fenderflare_R": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"Widebody Rear Fender Flares",
+        "value":800,
+    },
+    "slotType" : "pessima_fenderflare_R",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_fenderflare_R_kit", ["pessima_body"]],
+         ["pessima_fenderflare_door_RR_kit", ["pessima_door_RR"]],
+         ["pessima_fenderflare_door_RL_kit", ["pessima_door_RL"]],
+    ],
+    "nodes": [
+         ["id", "posX", "posY", "posZ"],
+         {"frictionCoef":0.5},
+         {"nodeMaterial":"|NM_METAL"},
+         {"collision":true},
+         {"selfCollision":true},
+         {"group":"pessima_body"},
+         //quarter panel
+         {"nodeWeight":2.0},
+         ["q5r", -0.82, 1.04, 0.53],
+         ["q5l", 0.82, 1.04, 0.53],
+         ["q6r", -0.88, 1.31, 0.66, {"group":["pessima_body","pessima_seats"]}],
+         ["q6l", 0.88, 1.31, 0.66, {"group":["pessima_body","pessima_seats"]}],
+         ["q7r", -0.87, 1.62, 0.555],
+         ["q7l", 0.87, 1.62, 0.555],
+    ],
+},
+}

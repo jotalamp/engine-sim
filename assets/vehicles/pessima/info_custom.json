@@ -1,0 +1,43 @@
+{
+  "0-100 km/h":6.2,
+  "0-100 mph":11.9,
+  "0-200 km/h":16.9,
+  "0-60 mph":5.8,
+  "100-0 km/h":31.3,
+  "100-200 km/h":10.6,
+  "60-0 mph":96.9,
+  "60-100 mph":6,
+  "BoundingBox":[
+    [
+      -0.66,
+      -1.93,
+      -0.215
+    ],
+    [
+      1.3,
+      2.6,
+      1.14
+    ]
+  ],
+  "Braking G":1.258,
+  "Config Type":"Custom",
+  "Configuration":"Street Tuned (M)",
+  "Description":"A GTz with a more powerful turbo and race suspension",
+  "Drivetrain":"AWD",
+  "Fuel Type":"Gasoline",
+  "Induction Type":"Turbo",
+  "Off-Road Score":25,
+  "Performance Class":"9",
+  "Population":508,
+  "Power":333,
+  "PowerPeakRPM":"5750 - 6600",
+  "Propulsion":"ICE",
+  "Top Speed":71.81385166,
+  "Torque":430,
+  "TorquePeakRPM":"4450 - 5500",
+  "Transmission":"Manual",
+  "Value":68000,
+  "Weight":1365,
+  "Weight/Power":4.099099099,
+  "defaultPaintName1":"Steel Gray"
+}

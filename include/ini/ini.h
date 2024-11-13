@@ -517,7 +517,8 @@ inline T INIReader::Converter(const std::string& s) const {
         _ >> v;
         return v;
     } catch (std::exception& e) {
-        throw std::runtime_error("cannot parse value '" + s + "' to type<T>.");
+        std::cerr << e.what();
+        throw std::runtime_error("cannot parse value '" + s + "' to type<T>. ");
     };
 }
 

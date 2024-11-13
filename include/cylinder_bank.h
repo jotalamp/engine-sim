@@ -9,14 +9,14 @@ class CylinderBank {
     public:
         struct Parameters {
             Crankshaft *crankshaft;
-            double PositionX;
-            double PositionY;
-            double Angle;
-            double Bore;
-            double DeckHeight;
-            double DisplayDepth;
-            int CylinderCount;
-            int Index;
+            double positionX;
+            double positionY;
+            double angle;
+            double bore;
+            double deckHeight;
+            double displayDepth;
+            int cylinderCount;
+            int index;
         };
 
     public:
@@ -39,6 +39,8 @@ class CylinderBank {
         inline double getX() const { return m_x; }
         inline double getY() const { return m_y; }
         inline double getDisplayDepth() const { return m_displayDepth; }
+
+        double m_dz;
 
     protected:
         double m_angle;

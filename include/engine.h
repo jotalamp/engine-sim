@@ -3,9 +3,6 @@
 
 #include "part.h"
 
-#include "ground.h"
-#include "vehicle.h"
-#include "tire.h"
 #include "piston.h"
 #include "connecting_rod.h"
 #include "crankshaft.h"
@@ -17,23 +14,32 @@
 #include "combustion_chamber.h"
 #include "units.h"
 #include "throttle.h"
+#include "ground.h"
 
 #include <string>
 
+class Simulator;
+class Vehicle;
+class Transmission;
 class Engine : public Part {
     public:
+        enum EngineType { INLINE, V_COMMON, V_SPLIT, BOXER, RADIAL };
+
         struct Parameters {
-            int CylinderBanks;
-            int CylinderCount;
-            int CrankshaftCount;
-            int ExhaustSystemCount;
-            int IntakeCount;
+            int cylinderBanks;
+            int cylinderCount;
+            int crankshaftCount;
+            int exhaustSystemCount;
+            int intakeCount;
 
-            std::string Name;
+            std::string name;
 
-            double StarterTorque = units::torque(90.0, units::ft_lb);
-            double StarterSpeed = units::rpm(200);
-            double Redline = units::rpm(6500);
+            double starterTorque = units::torque(90.0, units::ft_lb);
+            double starterSpeed = units::rpm(200);
+            double redline = units::rpm(6500);
+            double dynoMinSpeed = units::rpm(1000);
+            double dynoMaxSpeed = units::rpm(6500);
+            double dynoHoldStep = units::rpm(100);
 
             Throttle *throttle;
 
@@ -73,21 +79,22 @@ class Engine : public Part {
         virtual void resetFuelConsumption();
         virtual double getTotalFuelMassConsumed() const;
         double getTotalVolumeFuelConsumed() const;
+        double getTotalVolumeFuelLeft() const;
 
         inline double getStarterTorque() const { return m_starterTorque; }
         inline double getStarterSpeed() const { return m_starterSpeed; }
         inline double getRedline() const { return m_redline; }
+        inline double getDynoMinSpeed() const { return m_dynoMinSpeed; }
+        inline double getDynoMaxSpeed() const { return m_dynoMaxSpeed; }
+        inline double getDynoHoldStep() const { return m_dynoHoldStep; }
 
         int getCylinderBankCount() const { return m_cylinderBankCount; }
         int getCylinderCount() const { return m_cylinderCount; }
         int getCrankshaftCount() const { return m_crankshaftCount; }
-        int getTireCount() const { return m_tireCount; }
         int getExhaustSystemCount() const { return m_exhaustSystemCount; }
         int getIntakeCount() const { return m_intakeCount; }
         int getMaxDepth() const;
 
-        Ground *getGround() { return &m_ground; }
-        Tire *getTire(int i) const { return &m_tires[i]; }
         Crankshaft *getCrankshaft(int i) const { return &m_crankshafts[i]; }
         CylinderBank *getCylinderBank(int i) const { return &m_cylinderBanks[i]; }
         CylinderHead *getHead(int i) const { return &m_heads[i]; }
@@ -104,17 +111,14 @@ class Engine : public Part {
         double getInitialNoise() const { return m_initialNoise; }
         double getInitialJitter() const { return m_initialJitter; }
 
-        float scaleZ;
-        float scale;
+        virtual Simulator *createSimulator(Vehicle *vehicle, Transmission *transmission);
+
+        EngineType getEngineType() { return m_engineType; }
+        Ground* getGround() { return &m_ground; }
+        void setEngineType();
 
     protected:
         std::string m_name;
-
-        Ground m_ground;
-        Vehicle *m_vehicle;
-
-        Tire *m_tires;
-        int m_tireCount;
 
         Crankshaft *m_crankshafts;
         int m_crankshaftCount;
@@ -131,6 +135,9 @@ class Engine : public Part {
         double m_starterTorque;
         double m_starterSpeed;
         double m_redline;
+        double m_dynoMinSpeed;
+        double m_dynoMaxSpeed;
+        double m_dynoHoldStep;
 
         double m_initialSimulationFrequency;
         double m_initialHighFrequencyGain;
@@ -150,6 +157,10 @@ class Engine : public Part {
 
         double m_throttleValue;
         double m_displacement;
+
+        EngineType m_engineType;
+
+        Ground m_ground;
 };
 
 #endif /* ATG_ENGINE_SIM_ENGINE_H */

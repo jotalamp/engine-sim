@@ -11,9 +11,8 @@ class ConnectingRodObject : public SimulationObject {
         ConnectingRodObject();
         virtual ~ConnectingRodObject();
 
-        virtual void generateGeometry();
+        //virtual void generateGeometry();
         virtual void render(const ViewParameters *view);
-        //virtual void render();
         virtual void process(float dt);
         virtual void destroy();
 

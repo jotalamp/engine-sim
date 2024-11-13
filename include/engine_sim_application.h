@@ -1,7 +1,9 @@
 #ifndef ATG_ENGINE_SIM_ENGINE_SIM_APPLICATION_H
 #define ATG_ENGINE_SIM_ENGINE_SIM_APPLICATION_H
 
-#include <unistd.h>
+#include <SDL.h>
+
+#include "joystick.h"
 
 #include "geometry_generator.h"
 #include "simulator.h"
@@ -29,15 +31,37 @@
 #include "delta.h"
 #include "dtv.h"
 
+#include <fstream>
+#include "nlohmann/json.hpp"
+
+#include "ini/ini.h"
+#include "loader/logger.h"
+#include "../dependencies/submodules/box2d/include/box2d/box2d.h"
+#include "vehicle_object.h"
+#include "ground_object.h"
+
 #include <vector>
 
-#include <SDL2/SDL.h>
+using json = nlohmann::json;
 
-#include "../dependencies/submodules/box2d/include/box2d/box2d.h"
-#include "ini/ini.h"
-#include "vehicle_object.h"
+template <typename BasicJsonType>
+std::string to_string(const BasicJsonType& j)
+{
+    return j.dump();
+}
+
+struct Camera {
+    float zoom = 2.0f;
+    float fovY = 1.0f;
+    float aspectRatio = 16.0f / 9.0f;
+    ysVector2 rotation = ysVector2(0.0f, 0.0f);
+    ysVector3 position = ysVector3(0.0f, 0.0f, 0.0f);
+    ysVector3 target = ysVector3(0.0f, 0.0f, 0.0f);
+};
 
 class EngineSimApplication {
+    
+
     private:
         static std::string s_buildVersion;
 
@@ -45,13 +69,14 @@ class EngineSimApplication {
         EngineSimApplication();
         virtual ~EngineSimApplication();
 
+        json jbeam_json;
+
         static std::string getBuildVersion() { return s_buildVersion; }
 
+        std::string intToString(int number);
         void initialize(void *instance, ysContextObject::DeviceAPI api);
         void run();
         void destroy();
-
-        void loadMaterial(std::string filename, std::string name);
 
         void loadEngine(Engine *engine, Vehicle *vehicle, Transmission *transmission);
         void drawGenerated(
@@ -95,40 +120,38 @@ class EngineSimApplication {
         int getScreenWidth() const { return m_screenWidth; }
         int getScreenHeight() const { return m_screenHeight; }
 
-        Simulator *getSimulator() { return &m_simulator; }
+        Simulator *getSimulator() { return m_simulator; }
         InfoCluster *getInfoCluster() { return m_infoCluster; }
         ApplicationSettings* getAppSettings() { return &m_applicationSettings; }
 
         inih::INIReader getIniReader() { return m_iniReader; }
-        static std::string intToString(int number);
 
-        std::string getModeAsString() {
-                switch(m_mode) {
-                        case ENGINE: return "Engine";
-                        case DRIVING: return "Driving";
-                }
-        }
+        float getCylinderDifferenceZ() { return m_cylinderDifferenceZ; }
 
-        dbasic::Material* m_material_1;
+        void loadMaterial(std::string filename, std::string name);
+        void loadModel(std::string filename, float scale=1.0f);
 
-        b2World* m_world;
-        bool m_debug;
-        int m_selected_track;
-        bool m_show_engine;
-        //int m_selected_layer;
-        int m_selected_camera;
-        int m_selected_car;
+        Camera getCamera() { return m_camera; }
 
-        enum Mode { ENGINE, DRIVING };
+        float getScaleModel() { return m_scaleModel; }
+
+        bool getDebugMode() { return m_debug_mode;  }
+        void setDebugMode(bool debug_mode) { m_debug_mode = debug_mode; }
+        bool getShowEngine() { return m_show_engine; }
+        bool getShowEngine2() { return m_show_engine2; }
+        bool getShowTrack() { return m_show_track; }
+        bool getShowEngineOnly() { return m_show_engine_only; }
+        int getSelectedTrack() { return m_selected_track; }
+        b2World* getWorld() { return m_world; }
 
     protected:
         void loadScript();
         void processEngineInput();
         void renderScene();
+
         void refreshUserInterface();
 
-        inih::INIReader m_iniReader;
-
+    protected:
         double m_speedSetting = 1.0;
         double m_targetSpeedSetting = 1.0;
 
@@ -136,10 +159,12 @@ class EngineSimApplication {
         double m_targetClutchPressure = 1.0;
         int m_lastMouseWheel = 0;
 
+    protected:
         virtual void initialize();
         virtual void process(float dt);
         virtual void render();
 
+        float m_displayAngle;
         float m_displayHeight;
         int m_gameWindowHeight;
         int m_screenWidth;
@@ -164,28 +189,26 @@ class EngineSimApplication {
         std::vector<SimulationObject *> m_objects;
         Engine *m_iceEngine;
         Vehicle *m_vehicle;
-        VehicleObject *m_vehicle_object;
         Transmission *m_transmission;
-        Simulator m_simulator;
+        Simulator *m_simulator;
         double m_dynoSpeed;
         double m_torque;
 
         UiManager m_uiManager;
         EngineView *m_engineView;
         RightGaugeCluster *m_rightGaugeCluster;
-        CustomGaugeCluster *m_customGaugeCluster;
         OscilloscopeCluster *m_oscCluster;
         CylinderTemperatureGauge *m_temperatureGauge;
         PerformanceCluster *m_performanceCluster;
         LoadSimulationCluster *m_loadSimulationCluster;
         MixerCluster *m_mixerCluster;
         InfoCluster *m_infoCluster;
+        CustomGaugeCluster* m_customGaugeCluster;
         SimulationObject::ViewParameters m_viewParameters;
 
-        SDL_GameController* gGameController = NULL;
-        SDL_Joystick* gJoystick = NULL;
-
         bool m_paused;
+
+        float m_cylinderDifferenceZ;
 
     protected:
         void startRecording();
@@ -213,19 +236,40 @@ class EngineSimApplication {
         ysVector m_green;
         ysVector m_blue;
 
-        ysVector2 m_cameraRotation;
-        ysVector2 m_dragStartMousePosition;
-
         ysAudioBuffer *m_outputAudioBuffer;
         AudioBuffer m_audioBuffer;
         ysAudioSource *m_audioSource;
 
         int m_oscillatorSampleOffset;
-        int m_screen;
-        float m_fovY;
-        float m_zoom;
 
-        Mode m_mode; 
+        enum ScreenMode { SCREEN_MODE_DRIVING, SCREEN_MODE_1, SCREEN_MODE_2, SCREEN_MODE_3, SCREEN_MODE_LAST };
+        ScreenMode m_screen;
+
+        enum Controller { GAME_CONTROLLER, MOUSE };
+        Controller m_controller;
+
+        inih::INIReader m_iniReader;
+
+        Camera m_camera;
+
+        ysVector2 m_dragStartMousePosition;
+
+        float m_scaleModel;
+
+        bool m_debug_mode = false;
+        int m_selected_track;
+        bool m_show_engine;
+        bool m_show_engine2;
+        bool m_show_track;
+        bool m_show_engine_only = false;
+        int m_selected_camera;
+        int m_selected_car;
+        b2World* m_world;
+        VehicleObject* m_vehicle_object;
+        ysVector m_previousPosition;
+        ysVector m_previousPosition2;
+
+        Joystick j_Controller;
 
 #ifdef ATG_ENGINE_SIM_VIDEO_CAPTURE
         atg_dtv::Encoder m_encoder;

@@ -39,6 +39,7 @@ void FuelCluster::render() {
 
     std::stringstream ss;
     ss << std::setprecision(3) << std::fixed;
+    //ss << units::convert(getTotalVolumeFuelLeft(), units::L)
     ss << units::convert(getTotalVolumeFuelConsumed(), units::L);
     ss << " L";
 
@@ -47,7 +48,7 @@ void FuelCluster::render() {
 
     ss = std::stringstream();
     ss << std::setprecision(3) << std::fixed;
-    ss << units::convert(getTotalVolumeFuelConsumed(), units::gal);
+    ss << units::convert(getTotalVolumeFuelLeft(), units::gal);
     ss << " gal";
 
     const Bounds totalFuelGallons = grid.get(bodyBounds, 0, 3, 1, 1);
@@ -93,5 +94,11 @@ void FuelCluster::render() {
 double FuelCluster::getTotalVolumeFuelConsumed() const {
     return (m_engine != nullptr)
         ? m_engine->getTotalVolumeFuelConsumed()
+        : 0.0;
+}
+
+double FuelCluster::getTotalVolumeFuelLeft() const {
+    return (m_engine != nullptr)
+        ? m_engine->getTotalVolumeFuelLeft()
         : 0.0;
 }

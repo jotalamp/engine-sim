@@ -10,7 +10,7 @@ class ConvolutionFilter : public Filter {
 
         void initialize(int samples);
         virtual float f(float sample) override;
-        virtual void destroy() override;
+        virtual void destroy();
 
         int getSampleCount() const { return m_sampleCount; }
         float *getImpulseResponse() { return m_impulseResponse; }

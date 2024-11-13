@@ -1,0 +1,41 @@
+{
+  "0-100 km/h":10,
+  "0-100 mph":26.1,
+  "0-60 mph":9.4,
+  "100-0 km/h":37.1,
+  "60-0 mph":113.3,
+  "60-100 mph":16.7,
+  "BoundingBox":[
+    [
+      -0.66,
+      -1.93,
+      -0.215
+    ],
+    [
+      1.3,
+      2.6,
+      1.14
+    ]
+  ],
+  "Braking G":1.059,
+  "Config Type":"Factory",
+  "Configuration":"2.0 LX (A)",
+  "Description":"Mid-trim model with a more powerful DOHC engine and nicer hubcaps",
+  "Drivetrain":"FWD",
+  "Fuel Type":"Gasoline",
+  "Induction Type":"NA",
+  "Off-Road Score":27,
+  "Performance Class":"3",
+  "Population":7000,
+  "Power":141,
+  "PowerPeakRPM":5950,
+  "Propulsion":"ICE",
+  "Top Speed":53.15220354,
+  "Torque":180,
+  "TorquePeakRPM":"3400 - 4900",
+  "Transmission":"Automatic",
+  "Value":27000,
+  "Weight":1310,
+  "Weight/Power":9.290780142,
+  "defaultPaintName1":"Pleasant Blue"
+}

@@ -36,7 +36,9 @@ class Vehicle : public Part {
         inline void resetTravelledDistance() { m_travelledDistance = 0; }
         double linearForceToVirtualTorque(double force) const;
         float mapToRange(float input, float inputStart, float inputEnd, float outputStart, float outputEnd);
-        float steeringAngle;
+        
+        void setSteeringAngle(float steeringAngle) { m_steeringAngle = steeringAngle; }
+        float getSteeringAngle() { return m_steeringAngle; }
         
 
     protected:
@@ -60,6 +62,7 @@ class Vehicle : public Part {
         ysTransform *m_transform_camera;
         double m_rotation;
         float m_brakes;
+        float m_steeringAngle;
 };
 
 #endif /* ATG_ENGINE_SIM_VEHICLE_H */

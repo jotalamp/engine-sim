@@ -235,7 +235,7 @@ void UiElement::drawFrame(
     generator->generateFrame(params);
     generator->endShape(&frame);
 
-    m_app->getShaders()->SetBaseColor(frameColor);
+    m_app->getShaders()->SetBaseColor(frameColor); 
     m_app->drawGenerated(frame, 0x11, m_app->getShaders()->GetUiFlags());
 }
 

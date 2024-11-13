@@ -1,0 +1,51 @@
+{
+"pessima_taillight": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"Taillights",
+        "value":250,
+    },
+    "slotType" : "pessima_taillight",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         {"deformGroup":"taillight_R_break", "deformMaterialBase":"pessima_lights", "deformMaterialDamaged":"pessima_lights_dmg"},
+         ["pessima_taillight_R", ["pessima_body"],[]],
+         {"deformGroup":"taillight_R_break", "deformMaterialBase":"pessima_glass", "deformMaterialDamaged":"pessima_glass_dmg"},
+         ["pessima_taillightglass_R", ["pessima_body"],[]{"deformSound":"event:>Destruction>Vehicle>Glass>extglassbreaksound1", "deformVolume":0.5}],
+         {"deformGroup":"taillight_L_break", "deformMaterialBase":"pessima_lights", "deformMaterialDamaged":"pessima_lights_dmg"},
+         ["pessima_taillight_L", ["pessima_body"],[]],
+         {"deformGroup":"taillight_L_break", "deformMaterialBase":"pessima_glass", "deformMaterialDamaged":"pessima_glass_dmg"},
+         ["pessima_taillightglass_L", ["pessima_body"],[]{"deformSound":"event:>Destruction>Vehicle>Glass>extglassbreaksound2", "deformVolume":0.5}],
+         {"deformGroup":""},
+    ],
+    "props": [
+        ["func"      , "mesh"              , "idRef:", "idX:", "idY:"            , "baseRotation"        , "rotation"                 , "translation"        , "min", "max", "offset", "multiplier"],
+        {
+            "lightInnerAngle":0,
+            "lightOuterAngle":120,
+            "lightRange":8,
+            "lightColor":{"r":255, "g":50, "b":0, "a":255},
+            "lightAttenuation":{"x":0, "y":1, "z":1},
+            "lightCastShadows":false,
+            "flareName":"vehicleBrakeLightFlare",
+        },
+        //taillights
+        ["brake" ,         "SPOTLIGHT"        , "q11r", "r7rr", "q4r", {"x":0, "y":0, "z":0}, {"x":0, "y":0, "z":0},  {"x":0, "y":0, "z":0}, 0, 0, 0, 1, {"baseRotationGlobal":{"x":0, "y":178, "z":-10},"baseTranslation":{"x":0.4, "y":0.58, "z":0.0},"flareScale":0.06,"lightBrightness":0.05,"deformGroup":"taillight_R_break"}],
+        ["brake" ,         "SPOTLIGHT"        , "q11l", "r7ll", "q4l", {"x":0, "y":0, "z":0}, {"x":0, "y":0, "z":0},  {"x":0, "y":0, "z":0}, 0, 0, 0, 1, {"baseRotationGlobal":{"x":0, "y":178, "z":10},"baseTranslation":{"x":0.4, "y":0.58, "z":-0.0},"flareScale":0.06,"lightBrightness":0.05,"deformGroup":"taillight_L_break"}],
+        ["lowhighbeam" ,   "SPOTLIGHT"        , "q11r", "r7rr", "q4r", {"x":0, "y":0, "z":0}, {"x":0, "y":0, "z":0},  {"x":0, "y":0, "z":0}, 0, 0, 0, 1, {"baseRotationGlobal":{"x":0, "y":178, "z":-10},"baseTranslation":{"x":0.4, "y":0.58, "z":0.0},"flareScale":0.05,"lightBrightness":0.04,"lightRange":8,"deformGroup":"taillight_R_break"}],
+        ["lowhighbeam" ,   "SPOTLIGHT"        , "q11l", "r7ll", "q4l", {"x":0, "y":0, "z":0}, {"x":0, "y":0, "z":0},  {"x":0, "y":0, "z":0}, 0, 0, 0, 1, {"baseRotationGlobal":{"x":0, "y":178, "z":10},"baseTranslation":{"x":0.4, "y":0.58, "z":-0.0},"flareScale":0.05,"lightBrightness":0.04,"lightRange":8,"deformGroup":"taillight_L_break"}],
+        {
+            "lightInnerAngle":0,
+            "lightOuterAngle":120,
+            "lightRange":8,
+            "lightColor":{"r":255, "g":255, "b":0, "a":255},
+            "lightAttenuation":{"x":0, "y":1, "z":1},
+            "lightCastShadows":false,
+            "flareName":"vehicleBrakeLightFlare",
+        },
+        //corner
+        ["signal_R" ,         "SPOTLIGHT"        , "q11r", "r7rr", "q4r", {"x":0, "y":0, "z":0}, {"x":0, "y":0, "z":0}, {"x":0, "y":0, "z":0}, 0, 0, 0, 1, {"baseRotationGlobal":{"x":0, "y":178, "z":-10},"baseTranslation":{"x":0.4, "y":0.30, "z":0.0},"flareScale":0.03,"lightBrightness":0.04,"deformGroup":"taillight_R_break"}],
+        ["signal_L" ,         "SPOTLIGHT"        , "q11l", "r7ll", "q4l", {"x":0, "y":0, "z":0}, {"x":0, "y":0, "z":0}, {"x":0, "y":0, "z":0}, 0, 0, 0, 1, {"baseRotationGlobal":{"x":0, "y":178, "z":10},"baseTranslation":{"x":0.4, "y":0.30, "z":-0.0},"flareScale":0.03,"lightBrightness":0.04,"deformGroup":"taillight_L_break"}],
+    ],
+},
+}

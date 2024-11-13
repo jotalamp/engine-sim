@@ -12,7 +12,7 @@ Vehicle::Vehicle() {
     m_travelledDistance = 0;
     m_rollingResistance = 0;
     m_brakes = 0;
-    steeringAngle = 0;
+    m_steeringAngle = 0.0f;
 }
 
 Vehicle::~Vehicle() {
@@ -35,7 +35,8 @@ void Vehicle::update(double dt) {
     m_travelledDistance += getSpeed() * dt;
 
     //if(getSpeed() > 0.01f) 
-    float f = clamp(1.0f - 4.0f * getSpeed(), 0.0001f, 1.0f);
+    //float f = clamp((double)(1.0f - 4.0f * getSpeed()), 0.0001f, 1.0f);
+    //float f = 1.0f - 4.0f * getSpeed();
 
 
     //m_rotation = clamp((float)(0.00007f * steeringAngle * getSpeed()), -0.0002f, 0.0002f);

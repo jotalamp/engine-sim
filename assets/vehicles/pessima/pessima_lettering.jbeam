@@ -1,0 +1,142 @@
+{
+"pessima_lettering": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"Trunk Lettering",
+        "value":50,
+    },
+    "slotType" : "pessima_lettering_trunk",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_lettering_trunk", ["pessima_trunk"]],
+    ],
+},
+"pessima_lettering_DX": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"DX Trunk Lettering",
+        "value":50,
+    },
+    "slotType" : "pessima_lettering_trunk",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_lettering_trunk", ["pessima_trunk"]],
+         ["pessima_lettering_1.8", ["pessima_trunk"]],
+         ["pessima_lettering_DX", ["pessima_trunk"]],
+    ],
+},
+"pessima_lettering_LX": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"LX Trunk Lettering",
+        "value":70,
+    },
+    "slotType" : "pessima_lettering_trunk",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_lettering_trunk", ["pessima_trunk"]],
+         ["pessima_lettering_2.0" ["pessima_trunk"]],
+         ["pessima_lettering_LX", ["pessima_trunk"]],
+
+    ],
+},
+"pessima_lettering_HX": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"HX Trunk Lettering",
+        "value":80,
+    },
+    "slotType" : "pessima_lettering_trunk",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_lettering_trunk", ["pessima_trunk"]],
+         ["pessima_lettering_1.8" ["pessima_trunk"]],
+         ["pessima_lettering_HX", ["pessima_trunk"]],
+
+    ],
+},
+"pessima_lettering_ZX": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"ZX Trunk Lettering",
+        "value":90,
+    },
+    "slotType" : "pessima_lettering_trunk",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_lettering_trunk", ["pessima_trunk"]],
+         ["pessima_lettering_2.0" ["pessima_trunk"]],
+         ["pessima_lettering_ZX", ["pessima_trunk"]],
+
+    ],
+},
+"pessima_lettering_ZX_4ws": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"ZX AWS Trunk Lettering",
+        "value":90,
+    },
+    "slotType" : "pessima_lettering_trunk",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_lettering_trunk", ["pessima_trunk"]],
+         ["pessima_lettering_2.0" ["pessima_trunk"]],
+         ["pessima_lettering_ZX", ["pessima_trunk"],[],{"pos":{"x":0.07,"y":0.0045,"z":0}}],
+         ["pessima_lettering_4ws", ["pessima_trunk"]],
+
+    ],
+},
+"pessima_lettering_GTz": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"GTz Trunk Lettering",
+        "value":120,
+    },
+    "slotType" : "pessima_lettering_trunk",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_lettering_trunk", ["pessima_trunk"]],
+         ["pessima_lettering_2.0" ["pessima_trunk"]],
+         ["pessima_lettering_turbo" ["pessima_trunk"]],
+         ["pessima_lettering_4wd" ["pessima_trunk"]],
+         ["pessima_lettering_GTz", ["pessima_trunk"]],
+
+    ],
+},
+"pessima_logo_F": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"Ibishu Logo",
+        "value":50,
+    },
+    "slotType" : "pessima_logo_F",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_logo_F", ["pessima_hood"]],
+    ],
+},
+"pessima_logo_F_grille": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"Ibishu Logo",
+        "value":50,
+    },
+    "slotType" : "pessima_logo_F_grille",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_logo_F_grille", ["pessima_grille"]],
+    ],
+},
+"pessima_logo_F_grille_aero": {
+    "information":{
+        "authors":"BeamNG",
+        "name":"Ibishu Logo",
+        "value":70,
+    },
+    "slotType" : "pessima_logo_F_grille_aero",
+    "flexbodies": [
+         ["mesh", "[group]:", "nonFlexMaterials"],
+         ["pessima_logo_F_grille_aero", ["pessima_grille"]],
+    ],
+},
+}

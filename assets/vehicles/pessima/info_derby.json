@@ -1,0 +1,44 @@
+{
+  "0-100 km/h":11.1,
+  "0-100 mph":27.7,
+  "0-200 km/h":98.5,
+  "0-60 mph":10.5,
+  "100-0 km/h":37.2,
+  "100-200 km/h":87.3,
+  "60-0 mph":113.7,
+  "60-100 mph":17.1,
+  "BoundingBox":[
+    [
+      -0.53,
+      -1.93,
+      -0.215
+    ],
+    [
+      1.17,
+      2.6,
+      1.14
+    ]
+  ],
+  "Braking G":1.056,
+  "Config Type":"Factory",
+  "Configuration":"The Pessimistic (M)",
+  "Description":"What else could we have called it?",
+  "Drivetrain":"FWD",
+  "Fuel Type":"Gasoline",
+  "Induction Type":"NA",
+  "Off-Road Score":27,
+  "Performance Class":"3",
+  "Population":50,
+  "Power":134,
+  "PowerPeakRPM":5900,
+  "Propulsion":"ICE",
+  "Top Speed":55.68876686,
+  "Torque":175,
+  "TorquePeakRPM":"4000 - 5250",
+  "Transmission":"Manual",
+  "Weight":1250,
+  "Weight/Power":9.328358209,
+  "defaultPaintName1":"Bermuda Blue",
+  "defaultPaintName2":"Jet Black",
+  "defaultPaintName3":"Jet Black"
+}

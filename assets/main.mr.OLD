@@ -1,0 +1,8 @@
+import "themes/default.mr"
+import "engines/maximumqc/TJv10.mr"
+
+use_default_theme()
+
+set_engine(V10F1())
+set_transmission(f1_transmission())
+set_vehicle(f1_vehicle())

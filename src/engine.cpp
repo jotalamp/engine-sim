@@ -1,8 +1,10 @@
+#include "..\include\engine.h"
 #include "../include/engine.h"
 
 #include "../include/constants.h"
 #include "../include/units.h"
 #include "../include/fuel.h"
+#include "../include/piston_engine_simulator.h"
 
 #include <cmath>
 #include <assert.h>
@@ -20,13 +22,15 @@ Engine::Engine() {
     m_combustionChambers = nullptr;
 
     m_crankshaftCount = 0;
-    m_tireCount = 0;
     m_cylinderBankCount = 0;
     m_cylinderCount = 0;
     m_intakeCount = 0;
     m_exhaustSystemCount = 0;
     m_starterSpeed = 0;
     m_starterTorque = 0;
+    m_dynoMinSpeed = 0;
+    m_dynoMaxSpeed = 0;
+    m_dynoHoldStep = 0;
     m_redline = 0;
 
     m_throttle = nullptr;
@@ -39,7 +43,6 @@ Engine::Engine() {
 }
 
 Engine::~Engine() {
-    assert(m_tires == nullptr);
     assert(m_crankshafts == nullptr);
     assert(m_cylinderBanks == nullptr);
     assert(m_pistons == nullptr);
@@ -51,29 +54,27 @@ Engine::~Engine() {
 }
 
 void Engine::initialize(const Parameters &params) {
-    m_tireCount = 2;
-    scale = 22.6f;
-    //scale = 21.0f;
-
-    m_crankshaftCount = params.CrankshaftCount;
-    m_cylinderCount = params.CylinderCount;
-    m_cylinderBankCount = params.CylinderBanks;
-    m_exhaustSystemCount = params.ExhaustSystemCount;
-    m_intakeCount = params.IntakeCount;
-    m_starterTorque = params.StarterTorque;
-    m_starterSpeed = params.StarterSpeed;
-    m_redline = params.Redline;
-    m_name = params.Name;
+    m_crankshaftCount = params.crankshaftCount;
+    m_cylinderCount = params.cylinderCount;
+    m_cylinderBankCount = params.cylinderBanks;
+    m_exhaustSystemCount = params.exhaustSystemCount;
+    m_intakeCount = params.intakeCount;
+    m_starterTorque = params.starterTorque;
+    m_starterSpeed = params.starterSpeed;
+    m_dynoMinSpeed = params.dynoMinSpeed;
+    m_dynoMaxSpeed = params.dynoMaxSpeed;
+    m_dynoHoldStep = params.dynoHoldStep;
+    m_redline = params.redline;
+    m_name = params.name;
     m_throttle = params.throttle;
     m_initialHighFrequencyGain = params.initialHighFrequencyGain;
     m_initialSimulationFrequency = params.initialSimulationFrequency;
     m_initialJitter = params.initialJitter;
     m_initialNoise = params.initialNoise;
 
-    m_tires = new Tire[m_tireCount];
     m_crankshafts = new Crankshaft[m_crankshaftCount];
     m_cylinderBanks = new CylinderBank[m_cylinderBankCount];
-    m_heads = new CylinderHead[m_cylinderCount];
+    m_heads = new CylinderHead[m_cylinderBankCount];
     m_pistons = new Piston[m_cylinderCount];
     m_connectingRods = new ConnectingRod[m_cylinderCount];
     m_exhaustSystems = new ExhaustSystem[m_exhaustSystemCount];
@@ -87,8 +88,6 @@ void Engine::initialize(const Parameters &params) {
     for (int i = 0; i < m_cylinderCount; ++i) {
         m_combustionChambers[i].setEngine(this);
     }
-
-    scaleZ = 0.2f;
 }
 
 void Engine::destroy() {
@@ -96,15 +95,10 @@ void Engine::destroy() {
         m_crankshafts[i].destroy();
     }
 
-    for (int i = 0; i < m_tireCount; ++i) {
-        m_tires[i].destroy();
-    }
-
     for (int i = 0; i < m_cylinderCount; ++i) {
         m_pistons[i].destroy();
         m_connectingRods[i].destroy();
         m_combustionChambers[i].destroy();
-        m_heads[i].destroy();
     }
 
     for (int i = 0; i < m_exhaustSystemCount; ++i) {
@@ -117,7 +111,6 @@ void Engine::destroy() {
 
     m_ignitionModule.destroy();
 
-    if (m_tires != nullptr) delete[] m_tires;
     if (m_throttle != nullptr) delete m_throttle;
     if (m_crankshafts != nullptr) delete[] m_crankshafts;
     if (m_cylinderBanks != nullptr) delete[] m_cylinderBanks;
@@ -128,8 +121,6 @@ void Engine::destroy() {
     if (m_intakes != nullptr) delete[] m_intakes;
     if (m_combustionChambers != nullptr) delete[] m_combustionChambers;
 
-    //m_ground = nullptr;
-    m_tires = nullptr;
     m_crankshafts = nullptr;
     m_cylinderBanks = nullptr;
     m_pistons = nullptr;
@@ -139,6 +130,23 @@ void Engine::destroy() {
     m_intakes = nullptr;
     m_combustionChambers = nullptr;
     m_throttle = nullptr;
+}
+
+void Engine::setEngineType() {
+    if ( getCylinderBankCount() == 1)
+        m_engineType = INLINE;
+    else if (getCylinderBankCount() == 2) {
+        int journalCount = getCrankshaft(0)->getRodJournalCount();
+        int cylinderCount = getCylinderCount();
+
+        if (2 * journalCount == cylinderCount)
+            m_engineType = V_COMMON;
+        else
+            m_engineType = V_SPLIT;
+    }
+    else {
+        m_engineType = RADIAL;
+    }
 }
 
 Crankshaft *Engine::getOutputCrankshaft() const {
@@ -225,7 +233,7 @@ bool placeRod(
     const double s0 = (-b + sqrt_det) / (2 * a);
     const double s1 = (-b - sqrt_det) / (2 * a);
 
-    *s = std::max(s0, s1);
+    *s = max(s0, s1);
     if (*s < 0) return false;
    
     if (s != nullptr) {
@@ -279,8 +287,8 @@ void Engine::calculateDisplacement() {
                 continue;
             }
 
-            min_s[i] = std::min(min_s[i], s);
-            max_s[i] = std::max(max_s[i], s);
+            min_s[i] = min(min_s[i], s);
+            max_s[i] = max(max_s[i], s);
         }
     }
 
@@ -366,7 +374,7 @@ double Engine::getExhaustO2() const {
 
 void Engine::resetFuelConsumption() {
     for (int i = 0; i < m_intakeCount; ++i) {
-        m_intakes[i].m_totalFuelInjected = 0;
+        m_intakes[i].m_totalFuelInjected = 0.0f;
     }
 }
 
@@ -383,13 +391,29 @@ double Engine::getTotalVolumeFuelConsumed() const {
     return getTotalFuelMassConsumed() / m_fuel.getDensity();
 }
 
+double Engine::getTotalVolumeFuelLeft() const {
+    return 0.003 - getTotalVolumeFuelConsumed();
+}
+
 int Engine::getMaxDepth() const {
     int maxDepth = 0;
     for (int i = 0; i < m_crankshaftCount; ++i) {
-        maxDepth = std::max(m_crankshafts[i].getRodJournalCount(), maxDepth);
+        maxDepth = max(m_crankshafts[i].getRodJournalCount(), maxDepth);
     }
 
     return maxDepth;
+}
+
+Simulator *Engine::createSimulator(Vehicle *vehicle, Transmission *transmission) {
+    PistonEngineSimulator *simulator = new PistonEngineSimulator;
+    Simulator::Parameters simulatorParams;
+    simulatorParams.systemType = Simulator::SystemType::NsvOptimized;
+    simulator->initialize(simulatorParams);
+
+    simulator->loadSimulation(this, vehicle, transmission);
+    simulator->setFluidSimulationSteps(8);
+
+    return static_cast<Simulator *>(simulator);
 }
 
 double Engine::getRpm() const {

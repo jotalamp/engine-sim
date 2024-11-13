@@ -16,108 +16,90 @@ void CrankshaftObject::generateGeometry() {
     /* void */
 }
 
-void CrankshaftObject::render(const ViewParameters *view) {
-    if(!m_app->m_show_engine) return;
+void CrankshaftObject::render(const ViewParameters *view) 
+{
+    if (!m_app->getShowEngine()) return;
 
-    const int journalCount = m_crankshaft->getRodJournalCount();
+    // TODO: change setTransform function? and check how different engine types work
 
-    float scale = m_app->getSimulator()->getEngine()->scale * (float)m_crankshaft->getThrow();
+    const ysVector col = mix(m_app->getBackgroundColor(), m_app->getForegroundColor(), 0.7f);
 
-    //ysVector t = m_app->getSimulator()->getVehicle()->m_translation;
+    int journalCount = m_crankshaft->getRodJournalCount();
 
-    for (int i = 0; i < journalCount; ++i) 
-    {
+    const float scale = 1.2f;
+
+    for (int i = 0; i < journalCount; ++i) {
         const int layer = i;
 
-        float layerZ = m_app->getSimulator()->getEngine()->scaleZ;
+        //int journalCount = m_app->getSimulator()->getEngine()->getCrankshaft(0)->getRodJournalCount();
+        int cylinderCount = m_app->getSimulator()->getEngine()->getCylinderCount();
 
-        {
-            resetShader();
+        float deltaZ = 0.0f;
+        float offsetZ = 0.0f;
+        if (m_app->getSimulator()->getEngine()->getEngineType() == Engine::V_COMMON) {
+            deltaZ = 0 * i * 0.25f * m_app->getCylinderDifferenceZ();
+            offsetZ = 0.125f;
+        }
 
-            setTransform(
-                &m_crankshaft->m_body,
-                
-                scale,
-                scale,
-                1.0f,
+        //resetShader();
 
-                0.0f,
-                0,
-                layerZ * layer,
+        setTransform(
+            &m_crankshaft->m_body,
 
-                0.0f,
-                0.0f,
-                (float)m_crankshaft->getRodJournalAngle(i),
+            scale * (float)m_crankshaft->getThrow(),
+            scale * (float)m_crankshaft->getThrow(),
+            scale * (float)m_crankshaft->getThrow(),
 
-                m_app->getSimulator()->getVehicle()->m_transform_engine
-            );
+            0.0f,
+            0.0f,
+            ((float)layer + offsetZ) * m_app->getCylinderDifferenceZ() + deltaZ,
 
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialEngine"));
+            0.0f,
+            0.0f,
+            (float)m_crankshaft->getRodJournalAngle(i),
 
+            m_app->getSimulator()->getVehicle()->m_transform_engine);
+
+       /* m_app->getEngine()->DrawModel(
+            m_app->getShaders()->GetRegularFlags(),
+            m_app->getAssetManager()->GetModelAsset("Crankshaft_2JZ_GE_V_Part_1"),
+            0x32 - 0);*/
+
+        m_app->getShaders()->SetBaseColor(col);
+
+        if (m_app->getSimulator()->getEngine()->getCylinderBankCount() > 2) return;
+
+        
+        if (m_app->getSimulator()->getEngine()->getEngineType() == Engine::V_COMMON) {
+            m_app->getEngine()->DrawModel(
+                m_app->getShaders()->GetRegularFlags(),
+                m_app->getAssetManager()->GetModelAsset("Crankshaft_2JZ_GE_V_Part_1"),
+                0x32 - layer);
+        }
+        else {
             m_app->getEngine()->DrawModel(
                 m_app->getShaders()->GetRegularFlags(),
                 m_app->getAssetManager()->GetModelAsset("Crankshaft_2JZ_GE_Part_1"),
                 0x32 - layer);
-
-            float f = m_app->getSimulator()->getEngine()->scale * (float)m_crankshaft->getThrow();
-
-            float angle = m_app->getSimulator()->getVehicle()->m_rotation;
-            float z = layerZ * layer - 0.5f * layerZ;
-
-            setTransform(
-                &m_crankshaft->m_body,
-
-                f,
-                f,
-                scale,
-
-                0.0f,
-                0.0f,
-                z,
-
-                0.0f,
-                0*angle,
-                (float)m_crankshaft->getRodJournalAngle(i),
-
-                m_app->getSimulator()->getVehicle()->m_transform_engine
-            );
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("Crankshaft_2JZ_GE_Part_2"),
-                0x32 - layer);
         }
+
+        setTransform(
+            &m_crankshaft->m_body,
+
+            scale * (float)m_crankshaft->getThrow(),
+
+            0.0f,
+            0.0f,
+
+            (float)m_crankshaft->getRodJournalAngle(i),
+
+            ((float)(layer) + 0.5f + offsetZ) * m_app->getCylinderDifferenceZ() + deltaZ);
+
+        m_app->getEngine()->DrawModel(
+            m_app->getShaders()->GetRegularFlags(),
+            m_app->getAssetManager()->GetModelAsset("Crankshaft_2JZ_GE_Part_2"),
+            0x32 - layer);
     }
-
-    setTransform(
-        &m_crankshaft->m_body,
-
-        scale,
-        scale,
-        scale,
-
-        0.0f,
-        0.0f,
-        0.0f,
-
-        0.0f*ysMath::Constants::PI,
-        0.0f*ysMath::Constants::PI,
-        0.0f,
-
-        m_app->getSimulator()->getVehicle()->m_transform_engine);
-    //m_app->getShaders()->SetBaseColor(grey1);
-    /*
-    m_app->getShaders()->SetBaseColor(ysColor::srgbiToLinear(0xFF0F0F));
-    m_app->getEngine()->DrawModel(
-        m_app->getShaders()->GetRegularFlags(),
-        m_app->getAssetManager()->GetModelAsset("CrankSnout"),
-        0x32);
-
-    m_app->getShaders()->SetBaseColor(grey2);
-    m_app->getEngine()->DrawModel(
-        m_app->getShaders()->GetRegularFlags(),
-        m_app->getAssetManager()->GetModelAsset("CrankSnoutThreads"),
-        0x32);*/
 }
 
 void CrankshaftObject::process(float dt) {

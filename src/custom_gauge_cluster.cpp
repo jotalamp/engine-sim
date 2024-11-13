@@ -217,41 +217,43 @@ void CustomGaugeCluster::render() {
         : (float)units::convert(std::abs(getSpeed()), units::km / units::hour);
 
     const Bounds logoBounds = grid.get(m_bounds, 0, 0, 1, 1);
-    drawFrame(logoBounds, 1.0f, m_app->getForegroundColor(), m_app->getBackgroundColor());
+    drawFrame(logoBounds, 1.0f, m_app->getForegroundColor(), m_app->getForegroundColor());
 
     drawModel(
+        //Rod_2JZ_GE_BigEnd
         m_app->getAssetManager()->GetModelAsset("Logo"),
+        //m_app->getAssetManager()->GetModelAsset("Rod_2JZ_GE_BigEnd"),
         m_app->getForegroundColor(),
+        //ysColor::srgbiToLinear(0xFFFFFF),
+        //m_app->getBlue(),
         logoBounds.getPosition(Bounds::center),
-        Point(logoBounds.height(), logoBounds.height()) * 0.75f);
+        Point( logoBounds.height(), logoBounds.height()) * 0.75f );
 
 
-    const Bounds titleBounds = grid.get(m_bounds, 1, 0, 4, 1);
+    const Bounds titleBounds = grid.get(m_bounds, 1, 0, 15, 1);
     drawFrame(titleBounds, 1.0f, m_app->getForegroundColor(), m_app->getBackgroundColor());
 
     Grid titleSplit;
     titleSplit.h_cells = 1;
-    titleSplit.v_cells = 3;
+    titleSplit.v_cells = 4;
     drawAlignedText(
         "ENGINE SIMULATOR",
-        titleSplit.get(titleBounds, 0, 0).inset(10.0f).move({ 0.0f, -21.0f }),
+        titleSplit.get(titleBounds, 0, 0).inset(20.0f).move({ 0.0f, -38.0f }),
         42.0f,
         Bounds::bl,
         Bounds::bl);
     drawAlignedText(
         "YOUTUBE/ANGETHEGREAT",
-        titleSplit.get(titleBounds, 0, 1).inset(10.0f).move({ 0.0f, 5.0f }),
+        titleSplit.get(titleBounds, 0, 1).inset(20.0f).move({ 0.0f, 5.0f }),
         24.0f,
         Bounds::tl,
         Bounds::tl);
     drawAlignedText(
         "BUILD: v" + EngineSimApplication::getBuildVersion() + " // " __DATE__,
-        titleSplit.get(titleBounds, 0, 2).inset(10.0f).move({ 0.0f, 10.0f }),
+        titleSplit.get(titleBounds, 0, 2).inset(20.0f).move({ 0.0f, 10.0f }),
         16.0f,
         Bounds::tl,
         Bounds::tl);
-
-
 
     const Bounds fuelAirCluster = grid.get(m_bounds, 0, 7, 2, 2);// = m_bounds.verticalSplit(0.3f, 0.7f);
     //drawFrame(fuelAirCluster, 1.0, m_app->getForegroundColor(), m_app->getBackgroundColor());
@@ -279,7 +281,7 @@ void CustomGaugeCluster::render() {
 
     drawCenteredText(ss1.str(), body, 64.0f, Bounds::center);
 
-    const Bounds engineInfoBounds = grid.get(m_bounds, 5, 0, 6, 1);
+    const Bounds engineInfoBounds = grid.get(m_bounds, 6, 0, 10, 1);
     drawFrame(engineInfoBounds, 1.0f, m_app->getForegroundColor(), m_app->getBackgroundColor());
 
     drawAlignedText(
@@ -312,6 +314,24 @@ void CustomGaugeCluster::render() {
         24.0f,
         Bounds::rm,
         Bounds::rm);
+
+    std::stringstream ss2;
+
+    ss2 << std::to_string((int)m_simulator->getVehicle()->getMass());
+    ss2 << " KG, ";
+
+    ss2 << std::to_string(m_simulator->getVehicle()->getDragCoefficient());
+    ss2 << " DC, ";
+
+    ss2 << std::to_string((int)m_simulator->getVehicle()->getRollingResistance());
+    ss2 << " RR";
+
+    drawAlignedText(
+        ss2.str(),
+        engineInfoBounds.inset(10.0f),
+        24.0f,
+        Bounds::tl,
+        Bounds::tl);
 
 
 

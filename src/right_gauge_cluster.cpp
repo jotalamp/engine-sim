@@ -5,7 +5,6 @@
 #include "../include/constants.h"
 #include "../include/engine_sim_application.h"
 
-#include <climits>
 #include <cmath>
 #include <sstream>
 
@@ -32,15 +31,15 @@ RightGaugeCluster::~RightGaugeCluster() {
 void RightGaugeCluster::initialize(EngineSimApplication *app) {
     UiElement::initialize(app);
 
-    m_tachometer                = addElement<LabeledGauge>();
-    m_speedometer               = addElement<LabeledGauge>();
-    m_manifoldVacuumGauge       = addElement<LabeledGauge>();
-    m_intakeCfmGauge            = addElement<LabeledGauge>();
-    m_volumetricEffGauge        = addElement<LabeledGauge>();
-    m_combusionChamberStatus    = addElement<FiringOrderDisplay>();
-    m_throttleDisplay           = addElement<ThrottleDisplay>();
-    m_afrCluster                = addElement<AfrCluster>();
-    m_fuelCluster               = addElement<FuelCluster>();
+    m_tachometer = addElement<LabeledGauge>();
+    m_speedometer = addElement<LabeledGauge>();
+    m_manifoldVacuumGauge = addElement<LabeledGauge>();
+    m_intakeCfmGauge = addElement<LabeledGauge>();
+    m_volumetricEffGauge = addElement<LabeledGauge>();
+    m_combusionChamberStatus = addElement<FiringOrderDisplay>();
+    m_throttleDisplay = addElement<ThrottleDisplay>();
+    m_afrCluster = addElement<AfrCluster>();
+    m_fuelCluster = addElement<FuelCluster>();
 
     m_speedUnits = app->getAppSettings()->speedUnits;
     m_pressureUnits = app->getAppSettings()->pressureUnits;
@@ -374,7 +373,7 @@ void RightGaugeCluster::setUnits() {
 
         m_manifoldVacuumGauge->m_unit = "bar";
         m_manifoldVacuumGauge->m_gauge->m_min = 0;
-        m_manifoldVacuumGauge->m_gauge->m_max = 1;
+        m_manifoldVacuumGauge->m_gauge->m_max = 1.1f;
         m_manifoldVacuumGauge->m_gauge->m_minorStep = 1;
         m_manifoldVacuumGauge->m_gauge->m_majorStep = 1;
         m_manifoldVacuumGauge->m_precision = 2;

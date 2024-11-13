@@ -1,4 +1,4 @@
-#include "Discord.h"
+﻿#include "Discord.h"
 #include <stdio.h>
 #include <time.h>
 

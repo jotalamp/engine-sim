@@ -22,6 +22,7 @@ class FuelCluster : public UiElement {
 
     private:
         double getTotalVolumeFuelConsumed() const;
+        double getTotalVolumeFuelLeft() const;
 };
 
 #endif /* ATG_ENGINE_SIM_FUEL_CLUSTER_H */

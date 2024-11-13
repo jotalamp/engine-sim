@@ -13,9 +13,9 @@ class Engine;
 class CombustionChamber : public atg_scs::ForceGenerator {
     public:
         struct Parameters {
-            Piston *piston;
+            Piston *Piston;
             CylinderHead *Head;
-            Fuel *fuel;
+            Fuel *Fuel;
             Function *MeanPistonSpeedToTurbulence;
 
             double StartingPressure;
