@@ -1,7 +1,5 @@
 #include "../include/vehicle_drag_constraint.h"
 
-#include "../include/constants.h"
-#include "../include/units.h"
 #include "../include/vehicle.h"
 
 VehicleDragConstraint::VehicleDragConstraint() : Constraint(1, 1) {

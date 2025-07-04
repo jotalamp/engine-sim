@@ -1,29 +1,22 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
-    cmake_policy(SET CMP0135 NEW)
-endif()
-
-set(OpenGL_GL_PREFERENCE GLVND)
-
 include(CMakeDependentOption)
 
 option(DTV "Enable video output" OFF)
 option(PIRANHA_ENABLED "Enable scripting input" ON)
 cmake_dependent_option(DISCORD_ENABLED "Enable Discord Rich Presence" ON WIN32 OFF)
 
-if(DTV)
+if (DTV)
     add_compile_definitions(ATG_ENGINE_SIM_VIDEO_CAPTURE)
-endif(DTV)
+endif (DTV)
 
-if(PIRANHA_ENABLED)
+if (PIRANHA_ENABLED)
     add_compile_definitions(ATG_ENGINE_SIM_PIRANHA_ENABLED)
-endif(PIRANHA_ENABLED)
+endif (PIRANHA_ENABLED)
 
-if(DISCORD_ENABLED)
+if (DISCORD_ENABLED)
     add_compile_definitions(ATG_ENGINE_SIM_DISCORD_ENABLED)
-endif(DISCORD_ENABLED)
+endif (DISCORD_ENABLED)
 
 # Enable group projects in folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -83,7 +76,6 @@ add_library(engine-sim STATIC
     src/low_pass_filter.cpp
     src/part.cpp
     src/piston.cpp
-    src/piston_engine_simulator.cpp
     src/simulator.cpp
     src/standard_valvetrain.cpp
     src/starter_motor.cpp
@@ -128,7 +120,6 @@ add_library(engine-sim STATIC
     include/low_pass_filter.h
     include/part.h
     include/piston.h
-    include/piston_engine_simulator.h
     include/simulator.h
     include/standard_valvetrain.h
     include/starter_motor.h
@@ -154,7 +145,7 @@ target_link_libraries(engine-sim
 target_include_directories(engine-sim
     PUBLIC dependencies/submodules)
 
-if(PIRANHA_ENABLED)
+if (PIRANHA_ENABLED)
     add_library(engine-sim-script-interpreter STATIC
         # Source files
         scripting/src/channel_types.cpp
@@ -192,7 +183,7 @@ if(PIRANHA_ENABLED)
         scripting/include/transmission_node.h
         scripting/include/valvetrain_node.h
         scripting/include/vtec_valvetrain_node.h
-        scripting/include/vehicle_node.h
+		scripting/include/vehicle_node.h
     )
 
     target_include_directories(engine-sim-script-interpreter
@@ -202,7 +193,7 @@ if(PIRANHA_ENABLED)
         csv-io
         piranha
         box2d)
-endif(PIRANHA_ENABLED)
+endif (PIRANHA_ENABLED)
 
 add_executable(engine-sim-app WIN32
     # Source files
@@ -285,27 +276,27 @@ add_executable(engine-sim-app WIN32
     include/info_cluster.h
 )
 
-if(DTV)
+if (DTV)
     target_link_libraries(engine-sim-app
         direct-to-video)
-endif(DTV)
+endif (DTV)
 
-if(PIRANHA_ENABLED)
+if (PIRANHA_ENABLED)
     target_link_libraries(engine-sim-app
         engine-sim-script-interpreter)
-endif(PIRANHA_ENABLED)
+endif (PIRANHA_ENABLED)
 
 target_include_directories(engine-sim-app
     PUBLIC dependencies/submodules)
 
 add_subdirectory(dependencies)
 
-if(DISCORD_ENABLED)
+if (DISCORD_ENABLED)
     target_link_libraries(engine-sim-app
         discord
         discord-rpc
     )
-endif(DISCORD_ENABLED)
+endif (DISCORD_ENABLED)
 
 target_link_libraries(engine-sim-app
     engine-sim

@@ -8,7 +8,7 @@ CylinderHeadObject::CylinderHeadObject(int cylinderIndex) {
     m_head = nullptr;
     m_engine = nullptr;
     m_cylinderIndex = cylinderIndex;
-    Logger::DebugLine("2 Cylinder index: " + std::to_string(m_cylinderIndex));
+    //Logger::DebugLine("2 Cylinder index: " + std::to_string(m_cylinderIndex));
 }
 
 CylinderHeadObject::~CylinderHeadObject() {

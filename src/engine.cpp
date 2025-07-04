@@ -1,8 +1,6 @@
-#include "..\include\engine.h"
 #include "../include/engine.h"
 
 #include "../include/constants.h"
-#include "../include/units.h"
 #include "../include/fuel.h"
 #include "../include/piston_engine_simulator.h"
 
@@ -233,7 +231,7 @@ bool placeRod(
     const double s0 = (-b + sqrt_det) / (2 * a);
     const double s1 = (-b - sqrt_det) / (2 * a);
 
-    *s = max(s0, s1);
+    *s = std::max(s0, s1);
     if (*s < 0) return false;
    
     if (s != nullptr) {
@@ -287,8 +285,8 @@ void Engine::calculateDisplacement() {
                 continue;
             }
 
-            min_s[i] = min(min_s[i], s);
-            max_s[i] = max(max_s[i], s);
+            min_s[i] = std::min(min_s[i], s);
+            max_s[i] = std::max(max_s[i], s);
         }
     }
 
@@ -398,7 +396,7 @@ double Engine::getTotalVolumeFuelLeft() const {
 int Engine::getMaxDepth() const {
     int maxDepth = 0;
     for (int i = 0; i < m_crankshaftCount; ++i) {
-        maxDepth = max(m_crankshafts[i].getRodJournalCount(), maxDepth);
+        maxDepth = std::max(m_crankshafts[i].getRodJournalCount(), maxDepth);
     }
 
     return maxDepth;

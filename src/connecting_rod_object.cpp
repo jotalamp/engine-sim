@@ -1,7 +1,6 @@
 #include "../include/connecting_rod_object.h"
 
 #include "../include/engine_sim_application.h"
-#include "../include/units.h"
 #include "../include/ui_utilities.h"
 
 ConnectingRodObject::ConnectingRodObject() {

@@ -1,7 +1,5 @@
 #include "../include/dynamometer.h"
 
-#include "../include/units.h"
-
 #include <cmath>
 
 Dynamometer::Dynamometer() : atg_scs::Constraint(1, 1) {

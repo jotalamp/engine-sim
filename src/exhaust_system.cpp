@@ -1,7 +1,5 @@
 #include "../include/exhaust_system.h"
 
-#include "../include/units.h"
-
 ExhaustSystem::ExhaustSystem() {
     m_primaryFlowRate = 0;
     m_outletFlowRate = 0;
@@ -26,7 +24,7 @@ void ExhaustSystem::initialize(const Parameters &params) {
     m_system.initialize(
             units::pressure(1.0, units::atm),
             volume,
-            units::celcius(25.0));
+            units::celcius(25.0), GasSystem::Mix());
     m_system.setGeometry(
         systemLength,
         systemWidth,
@@ -36,7 +34,7 @@ void ExhaustSystem::initialize(const Parameters &params) {
     m_atmosphere.initialize(
         units::pressure(1.0, units::atm),
         units::volume(1000.0, units::m3),
-        units::celcius(25.0));
+        units::celcius(25.0), GasSystem::Mix());
     m_atmosphere.setGeometry(
         units::distance(10.0, units::m),
         units::distance(10.0, units::m),

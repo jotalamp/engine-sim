@@ -1,6 +1,5 @@
 #include "../include/firing_order_display.h"
 
-#include "../include/units.h"
 #include "../include/gauge.h"
 #include "../include/constants.h"
 #include "../include/engine_sim_application.h"

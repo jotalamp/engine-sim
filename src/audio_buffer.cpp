@@ -1,5 +1,7 @@
 #include "../include/audio_buffer.h"
 
+#include <cstdlib>
+
 #include <assert.h>
 
 AudioBuffer::AudioBuffer() {

@@ -1,6 +1,4 @@
 #include "../include/gas_system.h"
-
-#include "../include/units.h"
 #include "../include/utilities.h"
 
 #include <cmath>

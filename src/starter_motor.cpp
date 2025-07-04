@@ -1,7 +1,5 @@
 #include "../include/starter_motor.h"
 
-#include "../include/units.h"
-
 StarterMotor::StarterMotor() : atg_scs::Constraint(1, 1) {
     m_ks = 10.0;
     m_kd = 1.0;

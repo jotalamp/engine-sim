@@ -51,13 +51,7 @@ class SimulationObject {
             float z = 0.0f,
             ysTransform* parentTransform = nullptr);
 
-        void SimulationObject::setTransform(
-            atg_scs::RigidBody* rigidBody,
-            float scale = 1.0f,
-            float lx = 0.0f,
-            float ly = 0.0f,
-            float theta = 0.0f,
-            float z = 0.0f);
+        void setTransform(atg_scs::RigidBody *rigidBody, float scale, float lx, float ly, float angle, float z);
 
         ysVector tintByLayer(const ysVector &col, int layers) const;
 

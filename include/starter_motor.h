@@ -2,10 +2,11 @@
 #define ATG_ENGINE_SIM_STARTER_MOTOR_H
 
 #include "scs.h"
-
+#include "units.h"
 #include "crankshaft.h"
 
-class StarterMotor : public atg_scs::Constraint {
+class StarterMotor : public atg_scs::Constraint
+{
 public:
     StarterMotor();
     virtual ~StarterMotor();

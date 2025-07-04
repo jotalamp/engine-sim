@@ -1,8 +1,6 @@
 #include "../include/ignition_module.h"
 
 #include "../include/utilities.h"
-#include "../include/constants.h"
-#include "../include/units.h"
 
 #include <cmath>
 

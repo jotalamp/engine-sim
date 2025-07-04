@@ -212,7 +212,8 @@ void PistonEngineSimulator::placeAndInitialize() {
         m_engine->getChamber(i)->m_system.initialize(
             units::pressure(1.0, units::atm),
             m_engine->getChamber(i)->getVolume(),
-            units::celcius(25.0)
+            units::celcius(25.0),
+            GasSystem::Mix()
         );
 
         Piston *piston = m_engine->getChamber(i)->getPiston();
@@ -259,7 +260,7 @@ void PistonEngineSimulator::placeCylinder(int i) {
     const double s0 = (-b + sqrt_det) / (2 * a);
     const double s1 = (-b - sqrt_det) / (2 * a);
 
-    const double s = max(s0, s1);
+    const double s = std::max(s0, s1);
     if (s < 0) return;
 
     const double e_x = s * bank->getDx() + bank->getX();
@@ -373,7 +374,7 @@ void PistonEngineSimulator::writeToSynthesizer() {
         m_exhaustFlowStagingBuffer[i] = 0;
     }
 
-    const double attenuation = min(std::abs(filteredEngineSpeed()), 40.0) / 40.0;
+    const double attenuation = std::min(std::abs(filteredEngineSpeed()), 40.0) / 40.0;
     const double attenuation_3 = attenuation * attenuation * attenuation;
 
     static double lastValveLift[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };

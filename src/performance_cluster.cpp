@@ -1,8 +1,6 @@
 #include "../include/performance_cluster.h"
 
-#include "../include/units.h"
 #include "../include/gauge.h"
-#include "../include/constants.h"
 #include "../include/engine_sim_application.h"
 
 #include <sstream>

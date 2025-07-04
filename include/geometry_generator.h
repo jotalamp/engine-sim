@@ -1,6 +1,8 @@
 #ifndef ATG_ENGINE_SIM_GEOMETRY_GENERATOR_H
 #define ATG_ENGINE_SIM_GEOMETRY_GENERATOR_H
 
+#include <math.h>
+
 #include "delta.h"
 
 #include "../include/function.h"

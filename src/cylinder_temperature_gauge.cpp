@@ -1,6 +1,5 @@
 #include "../include/cylinder_temperature_gauge.h"
 
-#include "../include/units.h"
 #include "../include/gauge.h"
 #include "../include/constants.h"
 #include "../include/engine_sim_application.h"

@@ -2,7 +2,6 @@
 #include "../include/piston_object.h"
 #include "../include/connecting_rod_object.h"
 #include "../include/constants.h"
-#include "../include/units.h"
 #include "../include/crankshaft_object.h"
 #include "../include/cylinder_bank_object.h"
 #include "../include/cylinder_head_object.h"
@@ -177,7 +176,7 @@ void EngineSimApplication::initialize(void* instance, ysContextObject::DeviceAPI
 
 void EngineSimApplication::loadMaterial(std::string filename, std::string name)
 {
-	printf(("\nLoading Material: " + name).c_str());
+	printf("\nLoading Material: %s", name.c_str());
 	
 	dbasic::TextureAsset* textureAsset;
 	dbasic::Material* material;
@@ -213,7 +212,7 @@ void EngineSimApplication::initialize() {
 
 	//jbeam_json = data;
 
-	j_Controller = Joystick(1);
+	//j_Controller = Joystick(1);
 
 	m_camera.target = ysVector3(0.0f, 0.0f, 0.0f);
 
@@ -334,44 +333,50 @@ void EngineSimApplication::initialize() {
 	loadMaterial("highwaystuff/guardrail_1.png",	"Guardrail"			);
 
 	/// GARDA
-	/*
+	
 	loadMaterial("garda/fence.png",					"MaterialFence"		);
 	loadMaterial("garda/standard_material.png",		"MaterialStandard"	);
 	loadMaterial("garda/material.jpg",				"MaterialMat"		);
 	loadMaterial("garda/italian.jpg",				"MaterialItalian"	);
 	loadMaterial("garda/parking.jpg",				"MaterialParking"	);
-	*/
 
-	
+    int i = 0;
 
-	dbasic::Material* material_01;
+    dbasic::Material* material_01;
 	material_01 = m_assetManager.NewMaterial();
 	material_01->SetDiffuseColor(ysColor::srgbiToLinear(0xFFFFFF));
 	material_01->SetMetallic(2.0f);
 	material_01->SetName("MaterialWhite");
+    printf("\n%i",i++);
 
-	material = m_assetManager.NewMaterial();
+    material = m_assetManager.NewMaterial();
 	material->SetDiffuseColor(ysColor::srgbiToLinear(0x96A7AA));
 	material->SetDiffuseMix(0.27f);
 	material->SetName("MaterialGlass");
+    printf("\n%i", i++);
 
-	material = m_assetManager.NewMaterial();
+    material = m_assetManager.NewMaterial();
 	material->SetDiffuseColor(ysColor::srgbiToLinear(0x000000));
 	material->SetName("MaterialBlack");
+    printf("\n%i", i++);
 
-	material = m_assetManager.NewMaterial();
+    material = m_assetManager.NewMaterial();
 	material->SetDiffuseColor(ysColor::srgbiToLinear(0x888888));
 	material->SetName("MaterialGrey");
+    printf("\n%i", i++);
 
-	material = m_assetManager.NewMaterial();
+    material = m_assetManager.NewMaterial();
 	material->SetDiffuseColor(ysColor::srgbiToLinear(0x0000FF));
 	material->SetName("MaterialBlue");
+    printf("\n%i", i++);
 
-	material = m_assetManager.NewMaterial();
+    material = m_assetManager.NewMaterial();
 	material->SetDiffuseColor(ysColor::srgbiToLinear(0xFF0000));
 	material->SetName("MaterialRed");
+    printf("\nMaterialRed: %i", i++);
 
-	for (std::vector<std::string>::size_type i = 0; i != textureNames.size(); i++)
+    int j = i;
+    for (std::vector<std::string>::size_type i = 0; i != textureNames.size(); i++)
 	{
 		std::string textureName = textureNames[i];
 		m_assetManager.LoadTexture(("../assets/textures/" + textureFolder + "/" + textureName).c_str(), ("Texture_" + textureName).c_str());
@@ -380,27 +385,42 @@ void EngineSimApplication::initialize() {
 		material->SetDiffuseMap(textureAsset->GetTexture());
 		std::string materialName = "Material__" + intToString((int)i);
 		material->SetName(materialName.c_str());
-		printf("\n%s", materialName.c_str());
-	}
+        printf("\n%s", textureName.c_str());
+        printf("\n%i", j++);
+    }
 
-	m_textRenderer.SetEngine(&m_engine);
-	m_textRenderer.SetRenderer(m_engine.GetUiRenderer());
-	m_textRenderer.SetFont(m_engine.GetConsole()->GetFont());
+    int k = 0;
+    printf("\nTexture materials loaded\n");
 
-	loadScript();
+    printf("\nAk%i", k++);
+    m_textRenderer.SetEngine(&m_engine);
+    printf("\nBk%i", k++);
+    m_textRenderer.SetRenderer(m_engine.GetUiRenderer());
+    printf("\nCk%i", k++);
+    m_textRenderer.SetFont(m_engine.GetConsole()->GetFont());
+    printf("\nDk%i", k++);
+    //printf("\n%i", i++);
 
-	m_audioBuffer.initialize(44100, 44100);
-	m_audioBuffer.m_writePointer = (int)(44100 * 0.1);
+    //loadScript();
+    printf("\nE%i", k++);
 
-	ysAudioParameters params;
+    m_audioBuffer.initialize(44100, 44100);
+    printf("\nFm_audioBuffer.initialize(44100, 44100);");
+    m_audioBuffer.m_writePointer = (int)(44100 * 0.1);
+    printf("\nGk%i", k++);
+
+    ysAudioParameters params;
 	params.m_bitsPerSample = 16;
 	params.m_channelCount = 1;
 	params.m_sampleRate = 44100;
-	m_outputAudioBuffer =
+    printf("\nHk%i", k++);
+    m_outputAudioBuffer =
 		m_engine.GetAudioDevice()->CreateBuffer(&params, 44100);
+    printf("\nIk%i", k++);
 
-	m_audioSource = m_engine.GetAudioDevice()->CreateSource(m_outputAudioBuffer);
-	m_audioSource->SetMode((m_simulator->getEngine() != nullptr)
+    m_audioSource = m_engine.GetAudioDevice()->CreateSource(m_outputAudioBuffer);
+    printf("\nJk%i", k++);
+    m_audioSource->SetMode((m_simulator->getEngine() != nullptr)
 		? ysAudioSource::Mode::Loop
 		: ysAudioSource::Mode::Stop);
 	m_audioSource->SetPan(0.0f);
@@ -752,7 +772,7 @@ void EngineSimApplication::loadEngine(
 	for (int i = 0; i < engine->getExhaustSystemCount(); ++i) {
 		ImpulseResponse* response = engine->getExhaustSystem(i)->getImpulseResponse();
 
-		ysWindowsAudioWaveFile waveFile;
+		ysSdlAudioWaveFile waveFile;
 		waveFile.OpenFile(response->getFilename().c_str());
 		waveFile.InitializeInternalBuffer(waveFile.GetSampleCount());
 		waveFile.FillBuffer(0);
@@ -875,7 +895,7 @@ void EngineSimApplication::createObjects(Engine* engine) {
 
 		for (int j = 0; j < cylindersInBank; ++j)
 		{
-			Logger::DebugLine("1 Cylinder index: " + std::to_string(j));
+			//Logger::DebugLine("1 Cylinder index: " + std::to_string(j));
 			CylinderHeadObject* chObject = new CylinderHeadObject(j);
 			chObject->initialize(this);
 			chObject->m_head = engine->getHead(i);
@@ -920,9 +940,10 @@ void EngineSimApplication::loadScript() {
 	Vehicle* vehicle = nullptr;
 	Transmission* transmission = nullptr;
 
-#ifdef ATG_ENGINE_SIM_PIRANHA_ENABLED
+//#ifdef ATG_ENGINE_SIM_PIRANHA_ENABLED
 	es_script::Compiler compiler;
 	compiler.initialize();
+    printf("\nmain.mr->");
 	const bool compiled = compiler.compile("../assets/main.mr");
 	if (compiled) {
 		const es_script::Compiler::Output output = compiler.execute();
@@ -939,7 +960,7 @@ void EngineSimApplication::loadScript() {
 	}
 
 	compiler.destroy();
-#endif /* ATG_ENGINE_SIM_PIRANHA_ENABLED */
+//#endif /* ATG_ENGINE_SIM_PIRANHA_ENABLED */
 
 	if (vehicle == nullptr) {
 		Vehicle::Parameters vehParams;
@@ -982,7 +1003,7 @@ void EngineSimApplication::processEngineInput() {
 	fmx = (float)osmx / 959.0f;
 	fmx = clamp(fmx, -1.0f, 1.0f);
 
-	j_Controller.Update();
+	//j_Controller.Update();
 
 	float speed;
 	float steeringAngle = m_vehicle->getSteeringAngle();
@@ -994,13 +1015,14 @@ void EngineSimApplication::processEngineInput() {
 	else
 		m_vehicle->setSteeringAngle(0.0f);
 
-	if (j_Controller.Alive() && m_controller == GAME_CONTROLLER) {
+
+	/* if (j_Controller.Alive() && m_controller == GAME_CONTROLLER) {
 		float x = j_Controller.LSx();
 		speed = m_vehicle->getSpeed();
 		steeringAngle = 4.0f * x * abs(x) / (1.0f + abs(0.15f * speed));
 		m_vehicle->setSteeringAngle(steeringAngle);
 	}
-	else
+	else */
 	{
 		steeringAngle = fmx * abs(fmx);
 		m_vehicle->setSteeringAngle(steeringAngle);
@@ -1150,9 +1172,9 @@ void EngineSimApplication::processEngineInput() {
 		m_targetSpeedSetting = clamp(m_targetSpeedSetting + mouseWheelDelta * 0.0001);
 	}
 
-	if (j_Controller.Alive() && m_controller == GAME_CONTROLLER) {
+	/* if (j_Controller.Alive() && m_controller == GAME_CONTROLLER) {
 		m_targetSpeedSetting = j_Controller.RT();
-	}
+	} */
 
 	if (prevTargetThrottle != m_targetSpeedSetting) {
 		m_infoCluster->setLogMessage("Speed control set to " + std::to_string(m_targetSpeedSetting));
@@ -1177,7 +1199,7 @@ void EngineSimApplication::processEngineInput() {
 		m_infoCluster->setLogMessage("[,] - Set render layer to " + std::to_string(getViewParameters().Layer0));
 	}
 
-	if (m_engine.ProcessKeyDown(ysKey::Code::D) || j_Controller.buttonPressed(j_Buttons.l_s))
+	if (m_engine.ProcessKeyDown(ysKey::Code::D) /*|| j_Controller.buttonPressed(j_Buttons.l_s)*/)
 	//if (m_engine.ProcessKeyDown(ysKey::Code::D) || j_Controller.buttonDown(j_Buttons.l_s))
 	//if(j_Controller.RSy()<-0.1f)
 	{
@@ -1235,7 +1257,7 @@ void EngineSimApplication::processEngineInput() {
 	m_simulator->m_dyno.m_rotationSpeed = m_dynoSpeed;
 
 	const bool prevStarterEnabled = m_simulator->m_starterMotor.m_enabled;
-	if (m_engine.IsKeyDown(ysKey::Code::S) || (j_Controller.Alive() && j_Controller.buttonPressed(j_Buttons.B))) {
+	if (m_engine.IsKeyDown(ysKey::Code::S) /*|| (j_Controller.Alive() && j_Controller.buttonPressed(j_Buttons.B))*/) {
 		m_simulator->m_starterMotor.m_enabled = true;
 	}
 	else {
@@ -1249,7 +1271,7 @@ void EngineSimApplication::processEngineInput() {
 		m_infoCluster->setLogMessage(msg);
 	}
 
-	if (m_engine.ProcessKeyDown(ysKey::Code::A) || j_Controller.buttonDown(j_Buttons.Y)) {
+	if (m_engine.ProcessKeyDown(ysKey::Code::A) /*|| j_Controller.buttonDown(j_Buttons.Y)*/) {
 		m_simulator->getEngine()->getIgnitionModule()->m_enabled =
 			!m_simulator->getEngine()->getIgnitionModule()->m_enabled;
 
@@ -1259,14 +1281,14 @@ void EngineSimApplication::processEngineInput() {
 		m_infoCluster->setLogMessage(msg);
 	}
 
-	if (m_engine.ProcessKeyDown(ysKey::Code::Up) || j_Controller.buttonDown(j_Buttons.A) || m_engine.ProcessMouseButtonDown(ysMouse::Button::Right)) {
+	if (m_engine.ProcessKeyDown(ysKey::Code::Up) /*|| j_Controller.buttonDown(j_Buttons.A) || m_engine.ProcessMouseButtonDown(ysMouse::Button::Right)*/) {
 		m_simulator->getTransmission()->changeGear(m_simulator->getTransmission()->getGear() + 1);
 
 		m_infoCluster->setLogMessage(
 			"UPSHIFTED TO " + std::to_string(m_simulator->getTransmission()->getGear() + 1));
 	}
 
-	if (m_engine.ProcessKeyDown(ysKey::Code::Down) || j_Controller.buttonDown(j_Buttons.X) || m_engine.ProcessMouseButtonDown(ysMouse::Button::Left)) {
+	if (m_engine.ProcessKeyDown(ysKey::Code::Down) /*|| j_Controller.buttonDown(j_Buttons.X) || m_engine.ProcessMouseButtonDown(ysMouse::Button::Left)*/) {
 		m_simulator->getTransmission()->changeGear(m_simulator->getTransmission()->getGear() - 1);
 
 		if (m_simulator->getTransmission()->getGear() != -1) {
@@ -1288,9 +1310,9 @@ void EngineSimApplication::processEngineInput() {
 		m_targetClutchPressure = 0.0;
 		m_infoCluster->setLogMessage("CLUTCH DEPRESSED");
 	}
-	else if (j_Controller.Alive()) {
+	/* else if (j_Controller.Alive()) {
 		m_targetClutchPressure = 1 - j_Controller.LT();
-	}
+	} */
 	else if (!m_engine.IsKeyDown(ysKey::Code::Y)) {
 		m_targetClutchPressure = 1.0;
 	}
@@ -1306,7 +1328,7 @@ void EngineSimApplication::processEngineInput() {
 	m_clutchPressure = m_clutchPressure * (1 - clutch_s) + m_targetClutchPressure * clutch_s;
 	m_simulator->getTransmission()->setClutchPressure(m_clutchPressure);
 
-	j_Controller.RefreshState();
+	//j_Controller.RefreshState();
 }
 
 void EngineSimApplication::renderScene() {
@@ -1328,7 +1350,7 @@ void EngineSimApplication::renderScene() {
 
 	bool isTargetEngine;
 
-	enum ScreenMode { SCREEN_MODE_DRIVING, SCREEN_MODE_1, SCREEN_MODE_2, SCREEN_MODE_3 };
+	//enum ScreenMode { SCREEN_MODE_DRIVING, SCREEN_MODE_1, SCREEN_MODE_2, SCREEN_MODE_3 };
 	ScreenMode screenMode = (ScreenMode)m_screen;
 	
 	if (m_screen == SCREEN_MODE_DRIVING)
@@ -1455,6 +1477,7 @@ void EngineSimApplication::renderScene() {
 
 		break;
 	}
+    case SCREEN_MODE_LAST: break;
 	}
 
 	const float cameraAspectRatio =
@@ -1476,7 +1499,7 @@ void EngineSimApplication::renderScene() {
 	m_engine.GetMousePos(&mx, &my);
 
 	
-	if (j_Controller.Alive() && m_controller == GAME_CONTROLLER)
+	/* if (j_Controller.Alive() && m_controller == GAME_CONTROLLER)
 	{
 		if (isTargetEngine)
 		{
@@ -1493,7 +1516,7 @@ void EngineSimApplication::renderScene() {
 			m_camera.rotation.x += 0.03f * -x;
 			m_camera.rotation.y += 0.03f * -y;
 		}
-	}
+	} */
 
 	// Rotating orbit camera with mouse
 	if (m_engine.IsMouseButtonDown(ysMouse::Button::Middle))

@@ -36,7 +36,7 @@ class Shaders : public dbasic::ShaderBase {
             float screenWidth,
             float screenHeight,
             float angle = 0.0f);*/
-        void Shaders::CalculateCamera(
+        void CalculateCamera(
             float width,
             float height,
             const Bounds& cameraBounds,
@@ -48,7 +48,7 @@ class Shaders : public dbasic::ShaderBase {
             float zoom,
             float targetX,
             float targetY,
-            float targetZ);
+            float targetZ); 
 
         void CalculateUiCamera(float screenWidth, float screenHeight);
 

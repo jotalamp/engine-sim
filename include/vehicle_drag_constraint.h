@@ -2,9 +2,11 @@
 #define ATG_ENGINE_SIM_VEHICLE_DRAG_CONSTRAINT_H
 
 #include "scs.h"
+#include "../include/units.h"
 
 class Vehicle;
-class VehicleDragConstraint : public atg_scs::Constraint {
+class VehicleDragConstraint : public atg_scs::Constraint
+{
 public:
     VehicleDragConstraint();
     virtual ~VehicleDragConstraint();

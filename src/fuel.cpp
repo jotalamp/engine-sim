@@ -1,7 +1,5 @@
 #include "../include/fuel.h"
 
-#include "../include/units.h"
-
 #include <cmath>
 
 Fuel::Fuel() {

@@ -1,7 +1,5 @@
 #include "../include/intake.h"
 
-#include "../include/units.h"
-
 #include <cmath>
 
 Intake::Intake() {
@@ -26,7 +24,7 @@ void Intake::initialize(Parameters &params) {
     m_system.initialize(
         units::pressure(1.0, units::atm),
         params.volume,
-        units::celcius(25.0));
+        units::celcius(25.0), GasSystem::Mix());
     m_system.setGeometry(
         width,
         params.volume / params.CrossSectionArea,
@@ -36,7 +34,7 @@ void Intake::initialize(Parameters &params) {
     m_atmosphere.initialize(
         units::pressure(1.0, units::atm),
         units::volume(1000.0, units::m3),
-        units::celcius(25.0));
+        units::celcius(25.0), GasSystem::Mix());
     m_atmosphere.setGeometry(
         units::distance(100.0, units::m),
         units::distance(100.0, units::m),

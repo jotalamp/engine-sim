@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 
 #include "../include/gas_system.h"
-#include "../include/units.h"
+//#include "../include/units.h"
 #include "../include/csv_io.h"
 
 #include <sstream>
 
 TEST(GasSystemTests, GasSystemSanity) {
     GasSystem system;
-    system.initialize(0.0, 0.0, 0.0);
+    system.initialize(0.0, 0.0, 0.0, GasSystem::Mix());
 }
 
 TEST(GasSystemTests, AdiabaticEnergyConservation) {
@@ -21,7 +21,8 @@ TEST(GasSystemTests, AdiabaticEnergyConservation) {
     system.initialize(
         units::pressure(1.0, units::atm),
         units::volume(1.0, units::cc),
-        units::celcius(25.0)
+        units::celcius(25.0),
+        GasSystem::Mix()
     );
 
     const double initialSystemEnergy = system.kineticEnergy();
@@ -52,13 +53,15 @@ TEST(GasSystemTests, PressureEqualizationEnergyConservation) {
     system1.initialize(
         units::pressure(1.0, units::atm),
         units::volume(1000.0, units::cc),
-        units::celcius(25.0)
+        units::celcius(25.0),
+        GasSystem::Mix()
     );
 
     system2.initialize(
         units::pressure(2.0, units::atm),
         units::volume(1000.0, units::cc),
-        units::celcius(25.0)
+        units::celcius(25.0),
+        GasSystem::Mix()
     );
 
     const double initialSystemEnergy = system1.totalEnergy() + system2.totalEnergy();
@@ -95,14 +98,15 @@ TEST(GasSystemTests, PressureEquilibriumMaxFlow) {
     system1.initialize(
         units::pressure(1.0, units::atm),
         units::volume(1.0, units::cc),
-        units::celcius(2500.0)
+        units::celcius(2500.0),
+        GasSystem::Mix()
     );
 
     system2.initialize(
         units::pressure(2.0, units::atm),
         units::volume(1.0, units::cc),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
 
     const double maxFlowIn = system1.pressureEquilibriumMaxFlow(&system2);
 
@@ -126,8 +130,8 @@ TEST(GasSystemTests, PressureEquilibriumMaxFlowInfinite) {
     system1.initialize(
         units::pressure(1.0, units::atm),
         units::volume(1.0, units::cc),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
 
     constexpr double P_env = units::pressure(2.0, units::atm);
     constexpr double T_env = units::celcius(25.0);
@@ -135,7 +139,8 @@ TEST(GasSystemTests, PressureEquilibriumMaxFlowInfinite) {
     const double maxFlow = system1.pressureEquilibriumMaxFlow(P_env, T_env);
     const double E_k_per_mol = GasSystem::kineticEnergyPerMol(T_env, system1.degreesOfFreedom());
 
-    system1.gainN(maxFlow, E_k_per_mol);
+    system1.gainN(maxFlow, E_k_per_mol,
+                  GasSystem::Mix());
 
     EXPECT_NEAR(system1.pressure(), P_env, 1E-6);
 }
@@ -145,8 +150,8 @@ TEST(GasSystemTests, PressureEquilibriumMaxFlowInfiniteOverpressure) {
     system1.initialize(
         units::pressure(100.0, units::atm),
         units::volume(1.0, units::m3),
-        units::celcius(2500.0)
-    );
+        units::celcius(2500.0),
+        GasSystem::Mix());
 
     constexpr double P_env = units::pressure(2.0, units::atm);
     constexpr double T_env = units::celcius(25.0);
@@ -163,8 +168,8 @@ TEST(GasSystemTests, FlowVariableVolume) {
     system1.initialize(
         units::pressure(100.0, units::atm),
         units::volume(1.0, units::m3),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
 
     constexpr double P_env = units::pressure(2.0, units::atm);
     constexpr double T_env = units::celcius(25.0);
@@ -173,8 +178,10 @@ TEST(GasSystemTests, FlowVariableVolume) {
 
     constexpr double dV = units::volume(1000000.0, units::cc) / 100;
     for (int i = 0; i < 100; ++i) {
-        const double flowRate0 = system1.flow(0.01, 1/60.0, units::pressure(0.1, units::atm), units::celcius(25.0));
-        const double flowRate1 = system1.flow(0.01, 1 / 60.0, units::pressure(0.2, units::atm), units::celcius(25.0));
+        const double flowRate0 = system1.flow(0.01, 1 / 60.0, units::pressure(0.1, units::atm), units::celcius(25.0),
+                                              GasSystem::Mix());
+        const double flowRate1 = system1.flow(0.01, 1 / 60.0, units::pressure(0.2, units::atm), units::celcius(25.0),
+                                              GasSystem::Mix());
         system1.changeVolume(-dV);
         system1.changeTemperature(100);
 
@@ -187,12 +194,13 @@ TEST(GasSystemTests, PowerStrokeTest) {
     system1.initialize(
         units::pressure(100.0, units::atm),
         units::volume(1.0, units::m3),
-        units::celcius(2000.0)
-    );
+        units::celcius(2000.0),
+        GasSystem::Mix());
 
     constexpr double dV = units::volume(1000000.0, units::cc) / 100;
     for (int i = 0; i < 100; ++i) {
-        const double flowRate0 = system1.flow(1.0, 1 / 60.0, units::pressure(1.0, units::atm), units::celcius(25.0));
+        const double flowRate0 = system1.flow(1.0, 1 / 60.0, units::pressure(1.0, units::atm), units::celcius(25.0),
+                                              GasSystem::Mix());
         std::cerr << i << ", " << flowRate0 << ", " << system1.pressure() << "\n";
     }
 }
@@ -206,13 +214,13 @@ TEST(GasSystemTests, IntakeStrokeTest) {
     system1.initialize(
         units::pressure(1.0, units::atm),
         units::volume(1000.0, units::m3),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
     system2.initialize(
         units::pressure(1.0, units::atm),
         units::volume(1.0, units::m3),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
 
     csv.write("t");
     csv.write("n");
@@ -253,14 +261,15 @@ TEST(GasSystemTests, FlowLimit) {
     system1.initialize(
         units::pressure(100.0, units::atm),
         units::volume(1.0, units::m3),
-        units::celcius(2000.0)
-    );
+        units::celcius(2000.0),
+        GasSystem::Mix());
 
     constexpr double P_env = units::pressure(1.0, units::atm);
     constexpr double T_env = units::celcius(25.0);
     const double maxFlow = system1.pressureEquilibriumMaxFlow(P_env, T_env);
 
-    system1.flow(15.0, 10.0, P_env, T_env);
+    system1.flow(15.0, 10.0, P_env, T_env,
+                 GasSystem::Mix());
 
     EXPECT_NEAR(system1.pressure(), P_env, 1E-6);
 }
@@ -270,8 +279,8 @@ TEST(GasSystemTests, IdealGasLaw) {
     system1.initialize(
         units::pressure(100.0, units::atm),
         units::volume(1.0, units::m3),
-        units::celcius(2000.0)
-    );
+        units::celcius(2000.0),
+        GasSystem::Mix());
 
     const double PV = system1.pressure() * system1.volume();
     const double nRT = system1.n() * constants::R * system1.temperature();
@@ -333,7 +342,8 @@ TEST(GasSystemTests, ChokedFlowTest) {
     system1.initialize(
         units::pressure(2.5, units::atm),
         units::volume(1.0, units::m3),
-        units::celcius(2000.0)
+        units::celcius(2000.0),
+        GasSystem::Mix()
     );
 
     const double flow_k = GasSystem::flowConstant(
@@ -423,15 +433,15 @@ TEST(GasSystemTests, GasVelocityReducesStaticPressure) {
     system1.initialize(
         units::pressure(15, units::psi),
         units::volume(300, units::cc),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
     system1.setGeometry(units::distance(10, units::cm), units::distance(10, units::cm), 1.0, 0.0);
 
     system2.initialize(
         units::pressure(2, units::psi),
         units::volume(1.0, units::L),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
     system2.setGeometry(units::distance(10, units::cm), units::distance(2, units::cm), 1.0, 0.0);
 
     const double initialSystemEnergy = system1.totalEnergy() + system2.totalEnergy();
@@ -511,8 +521,8 @@ TEST(GasSystemTests, GasVelocityProducesScavengingEffect) {
     system1.initialize(
         units::pressure(1000, units::psi),
         units::volume(1000, units::cc),
-        units::celcius(1000.0)
-    );
+        units::celcius(1000.0),
+        GasSystem::Mix());
     system1.setGeometry(
         units::distance(10.0, units::cm),
         units::distance(1.0, units::cm),
@@ -522,8 +532,8 @@ TEST(GasSystemTests, GasVelocityProducesScavengingEffect) {
     system2.initialize(
         units::pressure(15, units::psi),
         tubeArea * units::distance(50.0, units::inch),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
     system2.setGeometry(
         units::distance(50.0, units::inch),
         std::sqrt(tubeArea),
@@ -533,8 +543,8 @@ TEST(GasSystemTests, GasVelocityProducesScavengingEffect) {
     atmosphere.initialize(
         units::pressure(15, units::psi),
         units::volume(10000, units::m3),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
 
     const double initialSystemEnergy =
         system1.totalEnergy()
@@ -643,8 +653,8 @@ TEST(GasSystemTests, GasVelocityProducesRamEffect) {
     cylinder.initialize(
         units::pressure(1.0, units::atm),
         units::volume(118, units::cc),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
     cylinder.setGeometry(
         units::distance(10.0, units::cm),
         units::distance(1.0, units::cm),
@@ -654,8 +664,8 @@ TEST(GasSystemTests, GasVelocityProducesRamEffect) {
     runner.initialize(
         units::pressure(1.0, units::atm),
         units::volume(320, units::cc),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
     runner.setGeometry(
         units::distance(5.0, units::inch),
         std::sqrt(runnerArea),
@@ -665,8 +675,8 @@ TEST(GasSystemTests, GasVelocityProducesRamEffect) {
     atmosphere.initialize(
         units::pressure(1.0, units::atm),
         units::volume(10000, units::m3),
-        units::celcius(25.0)
-    );
+        units::celcius(25.0),
+        GasSystem::Mix());
 
     const double initialSystemEnergy =
         cylinder.totalEnergy()
@@ -784,8 +794,8 @@ TEST(GasSystemTests, GasVelocityStabilizesInClosedSystem) {
     system1.initialize(
         units::pressure(100, units::psi),
         units::volume(1000, units::cc),
-        units::celcius(1000.0)
-    );
+        units::celcius(1000.0),
+        GasSystem::Mix());
     system1.setGeometry(
         units::distance(10.0, units::cm),
         units::distance(10.0, units::cm),
