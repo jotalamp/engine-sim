@@ -17,19 +17,23 @@
 #include "transmission_node.h"
 #include "vehicle_node.h"
 
-namespace es_script {
+namespace es_script
+{
 
-    class SetEngineNode : public piranha::Node {
+    class SetEngineNode : public piranha::Node
+    {
     public:
         SetEngineNode() { /* void */ }
         virtual ~SetEngineNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             registerInput(&m_engineInput, "engine");
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             EngineNode *engineNode = getObject<EngineNode>(m_engineInput);
 
             Engine *engine = new Engine;
@@ -41,20 +45,23 @@ namespace es_script {
         piranha::pNodeInput m_engineInput = nullptr;
     };
 
-    class AddRodJournalNode : public Node {
+    class AddRodJournalNode : public Node
+    {
     public:
         AddRodJournalNode() { /* void */ }
         virtual ~AddRodJournalNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("crankshaft", &m_crankshaft, InputTarget::Type::Object);
             addInput("rod_journal", &m_rodJournal, InputTarget::Type::Object);
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_crankshaft->addRodJournal(m_rodJournal);
@@ -65,20 +72,23 @@ namespace es_script {
         RodJournalNode *m_rodJournal = nullptr;
     };
 
-    class AddSlaveJournalNode : public Node {
+    class AddSlaveJournalNode : public Node
+    {
     public:
         AddSlaveJournalNode() { /* void */ }
         virtual ~AddSlaveJournalNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("rod", &m_rod, InputTarget::Type::Object);
             addInput("rod_journal", &m_rodJournal, InputTarget::Type::Object);
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_rod->addRodJournal(m_rodJournal);
@@ -89,20 +99,23 @@ namespace es_script {
         RodJournalNode *m_rodJournal = nullptr;
     };
 
-    class AddCrankshaftNode : public Node {
+    class AddCrankshaftNode : public Node
+    {
     public:
         AddCrankshaftNode() { /* void */ }
         virtual ~AddCrankshaftNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("engine", &m_engine, InputTarget::Type::Object);
             addInput("crankshaft", &m_crankshaft, InputTarget::Type::Object);
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_engine->addCrankshaft(m_crankshaft);
@@ -113,20 +126,23 @@ namespace es_script {
         EngineNode *m_engine = nullptr;
     };
 
-    class AddCylinderBankNode : public Node {
+    class AddCylinderBankNode : public Node
+    {
     public:
         AddCylinderBankNode() { /* void */ }
         virtual ~AddCylinderBankNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("engine", &m_engine, InputTarget::Type::Object);
             addInput("cylinder_bank", &m_cylinderBankNode, InputTarget::Type::Object);
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_engine->addCylinderBank(m_cylinderBankNode);
@@ -137,13 +153,15 @@ namespace es_script {
         EngineNode *m_engine = nullptr;
     };
 
-    class AddCylinderNode : public Node {
+    class AddCylinderNode : public Node
+    {
     public:
         AddCylinderNode() { /* void */ }
         virtual ~AddCylinderNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("piston", &m_pistonNode, InputTarget::Type::Object);
             addInput("connecting_rod", &m_connectingRod, InputTarget::Type::Object);
             addInput("rod_journal", &m_rodJournal, InputTarget::Type::Object);
@@ -157,7 +175,8 @@ namespace es_script {
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_cylinderBank->addCylinder(
@@ -168,8 +187,7 @@ namespace es_script {
                 m_exhaustSystem,
                 m_ignitionWire,
                 m_soundAttenuation,
-                m_primaryLength
-            );
+                m_primaryLength);
         }
 
     protected:
@@ -184,13 +202,15 @@ namespace es_script {
         double m_soundAttenuation = 1.0;
     };
 
-    class AddSampleNode : public Node {
+    class AddSampleNode : public Node
+    {
     public:
         AddSampleNode() { /* void */ }
         virtual ~AddSampleNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("x", &m_x);
             addInput("y", &m_y);
             addInput("function", &m_function, InputTarget::Type::Object);
@@ -198,7 +218,8 @@ namespace es_script {
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_function->addSample(m_x, m_y);
@@ -210,20 +231,23 @@ namespace es_script {
         FunctionNode *m_function = nullptr;
     };
 
-    class AddLobeNode : public Node {
+    class AddLobeNode : public Node
+    {
     public:
         AddLobeNode() { /* void */ }
         virtual ~AddLobeNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("centerline", &m_centerline);
             addInput("camshaft", &m_camshaft, InputTarget::Type::Object);
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_camshaft->addLobe(m_centerline);
@@ -234,27 +258,32 @@ namespace es_script {
         CamshaftNode *m_camshaft = nullptr;
     };
 
-    class SetCylinderHeadNode : public Node {
+    class SetCylinderHeadNode : public Node
+    {
     public:
         SetCylinderHeadNode() { /* void */ }
         virtual ~SetCylinderHeadNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("head", &m_head, InputTarget::Type::Object);
             addInput("bank", &m_bank, InputTarget::Type::Object);
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
-            if (m_bank->getCylinderHead() != nullptr) {
+            if (m_bank->getCylinderHead() != nullptr)
+            {
                 throwError("Cylinder bank already has a head");
                 return;
             }
-            else if (m_head->getBank() != nullptr) {
+            else if (m_head->getBank() != nullptr)
+            {
                 throwError("Cylinder head already attached to a bank");
                 return;
             }
@@ -268,18 +297,23 @@ namespace es_script {
         CylinderBankNode *m_bank = nullptr;
     };
 
-    class k_28inH2ONode : public Node {
-        class k_28inH2ONodeOutput : public piranha::NodeOutput {
+    class k_28inH2ONode : public Node
+    {
+        class k_28inH2ONodeOutput : public piranha::NodeOutput
+        {
         public:
-            k_28inH2ONodeOutput() : NodeOutput(&piranha::FundamentalType::FloatType) {
+            k_28inH2ONodeOutput() : NodeOutput(&piranha::FundamentalType::FloatType)
+            {
                 m_input = 0.0;
             }
 
-            virtual ~k_28inH2ONodeOutput() {
+            virtual ~k_28inH2ONodeOutput()
+            {
                 /* void */
             }
 
-            virtual void fullCompute(void *target) const {
+            virtual void fullCompute(void *target) const
+            {
                 *reinterpret_cast<double *>(target) = GasSystem::k_28inH2O(m_input);
             }
 
@@ -295,19 +329,22 @@ namespace es_script {
         virtual ~k_28inH2ONode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("flow", &m_flowInput);
 
             Node::registerInputs();
         }
 
-        virtual void registerOutputs() {
+        virtual void registerOutputs()
+        {
             registerOutput(&m_output, "__out");
 
             setPrimaryOutput("__out");
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_output.setInput(m_flowInput);
@@ -318,18 +355,23 @@ namespace es_script {
         double m_flowInput = 0.0;
     };
 
-    class k_CarbNode : public Node {
-        class k_CarbNodeOutput : public piranha::NodeOutput {
+    class k_CarbNode : public Node
+    {
+        class k_CarbNodeOutput : public piranha::NodeOutput
+        {
         public:
-            k_CarbNodeOutput() : NodeOutput(&piranha::FundamentalType::FloatType) {
+            k_CarbNodeOutput() : NodeOutput(&piranha::FundamentalType::FloatType)
+            {
                 m_input = 0.0;
             }
 
-            virtual ~k_CarbNodeOutput() {
+            virtual ~k_CarbNodeOutput()
+            {
                 /* void */
             }
 
-            virtual void fullCompute(void *target) const {
+            virtual void fullCompute(void *target) const
+            {
                 *reinterpret_cast<double *>(target) = GasSystem::k_carb(m_input);
             }
 
@@ -345,19 +387,22 @@ namespace es_script {
         virtual ~k_CarbNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("flow", &m_flowInput);
 
             Node::registerInputs();
         }
 
-        virtual void registerOutputs() {
+        virtual void registerOutputs()
+        {
             registerOutput(&m_output, "__out");
 
             setPrimaryOutput("__out");
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_output.setInput(m_flowInput);
@@ -368,13 +413,15 @@ namespace es_script {
         double m_flowInput = 0.0;
     };
 
-    class ConnectIgnitionWireNode : public Node {
+    class ConnectIgnitionWireNode : public Node
+    {
     public:
         ConnectIgnitionWireNode() { /* void */ }
         virtual ~ConnectIgnitionWireNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("wire", &m_wire, InputTarget::Type::Object);
             addInput("ignition_module", &m_module, InputTarget::Type::Object);
             addInput("angle", &m_angle);
@@ -382,7 +429,8 @@ namespace es_script {
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_module->connect(m_wire, m_angle);
@@ -394,20 +442,23 @@ namespace es_script {
         double m_angle = 0.0;
     };
 
-    class AddIgnitionModuleNode : public Node {
+    class AddIgnitionModuleNode : public Node
+    {
     public:
         AddIgnitionModuleNode() { /* void */ }
         virtual ~AddIgnitionModuleNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("engine", &m_engine, InputTarget::Type::Object);
             addInput("ignition_module", &m_ignitionModule, InputTarget::Type::Object);
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_engine->addIgnitionModule(m_ignitionModule);
@@ -418,13 +469,15 @@ namespace es_script {
         EngineNode *m_engine = nullptr;
     };
 
-    class GenerateHarmonicCamLobeNode : public Node {
+    class GenerateHarmonicCamLobeNode : public Node
+    {
     public:
         GenerateHarmonicCamLobeNode() { /* void */ }
         virtual ~GenerateHarmonicCamLobeNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("duration_at_50_thou", &m_durationAt50Thou);
             addInput("gamma", &m_gamma);
             addInput("lift", &m_lift);
@@ -434,7 +487,8 @@ namespace es_script {
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             const double angle = m_durationAt50Thou / 4;
@@ -445,15 +499,18 @@ namespace es_script {
             // pi / 2 = k * x
 
             const double step = extents / (m_steps - 5.0);
-            for (int i = 0; i < m_steps; ++i) {
-                if (i == 0) {
+            for (int i = 0; i < m_steps; ++i)
+            {
+                if (i == 0)
+                {
                     m_function->addSample(0.0, m_lift);
                 }
-                else {
+                else
+                {
                     const double x = i * step;
                     const double lift = (x >= extents)
-                        ? 0.0
-                        : m_lift * std::pow(0.5 + 0.5 * std::cos(k * x), m_gamma);
+                                            ? 0.0
+                                            : m_lift * std::pow(0.5 + 0.5 * std::cos(k * x), m_gamma);
                     m_function->addSample(x, lift);
                     m_function->addSample(-x, lift);
                 }
@@ -470,20 +527,23 @@ namespace es_script {
         FunctionNode *m_function = nullptr;
     };
 
-    class AddGearNode : public Node {
+    class AddGearNode : public Node
+    {
     public:
         AddGearNode() { /* void */ }
         virtual ~AddGearNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("ratio", &m_ratio, InputTarget::Type::Object);
             addInput("transmission", &m_transmission, InputTarget::Type::Object);
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             m_transmission->addGear(m_ratio);
@@ -494,19 +554,22 @@ namespace es_script {
         TransmissionNode *m_transmission = nullptr;
     };
 
-    class SetTransmissionNode : public Node {
+    class SetTransmissionNode : public Node
+    {
     public:
         SetTransmissionNode() { /* void */ }
         virtual ~SetTransmissionNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() override {
+        virtual void registerInputs() override
+        {
             addInput("transmission", &m_transmission, InputTarget::Type::Object);
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate() override
+        {
             readAllInputs();
 
             Transmission *transmission = new Transmission;
@@ -518,19 +581,22 @@ namespace es_script {
         TransmissionNode *m_transmission = nullptr;
     };
 
-    class SetVehicleNode : public piranha::Node {
+    class SetVehicleNode : public piranha::Node
+    {
     public:
         SetVehicleNode() { /* void */ }
         virtual ~SetVehicleNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             registerInput(&m_vehicle, "vehicle");
 
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             VehicleNode *vehicleNode = getObject<VehicleNode>(m_vehicle);
 
             Vehicle *vehicle = new Vehicle;
@@ -542,13 +608,15 @@ namespace es_script {
         piranha::pNodeInput m_vehicle = nullptr;
     };
 
-    class SetApplicationSettingsNode : public Node {
+    class SetApplicationSettingsNode : public Node
+    {
     public:
         SetApplicationSettingsNode() { /* void */ }
         virtual ~SetApplicationSettingsNode() { /* void */ }
 
     protected:
-        virtual void registerInputs() {
+        virtual void registerInputs()
+        {
             addInput("start_fullscreen", &m_settings.startFullscreen);
             addInput("power_units", &m_settings.powerUnits);
             addInput("torque_units", &m_settings.torqueUnits);
@@ -571,7 +639,8 @@ namespace es_script {
             Node::registerInputs();
         }
 
-        virtual void _evaluate() {
+        virtual void _evaluate()
+        {
             readAllInputs();
 
             Compiler::output()->applicationSettings = m_settings;

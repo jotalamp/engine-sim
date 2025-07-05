@@ -4,7 +4,7 @@
 #include "../include/engine_sim_application.h"
 #include "../include/ui_utilities.h"
 
-TireObject::TireObject(EngineSimApplication *app, b2World *world, Vehicle* vehicle, std::string selectedVehicleName, ysTransform *vehicleTransform, b2Body *vehicleBody, b2Vec2 localPosition, float height, bool steering)
+TireObject::TireObject(EngineSimApplication *app, b2World *world, Vehicle *vehicle, std::string selectedVehicleName, ysTransform *vehicleTransform, b2Body *vehicleBody, b2Vec2 localPosition, float height, bool steering)
 {
     m_app = app;
     m_world = world;
@@ -58,7 +58,7 @@ TireObject::TireObject(EngineSimApplication *app, b2World *world, Vehicle* vehic
 
     // Define the dynamic body fixture.
     b2FixtureDef fixtureDef;
-    //fixtureDef.shape = &circle;
+    // fixtureDef.shape = &circle;
     fixtureDef.shape = &dynamicBox;
 
     // Set the box density to be non-zero, so it will be dynamic.
@@ -71,13 +71,12 @@ TireObject::TireObject(EngineSimApplication *app, b2World *world, Vehicle* vehic
     // Add the shape to the body.
     m_body->CreateFixture(&fixtureDef);
 
-    
     b2RevoluteJointDef revoluteJointDef;
     revoluteJointDef.bodyA = m_vehicle_body;
     revoluteJointDef.bodyB = m_body;
     revoluteJointDef.collideConnected = false;
-    revoluteJointDef.localAnchorA.Set(localPosition.x, localPosition.y); 
-    revoluteJointDef.localAnchorB.Set(0, 0);                             // center of the circle
+    revoluteJointDef.localAnchorA.Set(localPosition.x, localPosition.y);
+    revoluteJointDef.localAnchorB.Set(0, 0); // center of the circle
 
     if (steering)
     {
@@ -90,7 +89,6 @@ TireObject::TireObject(EngineSimApplication *app, b2World *world, Vehicle* vehic
 
     if (steering)
         m_joint->SetLimits(-0.8f, 0.8f);
-    
 }
 
 TireObject::~TireObject()
@@ -116,7 +114,7 @@ b2Vec2 TireObject::getForwardVelocity()
 void TireObject::updateFriction()
 {
     // lateral linear velocity
-    //float maxLateralImpulse = 2.5f;
+    // float maxLateralImpulse = 2.5f;
     float maxLateralImpulse = 40.0f;
     b2Vec2 impulse = m_body->GetMass() * -getLateralVelocity();
     if (impulse.Length() > maxLateralImpulse)
@@ -156,7 +154,7 @@ void TireObject::updateDrive()
 
 void TireObject::render(const ViewParameters *view)
 {
-    
+
     resetShader();
 
     b2Fixture *fixture = m_body->GetFixtureList();
@@ -165,13 +163,10 @@ void TireObject::render(const ViewParameters *view)
     b2Vec2 size = 2.0f * poly->m_vertices[0];
     float angle = m_body->GetAngle();
 
-    
-
     m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
 
-
     // Top down
-    
+
     setTransform(
         &m_vehicle->m_body,
 
@@ -186,7 +181,6 @@ void TireObject::render(const ViewParameters *view)
         0.0f,
         -angle,
         0.0f);
-    
 
     // Side
     /*
@@ -206,8 +200,6 @@ void TireObject::render(const ViewParameters *view)
         0.0f);
     */
 
-    
-
     if (m_app->getDebugMode())
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
@@ -217,48 +209,38 @@ void TireObject::render(const ViewParameters *view)
     float scale = 0.6f;
     float speedfactor = m_app->getSimulator()->getSimulationSpeed();
 
-    
-
     if (position_x > 0.58f)
         position_x = -0.58f;
-
 
     double p_x, p_y;
     m_atg_body.localToWorld(m_body->GetPosition().x, m_body->GetPosition().y, &p_x, &p_y);
 
-    
-
     // L = T * R * S
-    // 
+    //
     // Top Down
     ysQuaternion qx = ysMath::LoadQuaternion(m_rotation * m_app->getSimulator()->getSimulationSpeed(), ysMath::Constants::XAxis);
     ysQuaternion qy = ysMath::LoadQuaternion(-m_body->GetAngle(), ysMath::Constants::YAxis);
 
     // Side
-    //ysQuaternion qx = ysMath::LoadQuaternion(m_body->GetAngle(), ysMath::Constants::XAxis);
-    
+    // ysQuaternion qx = ysMath::LoadQuaternion(m_body->GetAngle(), ysMath::Constants::XAxis);
+
     ysTransform transform;
-    //transform.SetOrientation(qx);
+    // transform.SetOrientation(qx);
     transform.SetOrientation(ysMath::QuatMultiply(qy, qx));
 
-    //transform.SetPosition(ysMath::LoadVector(0.0f, -(float)p_y, (float)p_x, 0.0f));
+    // transform.SetPosition(ysMath::LoadVector(0.0f, -(float)p_y, (float)p_x, 0.0f));
 
     transform.SetPosition(ysMath::LoadVector((float)p_x, m_height, (float)p_y, 0.0f));
-    
-    
+
     m_app->getShaders()->SetObjectTransform(transform.GetWorldTransform());
 
     ///////////
     ysQuaternion qz3 = ysMath::LoadQuaternion(m_modelRotation[2] * ysMath::Constants::PI, ysMath::Constants::ZAxis);
 
-
-
     ysTransform transform2;
     transform2.SetOrientation(qz3);
     transform2.SetParent(&transform);
     // transform2.SetPosition(ysMath::LoadVector((float)p_x, -0.45f, (float)p_y, 0.0f));
-
-
 
     m_app->getShaders()->SetObjectTransform(transform2.GetWorldTransform());
     /////////
@@ -267,9 +249,7 @@ void TireObject::render(const ViewParameters *view)
 
     int meshesPerTireModel = m_mesh_names.size() / 2;
 
-    //int meshesPerTireModel = 2;
-
-    
+    // int meshesPerTireModel = 2;
 
     for (std::vector<std::string>::size_type i = 0; i != meshesPerTireModel; i++)
     {
@@ -285,114 +265,16 @@ void TireObject::render(const ViewParameters *view)
             1);
     }
 
-    if(false)
-    m_app->getEngine()->DrawModel(
-        m_app->getShaders()->GetRegularFlags(),
-        m_app->getAssetManager()->GetModelAsset("DebugCube"),
-        0);
-    
-    /*
-    if (m_side == Left)
-    {
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWheel"));
-
+    if (false)
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("wheel_left"),
-            1);
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialTire"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("tire_left"),
-            1);
-    }
-    
-
-    if (m_side == Right)
-    {
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWheel"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("wheel_right"),
-            1);
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialTire"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("tire_right"),
-            1);
-    }
-    */
-
-    
-    
-    if(false)
-    if (m_side == Right)
-    {
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialGray"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Plane.014"),
-            1);
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFrame"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Plane.015"),
-            1);
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialTires"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Plane.016"),
-            1);
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialGray"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Plane.017"),
-            1);
-    }
-    else
-    {
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialTires"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Plane.012"),
-            1);
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialGray"));
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Plane.018"),
-            1);
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Plane.019"),
-            1);
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Plane.020"),
-            1);
-    }
-    //return;
+            m_app->getAssetManager()->GetModelAsset("DebugCube"),
+            0);
 }
 
 void TireObject::process(float dt, float rotationSpeed)
 {
-    //float frictionLimit = 0.6f;
+    // float frictionLimit = 0.6f;
     float frictionLimit = 0.9f;
 
     b2Vec2 currentForwardNormal = m_body->GetWorldVector(b2Vec2(0, 1));
@@ -404,7 +286,7 @@ void TireObject::process(float dt, float rotationSpeed)
 
     float l = lv.Length();
 
-    //float factor = 0.91f;
+    // float factor = 0.91f;
     float factor = 0.7f;
 
     if (l > frictionLimit)
@@ -416,13 +298,13 @@ void TireObject::process(float dt, float rotationSpeed)
     m_body->ApplyLinearImpulse(impulse, m_body->GetWorldCenter(), true);
 
     m_body->ApplyAngularImpulse(0.2f * m_body->GetInertia() * -m_body->GetAngularVelocity(), true);
-    //m_body->ApplyLinearImpulse(0.3f * rotationSpeed * m_body->GetWorldVector(b2Vec2(0.0f, 1.0f)), m_body->GetWorldCenter(), true);
-    //m_body->ApplyAngularImpulse(0.1f*rotationSpeed, true );
-    //m_body->SetAngularVelocity(10.0f * rotationSpeed);
-    //m_joint->SetMotorSpeed(rotationSpeed);
-    //m_app->getSimulator()->getVehicle()->
-    //m_joint->SetMaxMotorTorque(9.0f);
-    //m_joint->SetMotorSpeed(rotationSpeed);
+    // m_body->ApplyLinearImpulse(0.3f * rotationSpeed * m_body->GetWorldVector(b2Vec2(0.0f, 1.0f)), m_body->GetWorldCenter(), true);
+    // m_body->ApplyAngularImpulse(0.1f*rotationSpeed, true );
+    // m_body->SetAngularVelocity(10.0f * rotationSpeed);
+    // m_joint->SetMotorSpeed(rotationSpeed);
+    // m_app->getSimulator()->getVehicle()->
+    // m_joint->SetMaxMotorTorque(9.0f);
+    // m_joint->SetMotorSpeed(rotationSpeed);
 }
 
 void TireObject::destroy()

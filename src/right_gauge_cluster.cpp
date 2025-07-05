@@ -372,7 +372,7 @@ void RightGaugeCluster::setUnits() {
 
         m_manifoldVacuumGauge->m_unit = "bar";
         m_manifoldVacuumGauge->m_gauge->m_min = 0;
-        m_manifoldVacuumGauge->m_gauge->m_max = 1.1f;
+        m_manifoldVacuumGauge->m_gauge->m_max = 1;
         m_manifoldVacuumGauge->m_gauge->m_minorStep = 1;
         m_manifoldVacuumGauge->m_gauge->m_majorStep = 1;
         m_manifoldVacuumGauge->m_precision = 2;

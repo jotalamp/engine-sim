@@ -1,8 +1,7 @@
 #include "../include/audio_buffer.h"
 
-#include <cstdlib>
-
 #include <assert.h>
+#include <cmath>
 
 AudioBuffer::AudioBuffer() {
     m_writePointer = 0;

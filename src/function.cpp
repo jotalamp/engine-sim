@@ -155,7 +155,7 @@ double Function::sampleGaussian(double x) const {
     }
 
     for (int i = closest; i >= 0; --i) {
-        if (std::abs(x - m_x[i]) > filterRadius) break;
+        if (abs(x - m_x[i]) > filterRadius) break;
 
         const double w = m_gaussianFilter->evaluate((m_x[i] - x) / m_filterRadius);
         sum += w * m_y[i];

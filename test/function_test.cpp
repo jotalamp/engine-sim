@@ -73,7 +73,7 @@ TEST(FunctionTests, FunctionGaussianTest) {
 
     for (double s = 2.0; s <= 3.0; s += 0.001) {
         const double v = f.sampleGaussian(s);
-        std::cerr << v << "\n";
+        //std::cerr << v << "\n";
     }
 
     f.destroy();
