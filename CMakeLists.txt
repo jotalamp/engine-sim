@@ -1,9 +1,11 @@
-cmake_minimum_required(VERSION 3.10...4.1)
+cmake_minimum_required(VERSION 3.24)
 
-# Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
-    cmake_policy(SET CMP0135 NEW)
+if(POLICY CMP0135)
+	cmake_policy(SET CMP0135 NEW)
+	set(CMAKE_POLICY_DEFAULT_CMP0135 NEW)
 endif()
+
+set(DOWNLOAD_EXTRACT_TIMESTAMP)
 
 set(OpenGL_GL_PREFERENCE GLVND)
 
@@ -55,6 +57,30 @@ set_property(TARGET gmock PROPERTY FOLDER "gtest")
 set_property(TARGET gmock_main PROPERTY FOLDER "gtest")
 set_property(TARGET gtest PROPERTY FOLDER "gtest")
 set_property(TARGET gtest_main PROPERTY FOLDER "gtest")
+
+set(SDL2_INCLUDE_DIR G:/local/SDL2/include)
+set(SDL2_LIBRARY G:/local/SDL2/lib/x64/SDL2.lib)
+set(SDL2_DIR G:/local/SDL2)
+set(SDL2MAIN_LIBRARY G:/local/SDL2/lib/x64/SDL2main.lib)
+
+set(SDL2_IMAGE_INCLUDE_DIR G:/local/SDL2_image/include)
+set(SDL2_IMAGE_LIBRARY G:/local/SDL2_image/lib/x64/SDL2_image.lib)
+
+set(SDL2_IMAGE_LIBRARIES G:/local/SDL2_image/lib/x64/SDL2_image.lib)
+
+set(Boost_DIR G:/local/Boost_1_80_0)
+set(Boost_INCLUDE_DIR G:/local/Boost_1_80_0)
+set(Boost_FILESYSTEM_LIBRARY_RELEASE G:/local/Boost_1_80_0/lib64-msvc-14.3/libboost_filesystem-vc143-mt-x64-1_80.lib)
+set(Boost_FILESYSTEM_LIBRARY_DEBUG G:/local/Boost_1_80_0/lib64-msvc-14.3/libboost_filesystem-vc143-mt-gd-x64-1_80.lib)
+set(Boost_LIBRARY_DIR_DEBUG G:/local/Boost_1_80_0/lib64-msvc-14.3)
+set(Boost_LIBRARY_DIR_RELEASE G:/local/Boost_1_80_0/lib64-msvc-14.3)
+
+set(FLEX_EXECUTABLE G:/local/WinFlexBison/win_flex.exe)
+set(BISON_EXECUTABLE G:/local/WinFlexBison/win_bison.exe)
+
+include_directories(${Boost_INCLUDE_DIR})
+include_directories(${SDL2_INCLUDE_DIR})
+include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 
 # ========================================================
 
