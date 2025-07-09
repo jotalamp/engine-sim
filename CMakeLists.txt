@@ -58,6 +58,8 @@ set_property(TARGET gmock_main PROPERTY FOLDER "gtest")
 set_property(TARGET gtest PROPERTY FOLDER "gtest")
 set_property(TARGET gtest_main PROPERTY FOLDER "gtest")
 
+set(SDL2_INCLUDE_DIRS G:/local/SDL2/include)
+
 set(SDL2_INCLUDE_DIR G:/local/SDL2/include)
 set(SDL2_LIBRARY G:/local/SDL2/lib/x64/SDL2.lib)
 set(SDL2_DIR G:/local/SDL2)
