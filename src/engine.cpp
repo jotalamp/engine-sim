@@ -231,6 +231,7 @@ bool placeRod(
     const double s0 = (-b + sqrt_det) / (2 * a);
     const double s1 = (-b - sqrt_det) / (2 * a);
 
+    #undef max
     *s = std::max(s0, s1);
     if (*s < 0) return false;
    
@@ -285,6 +286,7 @@ void Engine::calculateDisplacement() {
                 continue;
             }
 
+            #undef min
             min_s[i] = std::min(min_s[i], s);
             max_s[i] = std::max(max_s[i], s);
         }
@@ -394,6 +396,7 @@ double Engine::getTotalVolumeFuelLeft() const {
 }
 
 int Engine::getMaxDepth() const {
+    #undef max
     int maxDepth = 0;
     for (int i = 0; i < m_crankshaftCount; ++i) {
         maxDepth = std::max(m_crankshafts[i].getRodJournalCount(), maxDepth);

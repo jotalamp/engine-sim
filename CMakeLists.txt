@@ -65,6 +65,8 @@ set(SDL2_LIBRARY G:/local/SDL2/lib/x64/SDL2.lib)
 set(SDL2_DIR G:/local/SDL2)
 set(SDL2MAIN_LIBRARY G:/local/SDL2/lib/x64/SDL2main.lib)
 
+set(SDL2_IMAGE_INCLUDE_DIRS G:/local/SDL2_image/include)
+
 set(SDL2_IMAGE_INCLUDE_DIR G:/local/SDL2_image/include)
 set(SDL2_IMAGE_LIBRARY G:/local/SDL2_image/lib/x64/SDL2_image.lib)
 

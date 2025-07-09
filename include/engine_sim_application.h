@@ -1,8 +1,11 @@
 #ifndef ATG_ENGINE_SIM_ENGINE_SIM_APPLICATION_H
 #define ATG_ENGINE_SIM_ENGINE_SIM_APPLICATION_H
 
-// #include <SDL.h>
+#ifdef _WIN32
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #ifdef _WIN32
 #include "joystick.h"

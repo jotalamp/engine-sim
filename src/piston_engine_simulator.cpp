@@ -260,6 +260,7 @@ void PistonEngineSimulator::placeCylinder(int i) {
     const double s0 = (-b + sqrt_det) / (2 * a);
     const double s1 = (-b - sqrt_det) / (2 * a);
 
+    #undef max
     const double s = std::max(s0, s1);
     if (s < 0) return;
 
@@ -374,6 +375,7 @@ void PistonEngineSimulator::writeToSynthesizer() {
         m_exhaustFlowStagingBuffer[i] = 0;
     }
 
+    #undef min
     const double attenuation = std::min(std::abs(filteredEngineSpeed()), 40.0) / 40.0;
     const double attenuation_3 = attenuation * attenuation * attenuation;
 
