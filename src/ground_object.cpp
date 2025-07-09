@@ -4,7 +4,7 @@
 #include "../include/engine_sim_application.h"
 #include "../include/ui_utilities.h"
 
-GroundObject::GroundObject(EngineSimApplication* app)
+GroundObject::GroundObject(EngineSimApplication *app)
 {
     m_app = app;
 
@@ -14,73 +14,68 @@ GroundObject::GroundObject(EngineSimApplication* app)
     // Define the ground body.
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(-14.0f, 10.0f);
+    bodyDef.position = {-14.0f, 10.0f};
 
     // Call the body factory which allocates memory for the ground body
     // from a pool and creates the ground box shape (also from a pool).
     // The body is also added to the world.
-    m_dynamic_bodies[0] = m_app->getWorld()->CreateBody(&bodyDef);
+    // m_dynamic_bodies[0] = m_app->getWorld()->CreateBody(&bodyDef);
+    m_dynamic_bodies[0] = b2CreateBody(m_app->getWorld(), &bodyDef);
 
-    b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(0.5f * 1.6f, 0.5f * 4.2f);
+    b2Polygon dynamicBox = b2MakeBox(0.5f * 1.6f, 0.5f * 4.2f);
 
     // Define the dynamic body fixture.
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &dynamicBox;
-    fixtureDef.density = 0.1f;
-    fixtureDef.friction = 0.9f;
+    b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef.density = 0.1f;
+    shapeDef.material.friction = 0.9f;
+
+    b2CreatePolygonShape(m_dynamic_bodies[0], &shapeDef, &dynamicBox);
 
     // Add the shape to the body.
-    m_dynamic_bodies[0]->CreateFixture(&fixtureDef);
-    m_dynamic_bodies[0]->SetAngularDamping(0.9f);
-    m_dynamic_bodies[0]->SetLinearDamping(0.9f);
+    b2Body_SetAngularDamping(m_dynamic_bodies[0], 0.9f);
+    b2Body_SetLinearDamping(m_dynamic_bodies[0], 0.9f);
 
     //////////7
     // Define the ground body.
     b2BodyDef groundBodyDef;
     groundBodyDef.type = b2_staticBody;
-    groundBodyDef.position.Set(-20.0f, 0.0f);
+    groundBodyDef.position = {-20.0f, 0.0f};
 
     // Call the body factory which allocates memory for the ground body
     // from a pool and creates the ground box shape (also from a pool).
     // The body is also added to the world.
-    m_static_bodies[0] = m_app->getWorld()->CreateBody(&groundBodyDef);
+    m_static_bodies[0] = b2CreateBody(m_app->getWorld(), &groundBodyDef);
 
     // Define another box shape for our dynamic body.
-    b2PolygonShape box;
-    box.SetAsBox(2.0f, 8000.0f);
+    b2Polygon box = b2MakeBox(2.0f, 8000.0f);
 
     // Define the dynamic body fixture.
-    // b2FixtureDef fixtureDef;
-    fixtureDef.shape = &box;
+    b2ShapeDef fixtureDef = b2DefaultShapeDef();
 
     // Set the box density to be non-zero, so it will be dynamic.
     fixtureDef.density = 0.0f;
 
     // Add the shape to the body.
-    m_static_bodies[0]->CreateFixture(&fixtureDef);
+    b2CreatePolygonShape(m_static_bodies[0], &fixtureDef, &dynamicBox);
 
-    groundBodyDef.position.Set(36.2f, 0.0f);
-    m_static_bodies[1] = m_app->getWorld()->CreateBody(&groundBodyDef);
-    m_static_bodies[1]->CreateFixture(&fixtureDef);
+    groundBodyDef.position = {36.2f, 0.0f};
+    m_static_bodies[1] = b2CreateBody(m_app->getWorld(), &groundBodyDef);
 
     // Define another box shape for our dynamic body.
-    b2PolygonShape box2;
-    box2.SetAsBox(0.2f, 191.5f);
+    b2Polygon box2 = b2MakeBox(0.2f, 191.5f);
 
     // Define the dynamic body fixture.
-    // b2FixtureDef fixtureDef;
-    fixtureDef.shape = &box2;
+    b2ShapeDef shapeDef = b2DefaultShapeDef();
 
-    // Set the box density to be non-zero, so it will be dynamic.
-    fixtureDef.density = 0.0f;
+    shapeDef.density = 0.0f;
 
-    groundBodyDef.position.Set(0.0f, 109.4f);
-    m_static_bodies[2] = m_app->getWorld()->CreateBody(&groundBodyDef);
-    m_static_bodies[2]->CreateFixture(&fixtureDef);
+    b2CreatePolygonShape(m_static_bodies[1], &shapeDef, &dynamicBox);
+
+    groundBodyDef.position = {0.0f, 109.4f};
+    m_static_bodies[2] = b2CreateBody(m_app->getWorld() , &groundBodyDef);
 }
 
-void GroundObject::initialize(EngineSimApplication* app)
+void GroundObject::initialize(EngineSimApplication *app)
 {
     m_app = app;
 }
@@ -95,132 +90,16 @@ void GroundObject::generateGeometry()
     /* void */
 }
 
-void GroundObject::render(const ViewParameters* view)
+void GroundObject::render(const ViewParameters *view)
 {
-    //return;
-    if(m_app->getShowEngineOnly()) return;
+    // return;
+    if (m_app->getShowEngineOnly())
+        return;
 
-    b2Vec2 impulse = m_dynamic_bodies[0]->GetMass() * b2Vec2(0.0f, 0.6f);
-    m_dynamic_bodies[0]->ApplyLinearImpulse(impulse, m_dynamic_bodies[0]->GetWorldCenter(), true);
+    b2Vec2 impulse = {b2Body_GetMass(m_dynamic_bodies[0]), 0.0f};
+    b2Body_ApplyLinearImpulseToCenter(m_dynamic_bodies[0], impulse, true);
 
     resetShader();
-
-    if (false/*m_app->m_debug*/)
-    {
-        b2Fixture* fixture = m_dynamic_bodies[0]->GetFixtureList();
-        b2PolygonShape* poly = (b2PolygonShape*)fixture->GetShape();
-        b2Vec2 position = m_dynamic_bodies[0]->GetPosition();
-        b2Vec2 size = 2.0f * poly->m_vertices[0];
-        float angle = m_dynamic_bodies[0]->GetAngle();
-
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
-
-        setTransform(
-            &m_atg_body,
-
-            size.x,
-            0.5f,
-            size.y,
-
-            position.x,
-            -0.5f,
-            position.y,
-
-            0.0f,
-            -angle,
-            0.0f);
-
-        /*
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("DebugCube"),
-            0);*/
-
-        setTransform(
-            &m_atg_body,
-
-            size.x,
-            size.x,
-            size.x,
-
-            position.x,
-            -1.1f,
-            position.y,
-
-            0.5f * ysMath::Constants::PI,
-            -angle + 0 * 0.5f * ysMath::Constants::PI,
-            0.5f * ysMath::Constants::PI);
-
-        /*
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("body.004"),
-            0);*/
-
-        setTransform(
-            &m_atg_body,
-
-            -0.6f * size.x,
-            0.6f * size.x,
-            0.6f * size.x,
-
-            position.x,
-            -0.8f,
-            position.y,
-
-            0 * 0.5f * ysMath::Constants::PI,
-            -angle + 0 * 0.5f * ysMath::Constants::PI,
-            0 * 0.5f * ysMath::Constants::PI);
-
-        //m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Impreza"));
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("RallyCar_03"));
-
-        /*
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Subaru Impreza"),
-            0);*/
-
-        m_app->getEngine()->DrawModel(
-            m_app->getShaders()->GetRegularFlags(),
-            m_app->getAssetManager()->GetModelAsset("Ford Cosworth"),
-            0);
-
-        if (false || m_app->getDebugMode()) {
-            int i = 2;
-            b2Fixture* fixture2 = m_static_bodies[i]->GetFixtureList();
-            b2PolygonShape* poly2 = (b2PolygonShape*)fixture2->GetShape();
-            b2Vec2 position2 = m_static_bodies[i]->GetPosition();
-            b2Vec2 size2 = 2.0f * poly2->m_vertices[i];
-            float angle2 = m_static_bodies[0]->GetAngle();
-
-            m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
-
-            setTransform(
-                &m_atg_body,
-
-                size2.x,
-                0.5f,
-                size2.y,
-
-                position2.x,
-                -0.5f,
-                position2.y,
-
-                0.0f,
-                -angle2,
-                0.0f);
-
-            m_app->getEngine()->DrawModel(
-                m_app->getShaders()->GetRegularFlags(),
-                m_app->getAssetManager()->GetModelAsset("DebugCube"),
-                0);
-        }
-
-
-    }
-
-
 
     int i = 0;
 
@@ -243,7 +122,7 @@ void GroundObject::render(const ViewParameters* view)
         0.0f * ysMath::Constants::PI,
         -0.5f * ysMath::Constants::PI);
 
-    //return;
+    // return;
 
     m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialLittleCity"));
 
@@ -261,7 +140,6 @@ void GroundObject::render(const ViewParameters* view)
         -0.5f * ysMath::Constants::PI,
         1.0f * ysMath::Constants::PI,
         0.5f * ysMath::Constants::PI);
-
 
     // Monza
     if (m_app->getSelectedTrack() == 2)
@@ -427,9 +305,6 @@ void GroundObject::render(const ViewParameters* view)
     if (m_app->getSelectedTrack() == 3)
     {
 
-
-
-
         /*
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
@@ -446,7 +321,8 @@ void GroundObject::render(const ViewParameters* view)
 
             int z = 450;
 
-            if (i > 180) z = 0;
+            if (i > 180)
+                z = 0;
 
             float x = (float)i / 180.0f * ysMath::Constants::PI;
 
@@ -465,14 +341,14 @@ void GroundObject::render(const ViewParameters* view)
                 0 * 0.5f * ysMath::Constants::PI,
                 1.0f * ysMath::Constants::PI);
 
-
             m_app->getEngine()->DrawModel(
                 m_app->getShaders()->GetRegularFlags(),
                 m_app->getAssetManager()->GetModelAsset("cone"),
                 0);
         }
 
-        for (float x = -36.0f * 40; x < 4000.0f; x += size) {
+        for (float x = -36.0f * 40; x < 4000.0f; x += size)
+        {
             setTransform(
                 &m_body,
 
@@ -532,7 +408,7 @@ void GroundObject::render(const ViewParameters* view)
                 0 * 0.5f * ysMath::Constants::PI,
                 0.0f * ysMath::Constants::PI);
 
-            //m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Grass"));
+            // m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Grass"));
 
             m_app->getEngine()->DrawModel(
                 m_app->getShaders()->GetRegularFlags(),
@@ -545,7 +421,6 @@ void GroundObject::render(const ViewParameters* view)
 
             if (i % (2 * 72) == 0)
             {
-
 
                 setTransform(
                     &m_body,
@@ -562,13 +437,11 @@ void GroundObject::render(const ViewParameters* view)
                     0 * 0.5f * ysMath::Constants::PI,
                     1.0f * ysMath::Constants::PI);
 
-
                 m_app->getEngine()->DrawModel(
                     m_app->getShaders()->GetRegularFlags(),
                     m_app->getAssetManager()->GetModelAsset("light_01"),
                     0);
             }
-
 
             m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Guardrail"));
 
@@ -587,21 +460,20 @@ void GroundObject::render(const ViewParameters* view)
                 0.0f * ysMath::Constants::PI,
                 0.5f * ysMath::Constants::PI);
 
-            if (false && i == 0) {
+            if (false && i == 0)
+            {
                 m_app->getEngine()->DrawModel(
                     m_app->getShaders()->GetRegularFlags(),
                     m_app->getAssetManager()->GetModelAsset("guardrail_02"),
                     0);
             }
-            else {
+            else
+            {
                 m_app->getEngine()->DrawModel(
                     m_app->getShaders()->GetRegularFlags(),
                     m_app->getAssetManager()->GetModelAsset("guardrail_01"),
                     0);
             }
-
-
-
 
             if (i % (4 * 144) == 0)
             {
@@ -621,7 +493,6 @@ void GroundObject::render(const ViewParameters* view)
                     0 * 0.5f * ysMath::Constants::PI,
                     0 * 0.5f * ysMath::Constants::PI,
                     1.0f * ysMath::Constants::PI);
-
 
                 m_app->getEngine()->DrawModel(
                     m_app->getShaders()->GetRegularFlags(),
@@ -647,7 +518,6 @@ void GroundObject::render(const ViewParameters* view)
                     0 * 0.5f * ysMath::Constants::PI,
                     0.5f * ysMath::Constants::PI,
                     1.0f * ysMath::Constants::PI);
-
 
                 m_app->getEngine()->DrawModel(
                     m_app->getShaders()->GetRegularFlags(),
@@ -681,21 +551,12 @@ void GroundObject::render(const ViewParameters* view)
                     m_app->getAssetManager()->GetModelAsset("cone"),
                     0);
             }*/
-
-
         }
-
-
-
-
-
-
     }
 
     // Track Garda
     if (m_app->getSelectedTrack() == 4)
     {
-
 
         setTransform(
             &m_body,
@@ -718,7 +579,6 @@ void GroundObject::render(const ViewParameters* view)
             0.0f * ysMath::Constants::PI);
 
         m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialMat"));
-
 
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
@@ -834,7 +694,6 @@ void GroundObject::render(const ViewParameters* view)
 void GroundObject::process(float dt)
 {
     /* void */
-
 }
 
 void GroundObject::destroy()

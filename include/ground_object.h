@@ -23,9 +23,9 @@ class GroundObject : public SimulationObject {
         atg_scs::RigidBody m_atg_body;
         Ground *m_ground;
         Vehicle *m_vehicle;
-        b2Body *m_dynamic_bodies[1];
-        b2Body *m_static_bodies[3];
-        b2Body* m_bodies[2];
+        b2BodyId m_dynamic_bodies[1];
+        b2BodyId m_static_bodies[3];
+        b2BodyId m_bodies[2];
         atg_scs::RigidBody m_body;
 };
 

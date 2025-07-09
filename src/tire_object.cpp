@@ -43,12 +43,11 @@ TireObject::TireObject(EngineSimApplication *app, b2World *world, Vehicle *vehic
     // Define the dynamic body. We set its position and call the body factory.
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
-    bodyDef.position = m_vehicle_body->GetPosition() + localPosition;
+    bodyDef.position = b2Body_GetPosition(m_vehicle_body) + localPosition;
     m_body = world->CreateBody(&bodyDef);
 
     // Define another box shape for our dynamic body.
-    b2PolygonShape dynamicBox;
-    dynamicBox.SetAsBox(0.08f, 0.26f);
+    b2Polygon dynamicBox = b2MakeBox(0.08f, 0.26f);
 
     /*
     b2CircleShape circle;
@@ -57,26 +56,34 @@ TireObject::TireObject(EngineSimApplication *app, b2World *world, Vehicle *vehic
     */
 
     // Define the dynamic body fixture.
-    b2FixtureDef fixtureDef;
-    // fixtureDef.shape = &circle;
-    fixtureDef.shape = &dynamicBox;
+    b2ShapeDef shapeDef = b2DefaultShapeDef();
 
     // Set the box density to be non-zero, so it will be dynamic.
-    fixtureDef.density = 2.0f;
+    shapeDef.density = 2.0f;
 
     // Override the default friction.
-    fixtureDef.friction = 0.3f;
-    fixtureDef.restitution = 0.9f;
+    shapeDef.material.friction = 0.3f;
+    shapeDef.material.restitution = 0.9f;
 
     // Add the shape to the body.
-    m_body->CreateFixture(&fixtureDef);
+    b2CreatePolygonShape(m_body, &shapeDef, &dynamicBox);
 
-    b2RevoluteJointDef revoluteJointDef;
-    revoluteJointDef.bodyA = m_vehicle_body;
-    revoluteJointDef.bodyB = m_body;
-    revoluteJointDef.collideConnected = false;
-    revoluteJointDef.localAnchorA.Set(localPosition.x, localPosition.y);
-    revoluteJointDef.localAnchorB.Set(0, 0); // center of the circle
+    b2Vec2 pivot = {-10.0f, 20.5f};
+b2RevoluteJointDef jointDef = b2DefaultRevoluteJointDef();
+jointDef.motorSpeed = 1.0f;
+jointDef.maxMotorTorque = 100.0f;
+jointDef.enableMotor = true;
+jointDef.lowerAngle = -0.25f * b2_pi;
+jointDef.upperAngle = 0.5f * b2_pi;
+jointDef.enableLimit = true;
+b2JointId jointId = b2CreateRevoluteJoint(worldId, &jointDef);
+
+    b2RevoluteJointDef revoluteJointDef = b2DefaultRevoluteJointDef();
+    //revoluteJointDef.bodyA = m_vehicle_body;
+    //revoluteJointDef.bodyB = m_body;
+    //revoluteJointDef.collideConnected = false;
+    //revoluteJointDef.localAnchorA.Set(localPosition.x, localPosition.y);
+    //revoluteJointDef.localAnchorB.Set(0, 0); // center of the circle
 
     if (steering)
     {
@@ -85,10 +92,11 @@ TireObject::TireObject(EngineSimApplication *app, b2World *world, Vehicle *vehic
         revoluteJointDef.enableLimit = true;
     }
 
-    m_joint = (b2RevoluteJoint *)m_world->CreateJoint(&revoluteJointDef);
+    //m_joint = (b2RevoluteJoint *)m_world->CreateJoint(&revoluteJointDef);
+    m_joint = b2CreateRevoluteJoint(m_world, &jointDef);
 
     if (steering)
-        m_joint->SetLimits(-0.8f, 0.8f);
+        b2RevoluteJoint_SetLimits(m_joint,-0.8f,0.8f);
 }
 
 TireObject::~TireObject()

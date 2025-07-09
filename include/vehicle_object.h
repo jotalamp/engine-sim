@@ -29,7 +29,7 @@ struct VehicleModel {
 
 class VehicleObject : public SimulationObject {
 public:
-    VehicleObject(EngineSimApplication *app, b2World *world, Vehicle *vehicle);
+    VehicleObject(EngineSimApplication *app, b2WorldId world, Vehicle *vehicle);
     virtual ~VehicleObject();
 
     virtual void initialize(EngineSimApplication *app);
@@ -43,9 +43,9 @@ public:
 
     std::string getSelectedVehicleName() { return m_selected_vehicle_name; }
 
-    b2World *m_world;
+    b2WorldId m_world;
     Vehicle *m_vehicle;
-    b2Body *m_body;
+    b2BodyId m_body;
     TireObject *m_tires[4];
     float rotation;
     VehicleModel m_vehicle_model;

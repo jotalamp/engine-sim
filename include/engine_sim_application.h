@@ -149,7 +149,7 @@ public:
     bool getShowTrack() { return m_show_track; }
     bool getShowEngineOnly() { return m_show_engine_only; }
     int getSelectedTrack() { return m_selected_track; }
-    b2World *getWorld() { return m_world; }
+    b2WorldId getWorld() { return m_world; }
 
 protected:
     void loadScript();
@@ -282,7 +282,7 @@ protected:
     bool m_show_engine_only = false;
     int m_selected_camera;
     int m_selected_car;
-    b2World *m_world;
+    b2WorldId m_world;
     VehicleObject *m_vehicle_object;
     ysVector m_previousPosition;
     ysVector m_previousPosition2;

@@ -4,7 +4,7 @@
 #include "../include/engine_sim_application.h"
 #include "../include/ui_utilities.h"
 
-VehicleObject::VehicleObject(EngineSimApplication* app, b2World* world, Vehicle* vehicle)
+VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle* vehicle)
 {
 	m_app = app;
 	m_world = world;
@@ -88,39 +88,44 @@ VehicleObject::VehicleObject(EngineSimApplication* app, b2World* world, Vehicle*
 	bodyDef.type = b2_dynamicBody;
 
 	// Top down
-	bodyDef.position.Set(-14.0f, 0.0f);
+	bodyDef.position = {-14.0f, 0.0f};
 
-	m_body = world->CreateBody(&bodyDef);
+	m_body = b2CreateBody(world, &bodyDef);
 
 	// Define another box shape for our dynamic body.
-	b2PolygonShape dynamicBox;
-	dynamicBox.SetAsBox(0.5f * m_vehicle_model.collisionBoxWidth, 0.1f * m_vehicle_model.collisionBoxLength);
+	b2Polygon dynamicBox = b2MakeBox(0.5f * m_vehicle_model.collisionBoxWidth, 0.1f * m_vehicle_model.collisionBoxLength);
 
 	// Define the dynamic body fixture.
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &dynamicBox;
+
+	b2BodyDef bodyDef = b2DefaultBodyDef();
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position = {0.0f, 4.0f};
+	m_body = b2CreateBody(world, &bodyDef);
+
+	//b2FixtureDef fixtureDef;
+	//fixtureDef.shape = &dynamicBox;
 
 	// Set the box density to be non-zero, so it will be dynamic.
-	fixtureDef.density = 25.0f;
-
+	b2ShapeDef shapeDef = b2DefaultShapeDef();
+	shapeDef.density = 25.0f;
+	
 	// Override the default friction.
-	fixtureDef.friction = 0.001f;
+	shapeDef.material.friction = 0.001f;
 
 	// Add the shape to the body.
-	m_body->CreateFixture(&fixtureDef);
-	m_body->ResetMassData();
+	b2CreatePolygonShape(m_body, &shapeDef, &dynamicBox);
 
 	// Wheels
 	m_tireCount = 4;
 
 	// Top Down
-	m_tires[0] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, b2Vec2(+m_vehicle_model.tireX, m_vehicle_model.tireRearZ), vehicleModel.tireY, true);
-	m_tires[1] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, b2Vec2(+m_vehicle_model.tireX, m_vehicle_model.tireFrontZ), vehicleModel.tireY, true);
-	m_tires[2] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, b2Vec2(-m_vehicle_model.tireX, m_vehicle_model.tireRearZ), vehicleModel.tireY, true);
-	m_tires[3] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, b2Vec2(-m_vehicle_model.tireX, m_vehicle_model.tireFrontZ), vehicleModel.tireY, true);
+	m_tires[0] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {+m_vehicle_model.tireX, m_vehicle_model.tireRearZ}, vehicleModel.tireY, true);
+	m_tires[1] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {+m_vehicle_model.tireX, m_vehicle_model.tireFrontZ}, vehicleModel.tireY, true);
+	m_tires[2] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {-m_vehicle_model.tireX, m_vehicle_model.tireRearZ}, vehicleModel.tireY, true);
+	m_tires[3] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {-m_vehicle_model.tireX, m_vehicle_model.tireFrontZ}, vehicleModel.tireY, true);
 
-	m_tires[0]->m_joint->SetLimits(0.0f, 0.0f);
-	m_tires[2]->m_joint->SetLimits(0.0f, 0.0f);
+	b2RevoluteJoint_SetLimits(m_tires[0]->m_joint,0,0);
+	//m_tires[2]->m_joint->SetLimits(0.0f, 0.0f);
 
 	bool rearWheelDrive = true;
 
@@ -248,7 +253,9 @@ void VehicleObject::process(float dt)
 		}
 	}
 
-	m_vehicle->m_rotation = -m_body->GetAngle();
+	//m_vehicle->m_rotation = -m_body->GetAngle();
+	//m_vehicle->m_rotation = -m_body->GetAngle();
+	m_vehicle->m_rotation = -b2Body_GetRotation(m_body).c;
 
 	//m_body->ApplyLinearImpulse(b2Vec2(-500.0f, 0.0f), m_body->GetWorldCenter(), true);
 	//m_body->ApplyForceToCenter(b2Vec2(0.0f,-10.0f*targetSpeedFromTireRotationSpeed), true);
@@ -262,8 +269,8 @@ void VehicleObject::destroy()
 		m_tires[i] = nullptr;
 	}
 
-	m_body->GetWorld()->DestroyBody(m_body);
-	m_body = nullptr;
+	b2DestroyBody(m_body);
+	m_body = b2_nullBodyId;
 
 	m_vehicle = nullptr;
 }

@@ -17,7 +17,7 @@ class TireObject : public SimulationObject {
     };
 
     public:
-        TireObject(EngineSimApplication *app, b2World* world, Vehicle *vehicle, std::string selectedVehicleName, ysTransform *vehicleTransform, b2Body *vehicleBody, b2Vec2 localPosition, float height, bool steering);
+        TireObject(EngineSimApplication *app, b2WorldId* world, Vehicle *vehicle, std::string selectedVehicleName, ysTransform *vehicleTransform, b2BodyId *vehicleBody, b2Vec2 localPosition, float height, bool steering);
         virtual ~TireObject();
 
         virtual void render(const ViewParameters *view);
@@ -28,11 +28,11 @@ class TireObject : public SimulationObject {
         inline void updateFriction();
         inline void updateDrive();
 
-        b2World *m_world;
+        b2WorldId m_world;
         Vehicle *m_vehicle;
-        b2Body *m_vehicle_body;
-        b2Body *m_body;
-        b2RevoluteJoint* m_joint;
+        b2BodyId m_vehicle_body;
+        b2BodyId m_body;
+        b2JointId m_joint;
         atg_scs::RigidBody m_atg_body;
         Side m_side;
         bool m_steering;

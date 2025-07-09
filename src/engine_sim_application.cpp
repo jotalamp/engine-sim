@@ -254,9 +254,9 @@ void EngineSimApplication::initialize()
     m_shaders.SetClearColor(ysColor::srgbiToLinear(0x34, 0x98, 0xdb));
     // Define the gravity vector.
     // Top down
-    b2Vec2 gravity(0.0f, 0.0f);
+
     // Construct a world object, which will hold and simulate the rigid bodies.
-    m_world = new b2World(gravity);
+    //m_world.gravity = {0.0f, 0.0f};
     float trackScale = getIniReader().Get<float>("Track", "Scale");
     std::string selectedVehicleModelFileName = getIniReader().Get<std::string>("SelectedVehicle", "Name");
 
@@ -382,8 +382,8 @@ void EngineSimApplication::initialize()
 void EngineSimApplication::process(float frame_dt)
 {
 
-    int32 velocityIterations = 2;
-    int32 positionIterations = 5;
+    int velocityIterations = 2;
+    int positionIterations = 5;
 
     frame_dt = static_cast<float>(clamp(frame_dt, 1 / 200.0f, 1 / 30.0f));
 
@@ -436,7 +436,8 @@ void EngineSimApplication::process(float frame_dt)
     const double avgFramerate = clamp(m_engine.GetAverageFramerate(), 30.0f, 1000.0f);
     m_simulator->startFrame(1 / avgFramerate);
 
-    m_world->Step((float)(speed * frame_dt), velocityIterations, positionIterations);
+    //m_world->Step((float)(speed * frame_dt), velocityIterations, positionIterations);
+    b2World_Step(m_world, (float)(speed * frame_dt), velocityIterations);
 
     m_vehicle_object->process((float)(speed * frame_dt));
 
@@ -682,9 +683,6 @@ void EngineSimApplication::destroy()
         SDL_JoystickClose(gJoystick);
         gJoystick = NULL;
     }*/
-
-    m_world->~b2World();
-    m_world = nullptr;
 
     SDL_Quit();
 }
