@@ -157,9 +157,9 @@ void GroundObject::render(const ViewParameters *view)
         setTransform(
             &m_body,
 
-            0.005 * scale,
-            0.005 * scale,
-            0.005 * scale,
+            0.005f * scale,
+            0.005f * scale,
+            0.005f * scale,
 
             0.0f,
             -0.7f,
@@ -417,7 +417,7 @@ void GroundObject::render(const ViewParameters *view)
 
             m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Lightpole"));
 
-            int i = x;
+            int i = (int)x;
 
             if (i % (2 * 72) == 0)
             {

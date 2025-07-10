@@ -32,6 +32,8 @@ std::string EngineSimApplication::s_buildVersion = " 3DW.0.24.11.13";
 
 EngineSimApplication::EngineSimApplication()
 {
+    printf("\nEngine simulator starts...");
+
     m_assetPath = "";
 
     m_geometryVertexBuffer = nullptr;
@@ -997,7 +999,7 @@ void EngineSimApplication::processEngineInput()
 
     // j_Controller.Update();
 
-    float speed;
+    //float speed;
     float steeringAngle = m_vehicle->getSteeringAngle();
 
     if (m_engine.IsKeyDown(ysKey::Code::Left))
@@ -1563,7 +1565,7 @@ void EngineSimApplication::renderScene()
     else if (!isTargetEngine)
     {
         float rotationSpeed = 0.5f * 0.06f;
-        m_camera.rotation.x = (1.0f - rotationSpeed) * m_camera.rotation.x - rotationSpeed * (m_simulator->getVehicle()->m_rotation + 0.5f * ysMath::Constants::PI);
+        m_camera.rotation.x = (1.0f - rotationSpeed) * m_camera.rotation.x - rotationSpeed * ((float)m_simulator->getVehicle()->m_rotation + 0.5f * ysMath::Constants::PI);
 
         int ry = m_engine.GetJoystickAxisRY();
 
@@ -1592,8 +1594,8 @@ void EngineSimApplication::renderScene()
 
         m_engineView->m_bounds,
 
-        m_screenWidth,
-        m_screenHeight,
+        (float)m_screenWidth,
+        (float)m_screenHeight,
 
         1.0f,
 

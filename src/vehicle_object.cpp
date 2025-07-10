@@ -33,7 +33,7 @@ VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle
 	VehicleModel vehicleModel;
 	vehicleModel.id = Bluebird;
 	vehicleModel.scale = 1.0f;
-	vehicleModel.height = -0.48;
+	vehicleModel.height = -0.48f;
 
 
 	std::vector<float> tirePosition = m_app->getIniReader().GetVector<float>(m_selected_vehicle_name, "TirePositions");
@@ -46,7 +46,7 @@ VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle
 	vehicleModel.collisionBoxWidth = 0.7f;
 
 	vehicleModel.transformEngine.SetOrientation(ysMath::LoadQuaternion(0.5f * ysMath::Constants::PI, ysMath::Constants::XAxis));
-	vehicleModel.transformEngine.SetPosition(ysMath::LoadVector(-1.5f, 0.3f, 0.38));
+	vehicleModel.transformEngine.SetPosition(ysMath::LoadVector(-1.5f, 0.3f, 0.38f));
 
 	m_vehicle_model = vehicleModel;
 

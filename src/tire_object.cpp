@@ -143,7 +143,7 @@ void TireObject::updateFriction()
 void TireObject::updateDrive()
 {
     // find desired speed
-    float desiredSpeed = m_vehicle->getSpeed();
+    float desiredSpeed = (float)m_vehicle->getSpeed();
     float m_maxDriveForce = 100.0f;
 
     // find current speed in forward direction
@@ -159,7 +159,7 @@ void TireObject::updateDrive()
         force = -m_maxDriveForce;
     else
         return;
-        
+
     //m_body->ApplyForce(force * currentForwardNormal, m_body->GetWorldCenter(), true);
     b2Body_ApplyForce(m_body,force * currentForwardNormal, b2Body_GetWorldCenterOfMass(m_body), true);
 }
@@ -170,7 +170,7 @@ void TireObject::render(const ViewParameters *view)
     resetShader();
 
     //b2ShapeDef *fixture = m_body->GetFixtureList();
-    b2ShapeId* shapes;
+    b2ShapeId* shapes = {};
     b2Body_GetShapes(m_body, shapes, b2Body_GetShapeCount(m_body));
     b2Polygon poly = b2Shape_GetPolygon(shapes[0]);
     //(b2Polygon *)fixture->GetShape();
@@ -235,7 +235,7 @@ void TireObject::render(const ViewParameters *view)
     // L = T * R * S
     //
     // Top Down
-    ysQuaternion qx = ysMath::LoadQuaternion(m_rotation * m_app->getSimulator()->getSimulationSpeed(), ysMath::Constants::XAxis);
+    ysQuaternion qx = ysMath::LoadQuaternion(m_rotation * (float)m_app->getSimulator()->getSimulationSpeed(), ysMath::Constants::XAxis);
     ysQuaternion qy = ysMath::LoadQuaternion(-b2Body_GetRotation(m_body).c, ysMath::Constants::YAxis);
 
     // Side
@@ -264,11 +264,11 @@ void TireObject::render(const ViewParameters *view)
 
     m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWheel"));
 
-    int meshesPerTireModel = m_mesh_names.size() / 2;
+    int meshesPerTireModel = (int)m_mesh_names.size() / 2;
 
     // int meshesPerTireModel = 2;
 
-    for (std::vector<std::string>::size_type i = 0; i != meshesPerTireModel; i++)
+    for (int i = 0; i != meshesPerTireModel; i++)
     {
         int j = i;
         if (m_side == Right)

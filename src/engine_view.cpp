@@ -3,7 +3,7 @@
 #include "../include/engine_sim_application.h"
 
 EngineView::EngineView() {
-    m_pan = { 0, units::distance(-6, units::inch) };
+    m_pan = { 0, (float)units::distance(-6, (float)units::inch) };
     m_checkMouse = true;
     m_lastScroll = 0;
     m_zoom = 1.0f;
@@ -40,7 +40,7 @@ void EngineView::onDrag(const Point &p0, const Point &mouse0, const Point &mouse
 }
 
 void EngineView::onMouseScroll(int scroll) {
-    const float f = std::pow(2.0, (float)scroll / 500.0f);
+    const float f = std::pow(2.0f, (float)scroll / 500.0f);
 
     const Point prevCenter = getCenter();
 

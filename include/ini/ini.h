@@ -70,7 +70,7 @@ inline static char* find_chars_or_comment(const char* s, const char* chars) {
 
 /* Version of strncpy that ensures dest (size bytes) is null-terminated. */
 inline static char* strncpy0(char* dest, const char* src, size_t size) {
-    strncpy(dest, src, size - 1);
+    strncpy_s(dest, size - 1, src, size - 1);
     dest[size - 1] = '\0';
     return dest;
 }
@@ -183,7 +183,7 @@ inline int ini_parse(const char* filename, ini_handler handler, void* user) {
     FILE* file;
     int error;
 
-    file = fopen(filename, "r");
+    fopen_s(&file, filename, "r");
     if (!file) return -1;
     error = ini_parse_file(file, handler, user);
     fclose(file);
@@ -421,7 +421,7 @@ inline std::vector<T> INIReader::GetVector(const std::string& section,
         return vs;
     } catch (std::exception& e) {
         throw std::runtime_error("cannot parse value " + value +
-                                 " to vector<T>.");
+                                 " to vector<T>." + e.what());
     }
 }
 
