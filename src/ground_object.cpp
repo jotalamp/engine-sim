@@ -65,7 +65,7 @@ GroundObject::GroundObject(EngineSimApplication *app)
     b2Polygon box2 = b2MakeBox(0.2f, 191.5f);
 
     // Define the dynamic body fixture.
-    b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef = b2DefaultShapeDef();
 
     shapeDef.density = 0.0f;
 

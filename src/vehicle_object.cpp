@@ -97,7 +97,7 @@ VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle
 
 	// Define the dynamic body fixture.
 
-	b2BodyDef bodyDef = b2DefaultBodyDef();
+	bodyDef = b2DefaultBodyDef();
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.position = {0.0f, 4.0f};
 	m_body = b2CreateBody(world, &bodyDef);
@@ -119,6 +119,8 @@ VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle
 	m_tireCount = 4;
 
 	// Top Down
+	//m_tires[0] = new TireObject(app,world,m_vehicle,m_selected_vehicle_name,&m_transform, m_body
+
 	m_tires[0] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {+m_vehicle_model.tireX, m_vehicle_model.tireRearZ}, vehicleModel.tireY, true);
 	m_tires[1] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {+m_vehicle_model.tireX, m_vehicle_model.tireFrontZ}, vehicleModel.tireY, true);
 	m_tires[2] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {-m_vehicle_model.tireX, m_vehicle_model.tireRearZ}, vehicleModel.tireY, true);
@@ -157,9 +159,14 @@ void VehicleObject::generateGeometry()
 void VehicleObject::render(const ViewParameters* view)
 {
 	// Top down
-	ysVector position = ysMath::LoadVector(m_body->GetPosition().x, m_vehicle_model.height - 0.2f, m_body->GetPosition().y - 0 * 1.3f);// = (ysVector3)m_transform.GetWorldPosition();
+	b2Vec2 pos = b2Body_GetPosition(m_body);
+	ysVector position = 
+	ysMath::LoadVector(
+		pos.x, m_vehicle_model.height - 0.2f, 
+		pos.y - 0 * 1.3f);// = (ysVector3)m_transform.GetWorldPosition();
 
-	rotation = -m_body->GetAngle();
+	rotation = -b2Body_GetRotation(m_body).c;
+	//-m_body->GetAngle();
 
 	m_transform.SetPosition(position);
 	m_previousPosition = position;
@@ -210,8 +217,8 @@ void VehicleObject::process(float dt)
 	//m_tires[1]->m_joint->EnableLimit(true);
 	//m_tires[3]->m_joint->EnableLimit(true);
 
-	m_tires[1]->m_joint->SetLimits(angle, angle);
-	m_tires[3]->m_joint->SetLimits(angle, angle);
+	b2RevoluteJoint_SetLimits(m_tires[1]->m_joint,angle,angle);
+	b2RevoluteJoint_SetLimits(m_tires[3]->m_joint,angle,angle);
 
 	m_brakes = m_vehicle->m_brakes;
 
@@ -219,7 +226,8 @@ void VehicleObject::process(float dt)
 
 	m_wheel_rotation_speed = (1.0f - m_brakes) * scale * (float)m_vehicle->getSpeed() / (2.0f * ysMath::Constants::PI * m_tire_radius);
 
-	float realSpeed = m_body->GetLocalVector(m_body->GetLinearVelocity()).y;
+	float realSpeed = b2Body_GetLocalVector(m_body,b2Body_GetLinearVelocity(m_body)).y;
+	//m_body->GetLocalVector(m_body->GetLinearVelocity()).y;
 
 	if (m_app->getSimulator()->getTransmission()->getGear() == -1)
 		m_wheel_rotation_speed = 0.99f * (1.0f - m_brakes) * scale * realSpeed / (2.0f * ysMath::Constants::PI * m_tire_radius);
@@ -229,18 +237,10 @@ void VehicleObject::process(float dt)
 	else if (m_app->getSimulator()->getTransmission()->getGear() > -2)
 		m_wheel_rotation += m_wheel_rotation_speed;
 
-	b2Vec2 currentForwardNormal = m_body->GetWorldVector(b2Vec2(0, 1));
+	b2Vec2 currentForwardNormal = b2Body_GetWorldVector(m_body, {0, 1});
 
 	float targetSpeedFromTireRotationSpeed = m_wheel_rotation_speed * 2.0f * ysMath::Constants::PI * m_tire_radius / scale;
 
-	if (false)
-	{
-		if (m_app->getSimulator()->getTransmission()->getGear() == -2)
-			m_body->ApplyForceToCenter(0.5f * (-targetSpeedFromTireRotationSpeed - realSpeed) * currentForwardNormal, true);
-		else
-			m_body->ApplyForceToCenter(0.5f * (targetSpeedFromTireRotationSpeed - realSpeed) * currentForwardNormal, true);
-	}
-	else
 	{
 		for (int i = 0; i < m_tireCount; i++)
 		{
