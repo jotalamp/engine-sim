@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <assert.h>
+#include <iostream>
 
 Engine::Engine() {
     m_name = "";
@@ -408,12 +409,13 @@ int Engine::getMaxDepth() const {
 Simulator *Engine::createSimulator(Vehicle *vehicle, Transmission *transmission) {
     PistonEngineSimulator *simulator = new PistonEngineSimulator;
     Simulator::Parameters simulatorParams;
+
     simulatorParams.systemType = Simulator::SystemType::NsvOptimized;
     simulator->initialize(simulatorParams);
 
     simulator->loadSimulation(this, vehicle, transmission);
     simulator->setFluidSimulationSteps(8);
-
+    DBG;
     return static_cast<Simulator *>(simulator);
 }
 

@@ -17,7 +17,7 @@ class TireObject : public SimulationObject {
     };
 
     public:
-        TireObject(EngineSimApplication *app, b2WorldId world, Vehicle *vehicle, std::string selectedVehicleName, ysTransform *vehicleTransform, b2BodyId vehicleBody, b2Vec2 localPosition, float height, bool steering);
+        TireObject(EngineSimApplication *app, Vehicle *vehicle, std::string selectedVehicleName, ysTransform *vehicleTransform, b2BodyId vehicleBody, b2Vec2 localPosition, float height, bool steering);
         virtual ~TireObject();
 
         virtual void render(const ViewParameters *view);
@@ -28,7 +28,6 @@ class TireObject : public SimulationObject {
         inline void updateFriction();
         inline void updateDrive();
 
-        b2WorldId m_world;
         Vehicle *m_vehicle;
         b2BodyId m_vehicle_body;
         b2BodyId m_body;

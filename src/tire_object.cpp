@@ -4,10 +4,10 @@
 #include "../include/engine_sim_application.h"
 #include "../include/ui_utilities.h"
 
-TireObject::TireObject(EngineSimApplication *app, b2WorldId world, Vehicle *vehicle, std::string selectedVehicleName, ysTransform *vehicleTransform, b2BodyId vehicleBody, b2Vec2 localPosition, float height, bool steering)
+TireObject::TireObject(EngineSimApplication *app, Vehicle *vehicle, std::string selectedVehicleName, ysTransform *vehicleTransform, b2BodyId vehicleBody, b2Vec2 localPosition, float height, bool steering)
 {
+    DBG;
     m_app = app;
-    m_world = world;
 
     m_height = height;
 
@@ -40,24 +40,26 @@ TireObject::TireObject(EngineSimApplication *app, b2WorldId world, Vehicle *vehi
     else
         m_side = Right;
 
+    DBG;
+
     // Define the dynamic body. We set its position and call the body factory.
-    b2BodyDef bodyDef;
+    b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
     bodyDef.position = b2Body_GetPosition(m_vehicle_body) + localPosition;
+    DBG;
+    b2BodyId bodyId = b2CreateBody(m_app->getWorld(), & bodyDef);
     //m_body = world->CreateBody(&bodyDef);
-    m_body = b2CreateBody(world,&bodyDef);
+    DBG;
+    m_body = bodyId;
+    DBG;
 
     // Define another box shape for our dynamic body.
     b2Polygon dynamicBox = b2MakeBox(0.08f, 0.26f);
-
-    /*
-    b2CircleShape circle;
-    //circle.m_p.Set(2.0f, 3.0f);
-    circle.m_radius = 1.0f*0.26f;
-    */
+    DBG;
 
     // Define the dynamic body fixture.
     b2ShapeDef shapeDef = b2DefaultShapeDef();
+    DBG;
 
     // Set the box density to be non-zero, so it will be dynamic.
     shapeDef.density = 2.0f;
@@ -65,39 +67,44 @@ TireObject::TireObject(EngineSimApplication *app, b2WorldId world, Vehicle *vehi
     // Override the default friction.
     shapeDef.material.friction = 0.3f;
     shapeDef.material.restitution = 0.9f;
+    DBG;
 
     // Add the shape to the body.
     b2CreatePolygonShape(m_body, &shapeDef, &dynamicBox);
 
+    DBG;
+
     b2Vec2 pivot = {-10.0f, 20.5f};
-b2RevoluteJointDef jointDef = b2DefaultRevoluteJointDef();
-jointDef.motorSpeed = 1.0f;
-jointDef.maxMotorTorque = 100.0f;
-jointDef.enableMotor = true;
-jointDef.lowerAngle = -0.25f * B2_PI;
-jointDef.upperAngle = 0.5f * B2_PI;
-jointDef.enableLimit = true;
-b2JointId jointId = b2CreateRevoluteJoint(world, &jointDef);
 
-    b2RevoluteJointDef revoluteJointDef = b2DefaultRevoluteJointDef();
-    //revoluteJointDef.bodyA = m_vehicle_body;
-    //revoluteJointDef.bodyB = m_body;
-    //revoluteJointDef.collideConnected = false;
-    //revoluteJointDef.localAnchorA.Set(localPosition.x, localPosition.y);
-    //revoluteJointDef.localAnchorB.Set(0, 0); // center of the circle
-
+    DBG;
+    b2RevoluteJointDef jointDef = b2DefaultRevoluteJointDef();
+    DBG;
+    jointDef.base.bodyIdA = vehicleBody;
+    jointDef.base.bodyIdB = m_body;
+    jointDef.base.localFrameA.q = b2MakeRot(0.5f * B2_PI);
+    jointDef.base.collideConnected = false;
+    // revoluteJointDef.localAnchorA.Set(localPosition.x, localPosition.y);
+    // revoluteJointDef.localAnchorB.Set(0, 0); // center of the circle
+    jointDef.base.localFrameA.p = b2Body_GetLocalPoint(jointDef.base.bodyIdA, pivot);
+    jointDef.base.localFrameB.p = b2Body_GetLocalPoint(jointDef.base.bodyIdB, pivot);
+    jointDef.motorSpeed = 1.0f;
+    jointDef.maxMotorTorque = 100.0f;
+    jointDef.enableMotor = true;
+    jointDef.lowerAngle = -0.25f * B2_PI;
+    jointDef.upperAngle = 0.5f * B2_PI;
+    jointDef.enableLimit = true;
     if (steering)
     {
-        revoluteJointDef.enableMotor = true;
-        revoluteJointDef.maxMotorTorque = 100000.0f;
-        revoluteJointDef.enableLimit = true;
+        jointDef.enableMotor = true;
+        jointDef.maxMotorTorque = 100000.0f;
+        jointDef.enableLimit = true;
     }
-
-    //m_joint = (b2RevoluteJoint *)m_world->CreateJoint(&revoluteJointDef);
-    m_joint = b2CreateRevoluteJoint(m_world, &jointDef);
-
+    DBG
+    b2JointId jointId = b2CreateRevoluteJoint(m_app->getWorld(), &jointDef);
+    DBG;
     if (steering)
-        b2RevoluteJoint_SetLimits(m_joint,-0.8f,0.8f);
+        b2RevoluteJoint_SetLimits(jointId, -0.8f, 0.8f);
+    DBG;
 }
 
 TireObject::~TireObject()

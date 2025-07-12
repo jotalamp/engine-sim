@@ -1,3 +1,6 @@
+
+#include <climits>
+
 #include "../include/load_simulation_cluster.h"
 
 #include "../include/engine_sim_application.h"

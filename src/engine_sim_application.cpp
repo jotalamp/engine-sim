@@ -32,7 +32,7 @@ std::string EngineSimApplication::s_buildVersion = " 3DW.0.24.11.13";
 
 EngineSimApplication::EngineSimApplication()
 {
-    printf("\nEngine simulator starts...");
+    D("Engine simulator starts...");
 
     m_assetPath = "";
 
@@ -258,7 +258,11 @@ void EngineSimApplication::initialize()
     // Top down
 
     // Construct a world object, which will hold and simulate the rigid bodies.
-    //m_world.gravity = {0.0f, 0.0f};
+    b2WorldDef worldDef = b2DefaultWorldDef();
+    worldDef.gravity = (b2Vec2){0.0f, 0.0f};
+    b2WorldId worldId = b2CreateWorld(&worldDef);
+    m_world = worldId;
+
     float trackScale = getIniReader().Get<float>("Track", "Scale");
     std::string selectedVehicleModelFileName = getIniReader().Get<std::string>("SelectedVehicle", "Name");
 
@@ -295,15 +299,15 @@ void EngineSimApplication::initialize()
 
     loadMaterial("motorway/grass.png", "Grass");
 
-    /// GARDA
+    D("GARDA");
     loadMaterial("garda/fence.png", "MaterialFence");
     loadMaterial("garda/standard_material.png", "MaterialStandard");
     loadMaterial("garda/material.jpg", "MaterialMat");
     loadMaterial("garda/italian.jpg", "MaterialItalian");
     loadMaterial("garda/parking.jpg", "MaterialParking");
 
-    dbasic::Material *material_01;
-    material_01 = m_assetManager.NewMaterial();
+    D("Material white");
+    dbasic::Material *material_01 = m_assetManager.NewMaterial();
     material_01->SetDiffuseColor(ysColor::srgbiToLinear(0xFFFFFF));
     material_01->SetMetallic(2.0f);
     material_01->SetName("MaterialWhite");
@@ -329,6 +333,9 @@ void EngineSimApplication::initialize()
     material->SetDiffuseColor(ysColor::srgbiToLinear(0xFF0000));
     material->SetName("MaterialRed");
 
+    D("Materials loaded");
+    D("texture names");
+
     for (std::vector<std::string>::size_type i = 0; i != textureNames.size(); i++)
     {
         std::string textureName = textureNames[i];
@@ -340,15 +347,19 @@ void EngineSimApplication::initialize()
         material->SetName(materialName.c_str());
     }
 
+    D("text renderer");
     m_textRenderer.SetEngine(&m_engine);
     m_textRenderer.SetRenderer(m_engine.GetUiRenderer());
     m_textRenderer.SetFont(m_engine.GetConsole()->GetFont());
 
+    D("load script");
     loadScript();
 
+    D("audiobuffer");
     m_audioBuffer.initialize(44100, 44100);
     m_audioBuffer.m_writePointer = (int)(44100 * 0.1);
 
+    D("audio parameters");
     ysAudioParameters params;
     params.m_bitsPerSample = 16;
     params.m_channelCount = 1;
@@ -356,6 +367,7 @@ void EngineSimApplication::initialize()
     m_outputAudioBuffer =
         m_engine.GetAudioDevice()->CreateBuffer(&params, 44100);
 
+    D("audio source");
     m_audioSource = m_engine.GetAudioDevice()->CreateSource(m_outputAudioBuffer);
      m_audioSource->SetMode((m_simulator->getEngine() != nullptr)
                                ? ysAudioSource::Mode::Loop
@@ -364,6 +376,7 @@ void EngineSimApplication::initialize()
     m_audioSource->SetVolume(1.0f);
 
 #ifdef ATG_ENGINE_SIM_DISCORD_ENABLED
+    D("discord");
     // Create a global instance of discord-rpc
     CDiscord::CreateInstance();
 
@@ -378,7 +391,8 @@ void EngineSimApplication::initialize()
     GetDiscordManager()->SetStatus(passMe, engineName, s_buildVersion);
 #endif /* ATG_ENGINE_SIM_DISCORD_ENABLED */
 
-    m_engine.GetGameWindow()->SetWindowStyle(ysWindow::WindowStyle::Fullscreen);
+    //D("fullscreen");
+    //m_engine.GetGameWindow()->SetWindowStyle(ysWindow::WindowStyle::Fullscreen);
 }
 
 void EngineSimApplication::process(float frame_dt)
@@ -694,6 +708,7 @@ void EngineSimApplication::loadEngine(
     Vehicle *vehicle,
     Transmission *transmission)
 {
+    D("destroy objects");
     destroyObjects();
 
     if (m_simulator != nullptr)
@@ -724,6 +739,7 @@ void EngineSimApplication::loadEngine(
     m_vehicle = vehicle;
     m_transmission = transmission;
 
+    D("create simulator");
     m_simulator = engine->createSimulator(vehicle, transmission);
 
     if (engine == nullptr || vehicle == nullptr || transmission == nullptr)
@@ -734,20 +750,27 @@ void EngineSimApplication::loadEngine(
         return;
     }
 
+    D("create objects");
     createObjects(engine);
+    DBG;
 
     m_viewParameters.Layer1 = engine->getMaxDepth();
+    DBG;
     engine->calculateDisplacement();
+    DBG;
 
+    D("set sim freq");
     m_simulator->setSimulationFrequency((int)engine->getSimulationFrequency());
     // m_simulator->setSimulationFrequency(5000);
 
+    D("synthesizer audio params");
     Synthesizer::AudioParameters audioParams = m_simulator->synthesizer().getAudioParameters();
     audioParams.inputSampleNoise = static_cast<float>(engine->getInitialJitter());
     audioParams.airNoise = static_cast<float>(engine->getInitialNoise());
     audioParams.dF_F_mix = static_cast<float>(engine->getInitialHighFrequencyGain());
     m_simulator->synthesizer().setAudioParameters(audioParams);
 
+    D("exhausts");
     for (int i = 0; i < engine->getExhaustSystemCount(); ++i)
     {
         ImpulseResponse *response = engine->getExhaustSystem(i)->getImpulseResponse();
@@ -767,9 +790,10 @@ void EngineSimApplication::loadEngine(
         waveFile.DestroyInternalBuffer();
     }
 
+    D("star audio rendering thread");
     m_simulator->startAudioRenderingThread();
 
-    m_simulator->setSimulationFrequency((int)engine->getSimulationFrequency() / 2);
+    //m_simulator->setSimulationFrequency((int)engine->getSimulationFrequency() / 2);
 }
 
 void EngineSimApplication::drawGenerated(
@@ -827,23 +851,28 @@ void EngineSimApplication::configure(const ApplicationSettings &settings)
 
 void EngineSimApplication::createObjects(Engine *engine)
 {
-
+    DBG;
     GroundObject *groundObject = new GroundObject(this);
     groundObject->m_ground = engine->getGround();
     groundObject->m_vehicle = m_vehicle;
     m_objects.push_back(groundObject);
 
-    VehicleObject *vehicleObject = new VehicleObject(this, m_world, m_vehicle);
+    DBG;
+    VehicleObject *vehicleObject = new VehicleObject(this, m_vehicle);
 
+    DBG;
     m_vehicle->m_transform = &vehicleObject->m_transform;
     m_vehicle->m_transform_engine = &vehicleObject->m_transform_engine;
     m_vehicle->m_transform_camera = &vehicleObject->m_transform_camera;
 
+    DBG;
     m_objects.push_back(vehicleObject);
     m_vehicle_object = vehicleObject;
 
+    DBG;
     int cylindersInBank = engine->getCylinderCount() / engine->getCylinderBankCount();
 
+    DBG;
     for (int i = 0; i < engine->getCylinderCount(); ++i)
     {
         ConnectingRodObject *rodObject = new ConnectingRodObject;
@@ -928,10 +957,10 @@ void EngineSimApplication::loadScript()
     Vehicle *vehicle = nullptr;
     Transmission *transmission = nullptr;
 
-    // #ifdef ATG_ENGINE_SIM_PIRANHA_ENABLED
+    #ifdef ATG_ENGINE_SIM_PIRANHA_ENABLED
+    D("piranha");
     es_script::Compiler compiler;
     compiler.initialize();
-    printf("\nmain.mr->");
     const bool compiled = compiler.compile("../assets/main.mr");
     if (compiled)
     {
@@ -950,34 +979,51 @@ void EngineSimApplication::loadScript()
     }
 
     compiler.destroy();
-    // #endif /* ATG_ENGINE_SIM_PIRANHA_ENABLED */
+    #endif /* ATG_ENGINE_SIM_PIRANHA_ENABLED */
 
     if (vehicle == nullptr)
     {
+        D("new vehicle");
         Vehicle::Parameters vehParams;
+
         vehParams.mass = units::mass(1597, units::kg);
         vehParams.diffRatio = 3.42;
         vehParams.tireRadius = units::distance(10, units::inch);
         vehParams.dragCoefficient = 0.25;
         vehParams.crossSectionArea = units::distance(6.0, units::foot) * units::distance(6.0, units::foot);
         vehParams.rollingResistance = 400.0;
+
         vehicle = new Vehicle;
         vehicle->initialize(vehParams);
     }
 
-    if (transmission == nullptr)
+    /* if (transmission == nullptr)
     {
+        printf("\nDEBUG 02");
         const double gearRatios[] = {2.97, 2.07, 1.43, 1.00, 0.84, 0.56};
         Transmission::Parameters tParams;
         tParams.GearCount = 6;
         tParams.GearRatios = gearRatios;
         tParams.MaxClutchTorque = units::torque(1000.0, units::ft_lb);
-        transmission = new Transmission;
-        transmission->initialize(tParams);
-    }
 
+        printf("\nDEBUG 02");
+
+        transmission = new Transmission;
+
+        printf("\nDEBUG 02");
+
+        transmission->initialize(tParams);
+
+        printf("\nDEBUG 02");
+    } */
+
+    D("load engine");
     loadEngine(engine, vehicle, transmission);
+
+    D("refresh ui");
     refreshUserInterface();
+
+    D("script loaded");
 }
 
 void EngineSimApplication::processEngineInput()

@@ -4,6 +4,8 @@
 #include "../include/engine_sim_application.h"
 #include "../include/ui_utilities.h"
 
+using std::cout;
+
 GroundObject::GroundObject(EngineSimApplication *app)
 {
     m_app = app;
@@ -11,68 +13,97 @@ GroundObject::GroundObject(EngineSimApplication *app)
     m_ground = nullptr;
     m_vehicle = nullptr;
 
-    // Define the ground body.
-    b2BodyDef bodyDef;
+    D("Create dynamic Box2d-body");
+
+    b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
-    bodyDef.position = {-14.0f, 10.0f};
-
-    // Call the body factory which allocates memory for the ground body
-    // from a pool and creates the ground box shape (also from a pool).
-    // The body is also added to the world.
-    // m_dynamic_bodies[0] = m_app->getWorld()->CreateBody(&bodyDef);
-    m_dynamic_bodies[0] = b2CreateBody(m_app->getWorld(), &bodyDef);
-
-    b2Polygon dynamicBox = b2MakeBox(0.5f * 1.6f, 0.5f * 4.2f);
-
-    // Define the dynamic body fixture.
+    bodyDef.position = (b2Vec2){0.0f, 4.0f};
+    b2BodyId bodyId = b2CreateBody(m_app->getWorld(), &bodyDef);
+    b2Polygon dynamicBox = b2MakeBox(1.0f, 1.0f);
     b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef.density = 1.0f;
+    shapeDef.material.friction = 0.3f;
+    b2CreatePolygonShape(bodyId, &shapeDef, &dynamicBox);
+    m_dynamic_bodies[0] = bodyId;
+
+    // bodyDef = b2DefaultBodyDef();
+    // bodyDef.type = b2_dynamicBody;
+    // bodyDef.position = {-14.0f, 10.0f};
+    // m_dynamic_bodies[0] = b2CreateBody(m_app->getWorld(), &bodyDef);
+    // dynamicBox = b2MakeBox(0.5f * 1.6f, 0.5f * 4.2f);
+
+    /* shapeDef = b2DefaultShapeDef();
     shapeDef.density = 0.1f;
     shapeDef.material.friction = 0.9f;
-
     b2CreatePolygonShape(m_dynamic_bodies[0], &shapeDef, &dynamicBox);
 
     // Add the shape to the body.
     b2Body_SetAngularDamping(m_dynamic_bodies[0], 0.9f);
-    b2Body_SetLinearDamping(m_dynamic_bodies[0], 0.9f);
+    b2Body_SetLinearDamping(m_dynamic_bodies[0], 0.9f); */
 
-    //////////7
-    // Define the ground body.
-    b2BodyDef groundBodyDef;
-    groundBodyDef.type = b2_staticBody;
-    groundBodyDef.position = {-20.0f, 0.0f};
+    if (b2Body_IsValid(m_dynamic_bodies[0]) == false)
+    {
+        printf("\nm_dynamic_bodies[0] not set!\n");
+        exit(1);
+    }
 
     // Call the body factory which allocates memory for the ground body
     // from a pool and creates the ground box shape (also from a pool).
     // The body is also added to the world.
-    m_static_bodies[0] = b2CreateBody(m_app->getWorld(), &groundBodyDef);
 
-    // Define another box shape for our dynamic body.
-    b2Polygon box = b2MakeBox(2.0f, 8000.0f);
+    D("Create ground body");
 
-    // Define the dynamic body fixture.
-    b2ShapeDef fixtureDef = b2DefaultShapeDef();
+    // Define the ground body.
+    b2BodyDef groundBodyDef = b2DefaultBodyDef();
+    groundBodyDef.position = (b2Vec2){0.0f, -10.0f};
+    b2BodyId groundId = b2CreateBody(m_app->getWorld(), &groundBodyDef);
+    b2Polygon groundBox = b2MakeBox(50.0f, 10.0f);
+    b2ShapeDef groundShapeDef = b2DefaultShapeDef();
+    b2CreatePolygonShape(groundId, &groundShapeDef, &groundBox);
+    m_static_bodies[0] = groundId;
 
-    // Set the box density to be non-zero, so it will be dynamic.
-    fixtureDef.density = 0.0f;
+    /*  b2BodyDef groundBodyDef;
+     groundBodyDef.type = b2_staticBody;
+     groundBodyDef.position = {-20.0f, 0.0f}; */
+
+    // Call the body factory which allocates memory for the ground body
+    // from a pool and creates the ground box shape (also from a pool).
+    // The body is also added to the world.
+    //m_static_bodies[0] = b2CreateBody(m_app->getWorld(), &groundBodyDef);
+    //b2Polygon box = b2MakeBox(2.0f, 8000.0f);
+    //b2ShapeDef fixtureDef = b2DefaultShapeDef();
+    //fixtureDef.density = 0.0f;
 
     // Add the shape to the body.
-    b2CreatePolygonShape(m_static_bodies[0], &fixtureDef, &dynamicBox);
+    //b2CreatePolygonShape(m_static_bodies[0], &fixtureDef, &box);
 
-    groundBodyDef.position = {36.2f, 0.0f};
-    m_static_bodies[1] = b2CreateBody(m_app->getWorld(), &groundBodyDef);
+    D("Create ground body 2");
+    // Define the ground body.
+    groundBodyDef = b2DefaultBodyDef();
+    groundBodyDef.position = (b2Vec2){0.0f, -10.0f};
+    b2BodyId groundId2 = b2CreateBody(m_app->getWorld(), &groundBodyDef);
+    b2Polygon groundBox2 = b2MakeBox(50.0f, 10.0f);
+    b2ShapeDef groundShapeDef2 = b2DefaultShapeDef();
+    b2CreatePolygonShape(groundId2, &groundShapeDef2, &groundBox2);
+    m_static_bodies[1] = groundId2;
+
+    //groundBodyDef.position = {36.2f, 0.0f};
+    //m_static_bodies[1] = b2CreateBody(m_app->getWorld(), &groundBodyDef);
 
     // Define another box shape for our dynamic body.
-    b2Polygon box2 = b2MakeBox(0.2f, 191.5f);
+    //b2Polygon box2 = b2MakeBox(0.2f, 191.5f);
 
     // Define the dynamic body fixture.
-    shapeDef = b2DefaultShapeDef();
+    //shapeDef = b2DefaultShapeDef();
 
-    shapeDef.density = 0.0f;
+    //shapeDef.density = 0.0f;
 
-    b2CreatePolygonShape(m_static_bodies[1], &shapeDef, &dynamicBox);
+    // b2CreatePolygonShape(m_static_bodies[1], &shapeDef, &dynamicBox);
 
-    groundBodyDef.position = {0.0f, 109.4f};
-    m_static_bodies[2] = b2CreateBody(m_app->getWorld() , &groundBodyDef);
+    //groundBodyDef.position = {0.0f, 109.4f};
+    //m_static_bodies[2] = b2CreateBody(m_app->getWorld(), &groundBodyDef);
+
+    D("Ground objects done");
 }
 
 void GroundObject::initialize(EngineSimApplication *app)

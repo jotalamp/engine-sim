@@ -4,10 +4,11 @@
 #include "../include/engine_sim_application.h"
 #include "../include/ui_utilities.h"
 
-VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle* vehicle)
+VehicleObject::VehicleObject(EngineSimApplication* app, Vehicle* vehicle)
 {
+    DBG;
 	m_app = app;
-	m_world = world;
+	m_world = app->getWorld();
 	m_vehicle = vehicle;
 	m_material = nullptr;
 	m_texture = nullptr;
@@ -19,35 +20,40 @@ VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle
 	m_brakes = 0.0f;
 	m_previousPosition = ysMath::LoadVector();
 
+    DBG;
 	m_selected_vehicle_name = m_app->getIniReader().Get<std::string>("SelectedVehicle", "Name");
 	//m_selected_vehicle_name = "Vehicle";
 
+    DBG;
 	m_mesh_names = m_app->getIniReader().GetVector<std::string>(m_selected_vehicle_name, "Meshes");
 	m_material_names = m_app->getIniReader().GetVector<std::string>(m_selected_vehicle_name, "Materials");
 
+    DBG;
 	for (std::vector<std::string>::size_type i = 0; i != m_mesh_names.size(); i++)
 		printf("\n%s", m_mesh_names[i].c_str());
 
-	printf("\n\n");
-
+    DBG;
 	VehicleModel vehicleModel;
 	vehicleModel.id = Bluebird;
 	vehicleModel.scale = 1.0f;
 	vehicleModel.height = -0.48f;
 
-
+    DBG;
 	std::vector<float> tirePosition = m_app->getIniReader().GetVector<float>(m_selected_vehicle_name, "TirePositions");
 	vehicleModel.tireX = tirePosition[1];
 	vehicleModel.tireY = tirePosition[0];
 	vehicleModel.tireFrontZ = tirePosition[2];
 	vehicleModel.tireRearZ = tirePosition[3];
 
+    DBG;
 	vehicleModel.collisionBoxLength = 2.0f;
 	vehicleModel.collisionBoxWidth = 0.7f;
 
+    DBG;
 	vehicleModel.transformEngine.SetOrientation(ysMath::LoadQuaternion(0.5f * ysMath::Constants::PI, ysMath::Constants::XAxis));
 	vehicleModel.transformEngine.SetPosition(ysMath::LoadVector(-1.5f, 0.3f, 0.38f));
 
+    DBG;
 	m_vehicle_model = vehicleModel;
 
 	m_vehicle_model.scale = m_app->getIniReader().Get<float>(m_selected_vehicle_name, "Scale");
@@ -56,24 +62,36 @@ VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle
 
 	m_modelRotation = m_app->getIniReader().GetVector<float>(m_selected_vehicle_name, "ModelRotation");
 
+    DBG;
+
 	ysQuaternion qx = ysMath::LoadQuaternion(m_modelRotation[0] * ysMath::Constants::PI, ysMath::Constants::XAxis);
 	ysQuaternion qy = ysMath::LoadQuaternion(m_modelRotation[1] * ysMath::Constants::PI, ysMath::Constants::YAxis);
 	ysQuaternion qz = ysMath::LoadQuaternion(m_modelRotation[2] * ysMath::Constants::PI, ysMath::Constants::ZAxis);
+
+    DBG;
 
 	ysQuaternion orientation = ysMath::QuatMultiply(ysMath::QuatMultiply(qx, qy), qz);
 	m_transform_model.SetOrientation(orientation);
 	m_transform_model.SetParent(&m_transform);
 
+    DBG;
+
 	m_transform.SetOrientation(ysMath::Constants::QuatIdentity);
 	m_transform.SetPosition(ysMath::LoadVector(0, 1, 0));
 	m_transform.SetParent(nullptr);
 
+    DBG;
+
 	m_engineModelRotation = m_app->getIniReader().GetVector<float>(m_selected_vehicle_name, "EngineModelRotation");
 	m_engineModelPosition = m_app->getIniReader().GetVector<float>(m_selected_vehicle_name, "EngineModelPosition");
+
+    DBG;
 
 	ysQuaternion eqx = ysMath::LoadQuaternion(m_engineModelRotation[0] * ysMath::Constants::PI, ysMath::Constants::XAxis);
 	ysQuaternion eqy = ysMath::LoadQuaternion(m_engineModelRotation[1] * ysMath::Constants::PI, ysMath::Constants::YAxis);
 	ysQuaternion eqz = ysMath::LoadQuaternion(m_engineModelRotation[2] * ysMath::Constants::PI, ysMath::Constants::ZAxis);
+
+    DBG;
 
 	ysQuaternion engineOrientation = ysMath::QuatMultiply(ysMath::QuatMultiply(eqx, eqy), eqz);
 
@@ -84,49 +102,48 @@ VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle
 
 	velocity = ysMath::LoadVector();
 
-	b2BodyDef bodyDef;
-	bodyDef.type = b2_dynamicBody;
+    D("create body");
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    DBG;
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position = (b2Vec2){-14.0f, 0.0f};
+    DBG;
+    b2BodyId bodyId = b2CreateBody(m_world, &bodyDef);
+    DBG;
 
-	// Top down
-	bodyDef.position = {-14.0f, 0.0f};
+    b2Polygon dynamicBox = b2MakeBox(0.5f * m_vehicle_model.collisionBoxWidth, 0.1f * m_vehicle_model.collisionBoxLength);
+    DBG;
+    b2ShapeDef shapeDef = b2DefaultShapeDef();
+    DBG;
+    shapeDef.density = 25.0f;
+    DBG;
+    shapeDef.material.friction = 0.001f;
+    DBG;
 
-	m_body = b2CreateBody(world, &bodyDef);
+    // Add the shape to the body.
+    b2CreatePolygonShape(m_body, &shapeDef, &dynamicBox);
+    DBG;
 
-	// Define another box shape for our dynamic body.
-	b2Polygon dynamicBox = b2MakeBox(0.5f * m_vehicle_model.collisionBoxWidth, 0.1f * m_vehicle_model.collisionBoxLength);
+    m_body = bodyId;
 
-	// Define the dynamic body fixture.
-
-	bodyDef = b2DefaultBodyDef();
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position = {0.0f, 4.0f};
-	m_body = b2CreateBody(world, &bodyDef);
-
-	//b2FixtureDef fixtureDef;
-	//fixtureDef.shape = &dynamicBox;
-
-	// Set the box density to be non-zero, so it will be dynamic.
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.density = 25.0f;
-	
-	// Override the default friction.
-	shapeDef.material.friction = 0.001f;
-
-	// Add the shape to the body.
-	b2CreatePolygonShape(m_body, &shapeDef, &dynamicBox);
+    DBG;
 
 	// Wheels
 	m_tireCount = 4;
 
+    DBG;
+
 	// Top Down
 	//m_tires[0] = new TireObject(app,world,m_vehicle,m_selected_vehicle_name,&m_transform, m_body
 
-	m_tires[0] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {+m_vehicle_model.tireX, m_vehicle_model.tireRearZ}, vehicleModel.tireY, true);
-	m_tires[1] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {+m_vehicle_model.tireX, m_vehicle_model.tireFrontZ}, vehicleModel.tireY, true);
-	m_tires[2] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {-m_vehicle_model.tireX, m_vehicle_model.tireRearZ}, vehicleModel.tireY, true);
-	m_tires[3] = new TireObject(app, world, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {-m_vehicle_model.tireX, m_vehicle_model.tireFrontZ}, vehicleModel.tireY, true);
+	m_tires[0] = new TireObject(app, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {+m_vehicle_model.tireX, m_vehicle_model.tireRearZ}, vehicleModel.tireY, true);
+	m_tires[1] = new TireObject(app, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {+m_vehicle_model.tireX, m_vehicle_model.tireFrontZ}, vehicleModel.tireY, true);
+	m_tires[2] = new TireObject(app, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {-m_vehicle_model.tireX, m_vehicle_model.tireRearZ}, vehicleModel.tireY, true);
+	m_tires[3] = new TireObject(app, m_vehicle, m_selected_vehicle_name, &m_transform, m_body, {-m_vehicle_model.tireX, m_vehicle_model.tireFrontZ}, vehicleModel.tireY, true);
 
-	b2RevoluteJoint_SetLimits(m_tires[0]->m_joint,0,0);
+    DBG;
+	//b2RevoluteJoint_SetLimits(m_tires[0]->m_joint,0,0);
+    DBG;
 	//m_tires[2]->m_joint->SetLimits(0.0f, 0.0f);
 
 	bool rearWheelDrive = true;
@@ -141,6 +158,7 @@ VehicleObject::VehicleObject(EngineSimApplication* app, b2WorldId world, Vehicle
 		m_tires[1]->m_drive = true;
 		m_tires[3]->m_drive = true;
 	}
+    DBG;
 }
 
 void VehicleObject::initialize(EngineSimApplication* app)

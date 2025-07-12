@@ -29,7 +29,7 @@ struct VehicleModel {
 
 class VehicleObject : public SimulationObject {
 public:
-    VehicleObject(EngineSimApplication *app, b2WorldId world, Vehicle *vehicle);
+    VehicleObject(EngineSimApplication *app, Vehicle *vehicle);
     virtual ~VehicleObject();
 
     virtual void initialize(EngineSimApplication *app);

@@ -58,6 +58,9 @@ set_property(TARGET gmock_main PROPERTY FOLDER "gtest")
 set_property(TARGET gtest PROPERTY FOLDER "gtest")
 set_property(TARGET gtest_main PROPERTY FOLDER "gtest")
 
+
+if(WIN32)
+
 set(SDL2_INCLUDE_DIRS G:/local/SDL2/include)
 
 set(SDL2_INCLUDE_DIR G:/local/SDL2/include)
@@ -85,6 +88,8 @@ set(BISON_EXECUTABLE G:/local/WinFlexBison/win_bison.exe)
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${SDL2_INCLUDE_DIR})
 include_directories(${SDL2_IMAGE_INCLUDE_DIR})
+
+endif(WIN32)
 
 # ========================================================
 
