@@ -201,13 +201,15 @@ void VehicleObject::render(const ViewParameters* view)
 	m_app->getShaders()->SetObjectTransform(m_transform_model.GetWorldTransform());
 
 	if (m_app->getShowEngineOnly()) return;
+	DBG;
 
 	for (std::vector<std::string>::size_type i = 0; i != m_mesh_names.size(); i++)
 	{
 		if (m_app->getShowEngine2() && (m_mesh_names[i].find("engine") != std::string::npos)) break;
-
+		DBG;
+		D(m_material_names[i].c_str());
 		m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial(m_material_names[i].c_str()));
-
+		DBG;
 		if (!m_app->getShowEngine() || m_mesh_names[i] != "hood")
 
 
@@ -215,13 +217,16 @@ void VehicleObject::render(const ViewParameters* view)
 				m_app->getShaders()->GetRegularFlags(),
 				m_app->getAssetManager()->GetModelAsset(m_mesh_names[i].c_str()),
 				1);
+		DBG;
 
 	}
-
+	DBG;
 	for (int i = 0; i < m_tireCount; i++)
 		m_tires[i]->render(view);
+	DBG;
 
 	m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
+	DBG;
 }
 
 
@@ -234,9 +239,12 @@ void VehicleObject::process(float dt)
 
 	//m_tires[1]->m_joint->EnableLimit(true);
 	//m_tires[3]->m_joint->EnableLimit(true);
+	DBG;
 
-	b2RevoluteJoint_SetLimits(m_tires[1]->m_joint,angle,angle);
-	b2RevoluteJoint_SetLimits(m_tires[3]->m_joint,angle,angle);
+	//b2RevoluteJoint_SetLimits(m_tires[1]->m_joint,angle,angle);
+	//b2RevoluteJoint_SetLimits(m_tires[3]->m_joint,angle,angle);
+
+	DBG;
 
 	m_brakes = m_vehicle->m_brakes;
 
@@ -246,6 +254,8 @@ void VehicleObject::process(float dt)
 
 	float realSpeed = b2Body_GetLocalVector(m_body,b2Body_GetLinearVelocity(m_body)).y;
 	//m_body->GetLocalVector(m_body->GetLinearVelocity()).y;
+
+	DBG;
 
 	if (m_app->getSimulator()->getTransmission()->getGear() == -1)
 		m_wheel_rotation_speed = 0.99f * (1.0f - m_brakes) * scale * realSpeed / (2.0f * ysMath::Constants::PI * m_tire_radius);
@@ -277,6 +287,7 @@ void VehicleObject::process(float dt)
 
 	//m_body->ApplyLinearImpulse(b2Vec2(-500.0f, 0.0f), m_body->GetWorldCenter(), true);
 	//m_body->ApplyForceToCenter(b2Vec2(0.0f,-10.0f*targetSpeedFromTireRotationSpeed), true);
+	b2Body_ApplyForceToCenter(m_body, {0.0f,-10.0f*targetSpeedFromTireRotationSpeed}, true);
 }
 
 void VehicleObject::destroy()

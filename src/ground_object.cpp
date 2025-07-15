@@ -126,17 +126,19 @@ void GroundObject::render(const ViewParameters *view)
     // return;
     if (m_app->getShowEngineOnly())
         return;
-
+    DBG;
     b2Vec2 impulse = {b2Body_GetMass(m_dynamic_bodies[0]), 0.0f};
+    DBG;
     b2Body_ApplyLinearImpulseToCenter(m_dynamic_bodies[0], impulse, true);
-
+    DBG;
     resetShader();
-
+    DBG;
     int i = 0;
 
     int l = 20;
 
     float scale = 0.1f;
+    DBG;
 
     setTransform(
         &m_body,
@@ -155,8 +157,8 @@ void GroundObject::render(const ViewParameters *view)
 
     // return;
 
-    m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialLittleCity"));
-
+    //m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialLittleCity"));
+    DBG;
     setTransform(
         &m_body,
 
@@ -172,9 +174,12 @@ void GroundObject::render(const ViewParameters *view)
         1.0f * ysMath::Constants::PI,
         0.5f * ysMath::Constants::PI);
 
+    DBG;
+
     // Monza
     if (m_app->getSelectedTrack() == 2)
     {
+        DBG;
         m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialTunnel"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
@@ -185,6 +190,7 @@ void GroundObject::render(const ViewParameters *view)
     // City
     if (m_app->getSelectedTrack() == 1)
     {
+        DBG;
         setTransform(
             &m_body,
 
@@ -200,85 +206,85 @@ void GroundObject::render(const ViewParameters *view)
             0.5f * ysMath::Constants::PI,
             0.5f * ysMath::Constants::PI);
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialPawn"));
-        m_app->getEngine()->DrawModel(
+        //m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialPawn"));
+        /* m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialCityRoads"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialCityRoads"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.001"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialParamount"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialParamount"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.002"),
-            0);
+            0); */
 
         // m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialCityRoads"));
-        m_app->getEngine()->DrawModel(
+        /* m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.003"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.004"),
-            0);
+            0); */
 
         // m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
-        m_app->getEngine()->DrawModel(
+        /* m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.005"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialProps"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialProps"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.006"),
-            0);
+            0); */
 
         // m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
-        m_app->getEngine()->DrawModel(
+        /* m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.007"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Material_03"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Material_03"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.008"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialGreen"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialGreen"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.009"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.010"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.011"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.012"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialBasketball"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialBasketball"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.013"),
@@ -288,27 +294,27 @@ void GroundObject::render(const ViewParameters *view)
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.014"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialProjects"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialProjects"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.015"),
-            0);
+            0); */
 
         // m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
-        m_app->getEngine()->DrawModel(
+        /* m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.016"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.017"),
-            0);
+            0); */
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialLaundry"));
+        /* m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialLaundry"));
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.018"),
@@ -318,10 +324,10 @@ void GroundObject::render(const ViewParameters *view)
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.019"),
-            0);
+            0); */
 
         // m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialFiller"));
-        m_app->getEngine()->DrawModel(
+        /* m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.020"),
             0);
@@ -330,12 +336,12 @@ void GroundObject::render(const ViewParameters *view)
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city.021"),
-            0);
+            0); */
     }
 
     if (m_app->getSelectedTrack() == 3)
     {
-
+        DBG;
         /*
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
@@ -344,9 +350,14 @@ void GroundObject::render(const ViewParameters *view)
 
         float size = 36.0f;
         float scale2 = 10.0f * scale;
+        
+        DBG;
+
+
 
         // ROUND
-        for (int i = 0; i < 360; i += 10)
+        //for (int i = 0; i < 360; i += 10)
+        if(false)
         {
             m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("Cone"));
 
@@ -377,6 +388,8 @@ void GroundObject::render(const ViewParameters *view)
                 m_app->getAssetManager()->GetModelAsset("cone"),
                 0);
         }
+
+        DBG;
 
         for (float x = -36.0f * 40; x < 4000.0f; x += size)
         {
@@ -583,12 +596,13 @@ void GroundObject::render(const ViewParameters *view)
                     0);
             }*/
         }
+        DBG;
     }
 
     // Track Garda
     if (m_app->getSelectedTrack() == 4)
     {
-
+        DBG;
         setTransform(
             &m_body,
 
@@ -647,9 +661,10 @@ void GroundObject::render(const ViewParameters *view)
 
     if (m_app->getSelectedTrack() == 4)
     {
+        DBG;
         scale *= 10.0f;
 
-        m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialCity2"));
+        //m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialCity2"));
 
         setTransform(
             &m_body,
@@ -666,7 +681,7 @@ void GroundObject::render(const ViewParameters *view)
             0.0f * ysMath::Constants::PI,
             0.0f * ysMath::Constants::PI);
 
-        // if(false)
+        if(false)
         m_app->getEngine()->DrawModel(
             m_app->getShaders()->GetRegularFlags(),
             m_app->getAssetManager()->GetModelAsset("city2"),

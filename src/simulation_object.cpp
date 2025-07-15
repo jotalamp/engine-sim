@@ -54,6 +54,7 @@ Piston *SimulationObject::getForemostPiston(CylinderBank *bank, int layer) {
 }
 
 void SimulationObject::resetShader() {
+    DBG;
     m_app->getShaders()->ResetBaseColor();
     m_app->getShaders()->SetObjectTransform(ysMath::LoadIdentity());
 }

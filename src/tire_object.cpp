@@ -173,20 +173,28 @@ void TireObject::updateDrive()
 
 void TireObject::render(const ViewParameters *view)
 {
-
+    DBG;
     resetShader();
+    DBG;
 
     //b2ShapeDef *fixture = m_body->GetFixtureList();
-    b2ShapeId* shapes = {};
-    b2Body_GetShapes(m_body, shapes, b2Body_GetShapeCount(m_body));
-    b2Polygon poly = b2Shape_GetPolygon(shapes[0]);
+    b2ShapeId* shapes;
+    DBG;
+    if(b2Body_IsValid(m_body)==false) D("Invalid body!");
+    DBG;
+    //b2Body_GetTransform(m_body);
+    //b2Body_GetShapes(m_body, shapes, 1/*b2Body_GetShapeCount(m_body)*/);
+    DBG;
+    //b2Polygon poly = b2Shape_GetPolygon(shapes[0]);
     //(b2Polygon *)fixture->GetShape();
     b2Vec2 position1 = b2Body_GetPosition(m_body);
     //m_body->GetPosition();
-    b2Vec2 size = 2.0f * poly.vertices[0];
+    //b2Vec2 size = 2.0f * poly.vertices[0];
+    b2Vec2 size = {1,1};
     float angle = b2Body_GetRotation(m_body).c;
     //m_body->GetAngle();
 
+    DBG;
     m_app->getShaders()->UseMaterial(m_app->getAssetManager()->FindMaterial("MaterialWhite"));
 
     // Top down
@@ -205,6 +213,8 @@ void TireObject::render(const ViewParameters *view)
         0.0f,
         -angle,
         0.0f);
+
+    DBG;
 
     // Side
     /*
@@ -230,8 +240,12 @@ void TireObject::render(const ViewParameters *view)
             m_app->getAssetManager()->GetModelAsset("DebugCube"),
             0);
 
+    DBG;
+
     float scale = 0.6f;
     double speedfactor = m_app->getSimulator()->getSimulationSpeed();
+
+    DBG;
 
     if (position_x > 0.58f)
         position_x = -0.58f;
@@ -255,7 +269,7 @@ void TireObject::render(const ViewParameters *view)
     // transform.SetPosition(ysMath::LoadVector(0.0f, -(float)p_y, (float)p_x, 0.0f));
 
     transform.SetPosition(ysMath::LoadVector((float)p_x, m_height, (float)p_y, 0.0f));
-
+    DBG;
     m_app->getShaders()->SetObjectTransform(transform.GetWorldTransform());
 
     ///////////
