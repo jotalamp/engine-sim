@@ -124,6 +124,7 @@ add_library(engine-sim STATIC
     src/part.cpp
     src/piston.cpp
     src/piston_engine_simulator.cpp
+    src/settings.cpp
     src/simulator.cpp
     src/standard_valvetrain.cpp
     src/starter_motor.cpp
@@ -169,6 +170,7 @@ add_library(engine-sim STATIC
     include/part.h
     include/piston.h
     include/piston_engine_simulator.h
+    include/settings.h
     include/simulator.h
     include/standard_valvetrain.h
     include/starter_motor.h
@@ -267,6 +269,7 @@ add_executable(engine-sim-app WIN32
     src/ui_utilities.cpp
     src/combustion_chamber_object.cpp
     src/oscilloscope.cpp
+    src/settings.cpp
     src/shaders.cpp
     src/engine_view.cpp
     src/right_gauge_cluster.cpp
@@ -307,6 +310,7 @@ add_executable(engine-sim-app WIN32
     include/ui_utilities.h
     include/combustion_chamber_object.h
     include/oscilloscope.h
+    include/settings.h
     include/shaders.h
     include/engine_view.h
     include/right_gauge_cluster.h

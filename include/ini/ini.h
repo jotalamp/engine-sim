@@ -71,7 +71,7 @@ inline static char* find_chars_or_comment(const char* s, const char* chars) {
 /* Version of strncpy that ensures dest (size bytes) is null-terminated. */
 inline static char* strncpy0(char* dest, const char* src, size_t size) {
     //strncpy_s(dest, size - 1, src, size - 1);
-    strcpy_s(dest, size - 1, src);
+    strncpy(dest, src, size - 1);
     dest[size - 1] = '\0';
     return dest;
 }

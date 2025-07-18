@@ -18,6 +18,7 @@
 
 #if ATG_ENGINE_SIM_DISCORD_ENABLED
 #include "../discord/Discord.h"
+#include "engine_sim_application.h"
 #endif
 
 std::string EngineSimApplication::s_buildVersion = " 3DW.0.24.11.13";
@@ -111,14 +112,15 @@ void EngineSimApplication::initialize(void *instance, ysContextObject::DeviceAPI
 
     m_previousPosition = ysMath::LoadVector();
 
-    m_iniReader = inih::INIReader{"../settings.ini"};
+    m_settings = Settings();
+    // m_iniReader = inih::INIReader{"../settings.ini"};
 
     dbasic::Path modulePath = dbasic::GetModulePath();
     dbasic::Path confPath = modulePath.Append("delta.conf");
 
     std::string enginePath = "../dependencies/submodules/delta-studio/engines/basic";
     m_assetPath = "../assets";
-    //m_assetPath = "";
+    // m_assetPath = "";
     if (confPath.Exists())
     {
         std::fstream confFile(confPath.ToString(), std::ios::in);
@@ -145,8 +147,8 @@ void EngineSimApplication::initialize(void *instance, ysContextObject::DeviceAPI
     settings.WindowPositionX = 0;
     settings.WindowPositionY = 0;
     settings.WindowStyle = ysWindow::WindowStyle::Windowed;
-    settings.WindowWidth = 1920;
-    settings.WindowHeight = 1080;
+    settings.WindowWidth = m_settings.screenWidth;
+    settings.WindowHeight = m_settings.screenHeight;
 
     m_engine.CreateGameWindow(settings);
 
@@ -198,6 +200,7 @@ void EngineSimApplication::loadMaterial(std::string filename, std::string name)
 
 void EngineSimApplication::loadModel(std::string filename, float scale)
 {
+    D(filename);
     std::string path = "/models/";
     m_assetManager.CompileInterchangeFile((m_assetPath + path + filename).c_str(), scale, true);
     m_assetManager.LoadSceneFile((m_assetPath + path + filename).c_str(), true);
@@ -221,22 +224,25 @@ void EngineSimApplication::initialize()
 
     // jbeam_json = data;
 
-    // j_Controller = Joystick(1);
+    // j_Controller = Joystick(1); 
+    DBG;
+    m_settings = Settings();
+    DBG;
 
     m_camera.target = ysVector3(0.0f, 0.0f, 0.0f);
 
-    m_show_engine = m_iniReader.Get<bool>("Settings", "ShowEngine");
-    m_show_engine2 = m_iniReader.Get<bool>("Settings", "ShowEngine2");
-    m_show_track = m_iniReader.Get<bool>("Settings", "ShowTrack");
+    m_show_engine = m_settings.showEngine;
+    m_show_engine2 = m_settings.showEngine;
+    m_show_track = m_settings.showTrack;
+    m_show_engine_only = m_settings.showEngineOnly;
 
-    m_show_engine_only = m_iniReader.Get<bool>("Settings", "ShowEngineOnly");
-
-    float m_engineModelScale = m_iniReader.Get<float>("Engine", "ModelScale");
+    float m_engineModelScale = m_settings.engineModelScale;
 
     m_camera.target = ysVector3(0 * 2.5f * m_cylinderDifferenceZ, 0.0f, 0.1f * m_cylinderDifferenceZ);
 
-    m_selected_track = m_iniReader.Get<int>("Settings", "SelectedTrack");
+    m_selected_track = m_settings.selectedTrack;
     printf("\nSelected Track: %i", m_selected_track);
+    DBG;
 
     if (m_show_engine_only)
     {
@@ -244,18 +250,19 @@ void EngineSimApplication::initialize()
     }
     else
     {
-        m_camera.zoom = m_iniReader.Get<float>("Camera", "Zoom");
+        m_camera.zoom = m_settings.cameraZoom;
         printf("\nZoom: %f", m_camera.zoom);
     }
+    DBG;
 
-    m_camera.fovY = m_iniReader.Get<float>("Camera", "FovY");
+    m_camera.fovY = m_settings.cameraFovY;
     int j = 0;
     printf("\nFovY: %f", m_camera.fovY);
     m_camera.fovY *= (ysMath::Constants::PI / 180.0f);
     m_camera.rotation = ysVector2(0 * 0.5f * ysMath::Constants::PI, 0.5f * ysMath::Constants::PI);
     m_shaders.SetClearColor(ysColor::srgbiToLinear(0x34, 0x98, 0xdb));
-    // Define the gravity vector.
-    // Top down
+
+    DBG;
 
     // Construct a world object, which will hold and simulate the rigid bodies.
     b2WorldDef worldDef = b2DefaultWorldDef();
@@ -263,17 +270,22 @@ void EngineSimApplication::initialize()
     b2WorldId worldId = b2CreateWorld(&worldDef);
     m_world = worldId;
 
-    float trackScale = getIniReader().Get<float>("Track", "Scale");
-    std::string selectedVehicleModelFileName = getIniReader().Get<std::string>("SelectedVehicle", "Name");
+    DBG;
 
-    std::string vehicleModelFileName = getIniReader().Get<std::string>(selectedVehicleModelFileName, "ModelFileName");
-    float vehicleScale = getIniReader().Get<float>(selectedVehicleModelFileName, "Scale");
+    float trackScale = getSettings().trackScale;
+    std::string selectedVehicleModelFileName = getSettings().selectedVehicleModelFileName;
+
+    std::string vehicleModelFileName = getSettings().selectedVehicleModelFileName;
+    float vehicleScale = getSettings().selectedVehicleScale;
 
     m_assetManager.CompileInterchangeFile((m_assetPath + "/assets").c_str(), 1.0f, true);
 
     m_assetManager.LoadSceneFile((m_assetPath + "/assets").c_str(), true);
 
+    DBG;
+
     loadModel(vehicleModelFileName, vehicleScale);
+    DBG;
     loadModel("ConnectingRodLong", m_engineModelScale);
     loadModel("Piston_2JZ_GE", m_engineModelScale);
     loadModel("Rod_2JZ_GE", m_engineModelScale);
@@ -291,7 +303,8 @@ void EngineSimApplication::initialize()
 
     loadMaterial("palette.png", "Palette");
 
-    std::vector<std::string> textureNames = getIniReader().GetVector<std::string>(selectedVehicleModelFileName, "Textures");
+    DBG;
+
     std::string textureFolder = "trueno";
 
     dbasic::TextureAsset *textureAsset;
@@ -305,6 +318,8 @@ void EngineSimApplication::initialize()
     loadMaterial("garda/material.jpg", "MaterialMat");
     loadMaterial("garda/italian.jpg", "MaterialItalian");
     loadMaterial("garda/parking.jpg", "MaterialParking");
+
+    DBG;
 
     D("Material white");
     dbasic::Material *material_01 = m_assetManager.NewMaterial();
@@ -336,9 +351,9 @@ void EngineSimApplication::initialize()
     D("Materials loaded");
     D("texture names");
 
-    for (std::vector<std::string>::size_type i = 0; i != textureNames.size(); i++)
+    for (std::vector<std::string>::size_type i = 0; i != m_settings.selectedVehicleTextureFileNames.size(); i++)
     {
-        std::string textureName = textureNames[i];
+        std::string textureName = m_settings.selectedVehicleTextureFileNames[i];
         m_assetManager.LoadTexture(("../assets/textures/" + textureFolder + "/" + textureName).c_str(), ("Texture_" + textureName).c_str());
         textureAsset = m_assetManager.GetTexture(("Texture_" + textureName).c_str());
         material = m_assetManager.NewMaterial();
@@ -369,9 +384,9 @@ void EngineSimApplication::initialize()
 
     D("audio source");
     m_audioSource = m_engine.GetAudioDevice()->CreateSource(m_outputAudioBuffer);
-     m_audioSource->SetMode((m_simulator->getEngine() != nullptr)
+    m_audioSource->SetMode((m_simulator->getEngine() != nullptr)
                                ? ysAudioSource::Mode::Loop
-                               : ysAudioSource::Mode::Stop); 
+                               : ysAudioSource::Mode::Stop);
     m_audioSource->SetPan(0.0f);
     m_audioSource->SetVolume(1.0f);
 
@@ -391,8 +406,8 @@ void EngineSimApplication::initialize()
     GetDiscordManager()->SetStatus(passMe, engineName, s_buildVersion);
 #endif /* ATG_ENGINE_SIM_DISCORD_ENABLED */
 
-    //D("fullscreen");
-    //m_engine.GetGameWindow()->SetWindowStyle(ysWindow::WindowStyle::Fullscreen);
+    // D("fullscreen");
+    // m_engine.GetGameWindow()->SetWindowStyle(ysWindow::WindowStyle::Fullscreen);
 }
 
 void EngineSimApplication::process(float frame_dt)
@@ -452,7 +467,7 @@ void EngineSimApplication::process(float frame_dt)
     const double avgFramerate = clamp(m_engine.GetAverageFramerate(), 30.0f, 1000.0f);
     m_simulator->startFrame(1 / avgFramerate);
 
-    //m_world->Step((float)(speed * frame_dt), velocityIterations, positionIterations);
+    // m_world->Step((float)(speed * frame_dt), velocityIterations, positionIterations);
     b2World_Step(m_world, (float)(speed * frame_dt), velocityIterations);
 
     m_vehicle_object->process((float)(speed * frame_dt));
@@ -703,6 +718,11 @@ void EngineSimApplication::destroy()
     SDL_Quit();
 }
 
+Settings EngineSimApplication::getSettings() const
+{
+    return m_settings;
+}
+
 void EngineSimApplication::loadEngine(
     Engine *engine,
     Vehicle *vehicle,
@@ -793,7 +813,7 @@ void EngineSimApplication::loadEngine(
     D("star audio rendering thread");
     m_simulator->startAudioRenderingThread();
 
-    //m_simulator->setSimulationFrequency((int)engine->getSimulationFrequency() / 2);
+    // m_simulator->setSimulationFrequency((int)engine->getSimulationFrequency() / 2);
 }
 
 void EngineSimApplication::drawGenerated(
@@ -928,7 +948,7 @@ void EngineSimApplication::createObjects(Engine *engine)
             cbObject->m_bank->m_dz = 0.09f * bankIndex * 0.25f * getCylinderDifferenceZ();
     }
 
-    m_cylinderDifferenceZ = m_iniReader.Get<float>("Engine", "CylinderDifferenceZ");
+    m_cylinderDifferenceZ = m_settings.cylinderDifferenceZ;
     m_cylinderDifferenceZ *= (float)engine->getHead(0)->getCylinderBank()->getBore();
 
     engine->setEngineType();
@@ -957,7 +977,7 @@ void EngineSimApplication::loadScript()
     Vehicle *vehicle = nullptr;
     Transmission *transmission = nullptr;
 
-    #ifdef ATG_ENGINE_SIM_PIRANHA_ENABLED
+#ifdef ATG_ENGINE_SIM_PIRANHA_ENABLED
     D("piranha");
     es_script::Compiler compiler;
     compiler.initialize();
@@ -979,7 +999,7 @@ void EngineSimApplication::loadScript()
     }
 
     compiler.destroy();
-    #endif /* ATG_ENGINE_SIM_PIRANHA_ENABLED */
+#endif /* ATG_ENGINE_SIM_PIRANHA_ENABLED */
 
     if (vehicle == nullptr)
     {
@@ -1045,7 +1065,7 @@ void EngineSimApplication::processEngineInput()
 
     // j_Controller.Update();
 
-    //float speed;
+    // float speed;
     float steeringAngle = m_vehicle->getSteeringAngle();
 
     if (m_engine.IsKeyDown(ysKey::Code::Left))

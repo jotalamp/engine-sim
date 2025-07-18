@@ -1,8 +1,9 @@
 #ifndef ATG_ENGINE_SIM_UTILITIES_H
 #define ATG_ENGINE_SIM_UTILITIES_H
 
-#define DBG std::cout << "[" << __FUNCTION__ << ":" << __LINE__ << "]\n";
-#define D(s) std::cout << "[" << __FUNCTION__ << ":" << __LINE__ << "]\t" << s << std::endl;
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define DBG std::cout << "[" << __FILENAME__ << ":" << __LINE__ << "]\n";
+#define D(s) std::cout << "[" << __FILENAME__ << ":" << __LINE__ << "]\t" << s << std::endl;
 
 double modularDistance(double a, double b, double mod = 1.0);
 double positiveMod(double x, double mod);

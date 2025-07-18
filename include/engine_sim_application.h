@@ -34,6 +34,7 @@
 #include "info_cluster.h"
 #include "application_settings.h"
 #include "transmission.h"
+#include "settings.h"
 
 #include "delta.h"
 #include "dtv.h"
@@ -41,7 +42,6 @@
 #include <fstream>
 #include "nlohmann/json.hpp"
 
-#include "ini/ini.h"
 #include "../dependencies/submodules/box2d/include/box2d/box2d.h"
 #include "vehicle_object.h"
 #include "ground_object.h"
@@ -85,6 +85,7 @@ public:
     void run();
     void destroy();
 
+    Settings getSettings() const;
     void loadEngine(Engine *engine, Vehicle *vehicle, Transmission *transmission);
     void drawGenerated(
         const GeometryGenerator::GeometryIndices &indices,
@@ -130,8 +131,6 @@ public:
     Simulator *getSimulator() { return m_simulator; }
     InfoCluster *getInfoCluster() { return m_infoCluster; }
     ApplicationSettings *getAppSettings() { return &m_applicationSettings; }
-
-    inih::INIReader getIniReader() { return m_iniReader; }
 
     float getCylinderDifferenceZ() { return m_cylinderDifferenceZ; }
 
@@ -266,8 +265,6 @@ protected:
     };
     Controller m_controller;
 
-    inih::INIReader m_iniReader;
-
     Camera m_camera;
 
     ysVector2 m_dragStartMousePosition;
@@ -286,6 +283,7 @@ protected:
     VehicleObject *m_vehicle_object;
     ysVector m_previousPosition;
     ysVector m_previousPosition2;
+    Settings m_settings;
 
     // Joystick j_Controller;
 

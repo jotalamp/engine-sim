@@ -21,12 +21,12 @@ VehicleObject::VehicleObject(EngineSimApplication* app, Vehicle* vehicle)
 	m_previousPosition = ysMath::LoadVector();
 
     DBG;
-	m_selected_vehicle_name = m_app->getIniReader().Get<std::string>("SelectedVehicle", "Name");
+	m_selected_vehicle_name = m_app->getSettings().selectedVehicleName;
 	//m_selected_vehicle_name = "Vehicle";
 
     DBG;
-	m_mesh_names = m_app->getIniReader().GetVector<std::string>(m_selected_vehicle_name, "Meshes");
-	m_material_names = m_app->getIniReader().GetVector<std::string>(m_selected_vehicle_name, "Materials");
+	m_mesh_names = m_app->getSettings().selectedVehicleMeshNames;
+	m_material_names = m_app->getSettings().selectedVehicleMaterialNames;
 
     DBG;
 	for (std::vector<std::string>::size_type i = 0; i != m_mesh_names.size(); i++)
@@ -39,7 +39,7 @@ VehicleObject::VehicleObject(EngineSimApplication* app, Vehicle* vehicle)
 	vehicleModel.height = -0.48f;
 
     DBG;
-	std::vector<float> tirePosition = m_app->getIniReader().GetVector<float>(m_selected_vehicle_name, "TirePositions");
+	std::vector<float> tirePosition = m_app->getSettings().selectedVehicleTirePositions;
 	vehicleModel.tireX = tirePosition[1];
 	vehicleModel.tireY = tirePosition[0];
 	vehicleModel.tireFrontZ = tirePosition[2];
@@ -56,11 +56,11 @@ VehicleObject::VehicleObject(EngineSimApplication* app, Vehicle* vehicle)
     DBG;
 	m_vehicle_model = vehicleModel;
 
-	m_vehicle_model.scale = m_app->getIniReader().Get<float>(m_selected_vehicle_name, "Scale");
+	m_vehicle_model.scale = m_app->getSettings().selectedVehicleScale;
 
 	m_vehicle_model.transformEngine.SetParent(&m_transform);
 
-	m_modelRotation = m_app->getIniReader().GetVector<float>(m_selected_vehicle_name, "ModelRotation");
+	m_modelRotation = m_app->getSettings().selectedVehicleModelRotation;
 
     DBG;
 
@@ -82,8 +82,8 @@ VehicleObject::VehicleObject(EngineSimApplication* app, Vehicle* vehicle)
 
     DBG;
 
-	m_engineModelRotation = m_app->getIniReader().GetVector<float>(m_selected_vehicle_name, "EngineModelRotation");
-	m_engineModelPosition = m_app->getIniReader().GetVector<float>(m_selected_vehicle_name, "EngineModelPosition");
+	m_engineModelRotation = m_app->getSettings().selectedVehicleEngineModelRotation;
+	m_engineModelPosition = m_app->getSettings().selectedVehicleEngineModelRotation;
 
     DBG;
 
@@ -118,10 +118,11 @@ VehicleObject::VehicleObject(EngineSimApplication* app, Vehicle* vehicle)
     shapeDef.density = 25.0f;
     DBG;
     shapeDef.material.friction = 0.001f;
-    DBG;
+    
+	DBG;
 
     // Add the shape to the body.
-    b2CreatePolygonShape(m_body, &shapeDef, &dynamicBox);
+    //b2CreatePolygonShape(m_body, &shapeDef, &dynamicBox);
     DBG;
 
     m_body = bodyId;

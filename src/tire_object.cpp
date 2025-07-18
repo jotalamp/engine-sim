@@ -11,9 +11,9 @@ TireObject::TireObject(EngineSimApplication *app, Vehicle *vehicle, std::string 
 
     m_height = height;
 
-    m_mesh_names = m_app->getIniReader().GetVector<std::string>(selectedVehicleName, "TireMeshes");
-    m_material_names = m_app->getIniReader().GetVector<std::string>(selectedVehicleName, "TireMaterials");
-    m_modelRotation = m_app->getIniReader().GetVector<float>(selectedVehicleName, "TireModelRotation");
+    m_mesh_names = app->getSettings().tireMeshes;
+    m_material_names = m_app->getSettings().tireMaterials;
+    m_modelRotation = m_app->getSettings().tireModelRotation;
 
     ysQuaternion qx = ysMath::LoadQuaternion(m_modelRotation[0] * ysMath::Constants::PI, ysMath::Constants::XAxis);
     ysQuaternion qy = ysMath::LoadQuaternion(m_modelRotation[1] * ysMath::Constants::PI, ysMath::Constants::YAxis);
